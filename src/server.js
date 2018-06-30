@@ -1,11 +1,12 @@
-// import app from './config/express';
-// import { debugInfo } from './common/debugInfo';
 
-// const port = process.env.PORT || '3000';
-
-// app.listen(port, (err) => {
-//     if (err) {
-//         debugInfo(err);
-//     }
-// });
+var SerialPort = require('serialport');
+var port = new SerialPort('/dev/ttyUSB0', {
+  baudRate: 115200
+});
 console.log('hello');
+port.on('open', function() {
+    console.log('opening the port');
+});
+port.on('data', function (data) {
+    console.log('Data:', new Buffer(data).toString('ascii'));
+});
