@@ -1,14 +1,15 @@
 {
-    "name": "channel-9-web-api-coding-challenge",
+    "name": "drone.js",
     "version": "1.0.0",
-    "description": "channel 9 Web Api Coding Challenge",
+    "description": "",
     "author": "Mark Saravi",
     "license": "ISC",
     "scripts": {
         "clean": "rm -rf dist && mkdir dist",
         "build": "npm run clean && babel -d ./dist ./src",
         "prodserver": "node ./dist/server.js",
-        "start": "export NODE_ENV=production && npm run build && npm run prodserver",
+        "start": "node ./src/drone.js",
+        "buildstart": "export NODE_ENV=production && npm run build && npm run prodserver",
         "devserver": "npm-run-all --parallel test rundev lint",
         "rundev": "export NODE_ENV=development && babel-node src/server.js",
         "lint": "node_modules/.bin/esw src",
