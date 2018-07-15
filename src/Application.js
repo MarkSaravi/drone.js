@@ -2,15 +2,15 @@ module.exports.CreateApplication = function (eventHandler) {
     let imuIsOpen = false;
     process.stdin.setEncoding('utf8');
 
-    eventHandler.on('imu-data', (r) => {
-        console.log(`roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
+    process.on('imu-data', (r) => {
+        console.log(`Process: roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
     });
 
-    eventHandler.on('imu-connected', () => {
+    process.on('imu-connected', () => {
         imuIsOpen = true;
     });
 
-    eventHandler.on('imu-disconnected', () => {
+    process.on('imu-disconnected', () => {
         imuIsOpen = false;
         exitApplication();
     });
@@ -24,7 +24,7 @@ module.exports.CreateApplication = function (eventHandler) {
         process.stdin.on('readable', () => {
             const chunk = process.stdin.read();
             if (chunk !== null && chunk === '\n') {
-                eventHandler.emit('stop-application');
+                process.emit('stop-application');
             }
         });
     }

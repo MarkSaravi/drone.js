@@ -1,4 +1,4 @@
-module.exports.CreateImuDevice = function (devicesInfo, eventHandler) {
+module.exports.CreateImuDevice = function (devicesInfo) {
     const SerialPort = require('serialport');
 
     const imuPort = new SerialPort(devicesInfo.imuPort, {
@@ -7,15 +7,15 @@ module.exports.CreateImuDevice = function (devicesInfo, eventHandler) {
 
     imuPort.on('open', () => {
         console.log(`${devicesInfo.imuPort} is connected.`);
-        eventHandler.emit('imu-connected');
+        process.emit('imu-connected');
     });
 
     imuPort.on('close', () => {
         console.log(`${devicesInfo.imuPort} is disconnected.`);
-        eventHandler.emit('imu-disconnected');
+        process.emit('imu-disconnected');
     });
 
-    eventHandler.on('stop-application', () =>{
+    process.on('stop-application', () =>{
         imuPort.close();
     });
 
@@ -26,7 +26,7 @@ module.exports.CreateImuDevice = function (devicesInfo, eventHandler) {
                 try {
                     let r = JSON.parse(new Buffer(buffer).toString('ascii'));
                     //console.log(`In IMU: ${r.roll}, ${r.pitch}, ${r.yaw}, ${r.dt}`);
-                    eventHandler.emit('imu-data', r);
+                    process.emit('imu-data', r);
                 } catch (ex) {
                 }
                 buffer = [];
