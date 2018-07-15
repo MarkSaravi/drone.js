@@ -2,7 +2,7 @@ module.exports.CreateApplication = function (eventHandler) {
     let imuIsOpen = false;
     process.stdin.setEncoding('utf8');
 
-    eventHandler.on('imudata', (r) => {
+    eventHandler.on('imu-data', (r) => {
         console.log(`roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
     });
 

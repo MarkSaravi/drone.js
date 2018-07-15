@@ -26,7 +26,7 @@ module.exports.CreateImuDevice = function (devicesInfo, eventHandler) {
                 try {
                     let r = JSON.parse(new Buffer(buffer).toString('ascii'));
                     //console.log(`In IMU: ${r.roll}, ${r.pitch}, ${r.yaw}, ${r.dt}`);
-                    eventHandler.emit('imudata', r);
+                    eventHandler.emit('imu-data', r);
                 } catch (ex) {
                 }
                 buffer = [];
