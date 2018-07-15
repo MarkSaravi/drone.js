@@ -1,4 +1,4 @@
-module.exports.CreateImuDevice = function (devicesInfo) {
+module.exports.CreateImuDevice = function (devicesInfo, eventHandler) {
     const SerialPort = require('serialport');
 
     const imuPort = new SerialPort(devicesInfo.imuPort, {
@@ -7,47 +7,34 @@ module.exports.CreateImuDevice = function (devicesInfo) {
 
     imuPort.on('open', () => {
         console.log(`${devicesInfo.imuPort} is connected.`);
+        eventHandler.emit('imu-connected');
     });
 
     imuPort.on('close', () => {
         console.log(`${devicesInfo.imuPort} is disconnected.`);
+        eventHandler.emit('imu-disconnected');
     });
 
-    function closeDevice() {
+    eventHandler.on('stop-application', () =>{
         imuPort.close();
-    }
+    });
 
-    function registerDataEvent(callBack) {
-        let buffer = [];
-        let counter = 0;
-        imuPort.on('data', function (data) {
-            for (let b of data) {
-                if (b === 10) {
-                    try {
-                        let r = JSON.parse(new Buffer(buffer).toString('ascii'));
-                        console.log(`In IMU: ${r.roll}, ${r.pitch}, ${r.yaw}, ${r.dt}`);
-                        callBack(r);
-                    } catch (ex) {
-                    }
-                    buffer = [];
-                    if (counter++ === 100) {
-                        console.log('-------------------------------------------------');
-                        counter = 0;
-                    }
-                } else {
-                    buffer.push(b);
+    let buffer = [];
+    imuPort.on('data', function (data) {
+        for (let b of data) {
+            if (b === 10) {
+                try {
+                    let r = JSON.parse(new Buffer(buffer).toString('ascii'));
+                    //console.log(`In IMU: ${r.roll}, ${r.pitch}, ${r.yaw}, ${r.dt}`);
+                    eventHandler.emit('imudata', r);
+                } catch (ex) {
                 }
-
+                buffer = [];
+            } else {
+                buffer.push(b);
             }
-        });
-    }
 
-    return {
-        get isOpen() {
-            return imuPort.isOpen;
-        },
-        closeDevice,
-        registerDataEvent
-    }
+        }
+    });
 }
 

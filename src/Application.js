@@ -1,22 +1,22 @@
-module.exports.CreateApplication = function (imuDevice) {
-    const EventEmitter = require('events');
-
-    class EventHandler extends EventEmitter { }
-
-    const eventHandler = new EventHandler();
+module.exports.CreateApplication = function (eventHandler) {
+    let imuIsOpen = false;
     process.stdin.setEncoding('utf8');
 
     eventHandler.on('imudata', (r) => {
-        console.log(`In Application: ${r.roll}, ${r.pitch}, ${r.yaw}, ${r.dt}`);
+        console.log(`roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
     });
 
-    function exit() {
-        console.log('Checking for termination...');
-        if (imuDevice.isOpen) {
-            console.log('Not ready for termination.');
-            return;
-        }
-        console.log('Application is terminated.');
+    eventHandler.on('imu-connected', () => {
+        imuIsOpen = true;
+    });
+
+    eventHandler.on('imu-disconnected', () => {
+        imuIsOpen = false;
+        exitApplication();
+    });
+
+    function exitApplication() {
+        if (imuIsOpen) return;
         process.exit();
     }
 
@@ -24,19 +24,12 @@ module.exports.CreateApplication = function (imuDevice) {
         process.stdin.on('readable', () => {
             const chunk = process.stdin.read();
             if (chunk !== null && chunk === '\n') {
-                imuDevice.closeDevice();
-                setInterval(exit, 100);
+                eventHandler.emit('stop-application');
             }
         });
     }
 
-    process.stdin.on('end', () => {
-        //process.stdout.write('end');
-    });
     return {
-        start,
-        imuData: function(r) {
-            eventHandler.emit('imudata', r);
-        }
+        start
     };
 }
