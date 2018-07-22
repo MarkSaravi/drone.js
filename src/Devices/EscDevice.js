@@ -1,4 +1,4 @@
-module.exports.CreateEscDevice = function (devicesInfo) {
+module.exports.CreateDevice = function (devicesInfo) {
     const SerialPort = require('serialport');
 
     const escPort = new SerialPort(devicesInfo.escPort, {
@@ -20,6 +20,7 @@ module.exports.CreateEscDevice = function (devicesInfo) {
     });
 
     process.on('esc-data', function (data) {
+        console.log(data + '\n');
         escPort.write(data, function (err) {
             if (err) {
                 return console.log('Error on ESC write: ', err.message);

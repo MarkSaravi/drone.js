@@ -1,5 +1,6 @@
 module.exports.CreateApplication = function () {
     let imuIsOpen = false;
+    let escIsOpen = false;
     process.stdin.setEncoding('utf8');
 
     process.on('imu-data', (r) => {
@@ -15,8 +16,17 @@ module.exports.CreateApplication = function () {
         exitApplication();
     });
 
+    process.on('esc-connected', () => {
+        escIsOpen = true;
+    });
+
+    process.on('esc-disconnected', () => {
+        escIsOpen = false;
+        exitApplication();
+    });
+
     function exitApplication() {
-        if (imuIsOpen) return;
+        if (imuIsOpen || escIsOpen) return;
         process.exit();
     }
 
@@ -25,6 +35,8 @@ module.exports.CreateApplication = function () {
             const chunk = process.stdin.read();
             if (chunk !== null && chunk === '\n') {
                 process.emit('stop-application');
+            } else if (chunk !== null && chunk.length >= 2) {
+                process.emit('esc-data', chunk);
             }
         });
     }
