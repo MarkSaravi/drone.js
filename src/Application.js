@@ -1,4 +1,4 @@
-module.exports.CreateApplication = function (eventHandler) {
+module.exports.CreateApplication = function () {
     let imuIsOpen = false;
     process.stdin.setEncoding('utf8');
 

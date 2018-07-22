@@ -1,4 +1,4 @@
-module.exports.CreateImuDevice = function (devicesInfo) {
+module.exports.CreateDevice = function (devicesInfo) {
     const SerialPort = require('serialport');
 
     const imuPort = new SerialPort(devicesInfo.imuPort, {
@@ -6,12 +6,12 @@ module.exports.CreateImuDevice = function (devicesInfo) {
     });
 
     imuPort.on('open', () => {
-        console.log(`${devicesInfo.imuPort} is connected.`);
+        console.log(`IMU (${devicesInfo.imuPort}) is connected.`);
         process.emit('imu-connected');
     });
 
     imuPort.on('close', () => {
-        console.log(`${devicesInfo.imuPort} is disconnected.`);
+        console.log(`ESC (${devicesInfo.imuPort}) is disconnected.`);
         process.emit('imu-disconnected');
     });
 
