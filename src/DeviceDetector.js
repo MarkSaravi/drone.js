@@ -7,12 +7,7 @@ const escBaudRate = 115200;
 const imuEnabled = false;
 const escEnabled = true;
 
-function printObj(obj) {
-    console.log(JSON.stringify(obj));
-}
-
-function findDevice(portNameBase, portIndex, baudRate, pattern, portType) {
-    const portName = portNameBase + portIndex;
+function findDevice(portName, baudRate, pattern, portType) {
     const SerialPort = require('serialport');
     let portFound = false;
     const port = new SerialPort(portName, {
@@ -23,7 +18,7 @@ function findDevice(portNameBase, portIndex, baudRate, pattern, portType) {
     });
     port.on('close', function () {
         console.log(`Port ${portName} is closed`);
-        process.emit('port-closed', {portName, baudRate, portType , portIndex, portFound})
+        process.emit('port-closed', portFound);
     });
 
     let buffer = [];
@@ -32,13 +27,14 @@ function findDevice(portNameBase, portIndex, baudRate, pattern, portType) {
         for (let b of data) {
             if (b === 10) {
                 let str = new Buffer(buffer).toString('ascii');
-                if (str.includes(pattern)) {
+                if (str.indexOf(pattern) >= 0) {
                     console.log(`Port ${portName} is ${portType}`);
                     portFound = true;
                     port.close();
                 } else {
                     counter++;
-                    if (counter == 3) {
+                    if (counter >= 3) {
+                        console.log('!!!! ', str, ' !!!!');
                         console.log(`Port ${portName} is not ${portType}`);
                         port.close();
                     }
@@ -50,15 +46,26 @@ function findDevice(portNameBase, portIndex, baudRate, pattern, portType) {
     });
 }
 
-function startDeviceFinder(portNameBase, baudRate, pattern, portType) {
-    findDevice(portNameBase, 0, baudRate, pattern, portType);
-    // process.on('port-closed', function (portInfo) {
-    //     console.log('***', `${printObj(portInfo)}`);
-    //     if (portInfo && !portInfo.portFound) {
-    //         findDevice(portNameBase, portInfo.portIndex + 1, baudRate, pattern, portType);
-    //     }
-    // });
-    // process.emit('port-closed', { portNameBase, portIndex: -1, portFound: false });
+function startDeviceFinder(portNameBase, baudRate, patterns) {
+    let patternIndex = 0;
+    let portIndex = -1;
+    let searching = true;
+    process.on('port-closed', function (portFound) {
+        //console.log('***', `${JSON.stringify(portInfo)}`);        
+        if (portFound) {
+            portIndex = 0;
+            patternIndex++;
+        } else {
+            portIndex++;
+        }
+        if (patternIndex == patterns.length) {
+            process.emit('device-finding-end');
+            return;
+        }
+        let portName = portNameBase + portIndex;
+        findDevice(portName, baudRate, patterns[patternIndex].pattern, patterns[patternIndex].portType);
+    });
+    process.emit('port-closed', false);
 }
 
 module.exports.startDeviceFinder = startDeviceFinder;

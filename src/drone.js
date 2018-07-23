@@ -8,4 +8,5 @@ const startDeviceFinder = require('./DeviceDetector.js').startDeviceFinder;
 // const app = require('./Application.js').CreateApplication();
 
 // app.start();
-startDeviceFinder('/dev/ttyUSB', 115200, 'roll', 'imu');
+startDeviceFinder('/dev/ttyUSB', 115200, [{ pattern: 'pitch', portType:'imu'},{ pattern: 'esc', portType:'esc'}]);
+//startDeviceFinder('/dev/ttyUSB', 115200, 'esc', 'esc');
