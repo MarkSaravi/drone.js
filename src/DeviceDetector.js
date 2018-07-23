@@ -11,7 +11,14 @@ function findDevice(portName, baudRate, pattern, portType) {
     const SerialPort = require('serialport');
     let portFound = false;
     const port = new SerialPort(portName, {
-        baudRate: baudRate
+        baudRate: baudRate,
+        autoOpen: false
+    });
+    port.open(function(err){
+        if (err) {
+            console.log(`Error: Can not open ${portName}`);
+            process.emit('port-closed', portFound);    
+        }
     });
     port.on('open', function () {
         console.log(`Listening to ${portName}`);
@@ -51,7 +58,7 @@ function startDeviceFinder(portNameBase, baudRate, patterns) {
     let portIndex = -1;
 
     process.on('port-closed', function (portFound) {
-        if (portFound) {
+        if (portFound || portIndex > 9) {
             portIndex = 0;
             patternIndex++;
         } else {
