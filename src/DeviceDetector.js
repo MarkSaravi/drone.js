@@ -35,6 +35,7 @@ function findDevice(portName, baudRate, pattern, portType) {
             if (b === 10) {
                 let str = new Buffer(buffer).toString('ascii');
                 if (str.indexOf(pattern) >= 0) {
+                    port.removeListener('data',()=>{});
                     console.log(`Port ${portName} is ${portType.toUpperCase()}`);
                     portsInfo[portType] = { portName, baudRate };
                     portFound = true;
@@ -42,8 +43,10 @@ function findDevice(portName, baudRate, pattern, portType) {
                 } else {
                     counter++;
                     if (counter >= 3) {
-                        console.log(`Port ${portName} is not ${portType.toUpperCase()}`);
+                        port.removeListener('data',()=>{});
+                        console.log(`Port ${portName} is not ${portType.toUpperCase()}`);                        
                         port.close();
+                        return;
                     }
                 }
             } else {
