@@ -1,17 +1,17 @@
-module.exports.CreateDevice = function (devicesInfo) {
+module.exports.CreateDevice = function (portName, baudRate) {
     const SerialPort = require('serialport');
 
-    const escPort = new SerialPort(devicesInfo.escPort, {
-        baudRate: devicesInfo.escBaudRate
+    const escPort = new SerialPort(portName, {
+        baudRate: baudRate
     });
 
     escPort.on('open', () => {
-        console.log(`ESC (${devicesInfo.escPort}) is connected.`);
+        console.log(`ESC (${portName}) is connected.`);
         process.emit('esc-connected');
     });
 
     escPort.on('close', () => {
-        console.log(`ESC (${devicesInfo.escPort}) is disconnected.`);
+        console.log(`ESC (${portName}) is disconnected.`);
         process.emit('esc-disconnected');
     });
 

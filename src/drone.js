@@ -1,12 +1,16 @@
 const startDeviceFinder = require('./DeviceDetector.js').startDeviceFinder;
-// if (devicesInfo.imuEnabled) {
-//     require('./Devices/ImuDevice.js').CreateDevice(devicesInfo);
-// }
-// if (devicesInfo.escEnabled) {
-//     require('./Devices/EscDevice.js').CreateDevice(devicesInfo);
-// }
-// const app = require('./Application.js').CreateApplication();
-
-// app.start();
 startDeviceFinder('/dev/ttyUSB', 115200, [{ pattern: 'pitch', portType:'imu'},{ pattern: 'esc', portType:'esc'}]);
-//startDeviceFinder('/dev/ttyUSB', 115200, 'esc', 'esc');
+process.on('device-finding-end', function(devicesInfo){
+    if (!devicesInfo.imu) {
+        console.log('Can not find IMU device');
+        process.exit();
+    }
+    if (!devicesInfo.esc) {
+        console.log('Can not find ESC device');
+        process.exit();
+    }
+    require('./Devices/ImuDevice.js').CreateDevice(devicesInfo.imu.portName, devicesInfo.imu.baudRate);
+    require('./Devices/EscDevice.js').CreateDevice(devicesInfo.esc.portName, devicesInfo.esc.baudRate);
+    const app = require('./Application.js').CreateApplication();
+    app.start();
+});

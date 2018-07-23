@@ -1,17 +1,17 @@
-module.exports.CreateDevice = function (devicesInfo) {
+module.exports.CreateDevice = function (portName, baudRate) {
     const SerialPort = require('serialport');
 
-    const imuPort = new SerialPort(devicesInfo.imuPort, {
-        baudRate: devicesInfo.imuBaudRate
+    const imuPort = new SerialPort(portName, {
+        baudRate: baudRate
     });
 
     imuPort.on('open', () => {
-        console.log(`IMU (${devicesInfo.imuPort}) is connected.`);
+        console.log(`IMU (${portName}) is connected.`);
         process.emit('imu-connected');
     });
 
     imuPort.on('close', () => {
-        console.log(`ESC (${devicesInfo.imuPort}) is disconnected.`);
+        console.log(`IMU (${portName}) is disconnected.`);
         process.emit('imu-disconnected');
     });
 
@@ -25,7 +25,6 @@ module.exports.CreateDevice = function (devicesInfo) {
             if (b === 10) {
                 try {
                     let r = JSON.parse(new Buffer(buffer).toString('ascii'));
-                    //console.log(`In IMU: ${r.roll}, ${r.pitch}, ${r.yaw}, ${r.dt}`);
                     process.emit('imu-data', r);
                 } catch (ex) {
                 }
