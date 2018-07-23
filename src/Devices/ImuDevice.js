@@ -33,7 +33,6 @@ module.exports.CreateDevice = function (devicesInfo) {
             } else {
                 buffer.push(b);
             }
-
         }
     });
 }
