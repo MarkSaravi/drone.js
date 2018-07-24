@@ -11,6 +11,7 @@ process.on('device-finding-end', function(devicesInfo){
     }
     require('./Devices/ImuDevice.js').CreateDevice(devicesInfo.imu.portName, devicesInfo.imu.baudRate);
     require('./Devices/EscDevice.js').CreateDevice(devicesInfo.esc.portName, devicesInfo.esc.baudRate);
+    require('./Devices/BleDevice.js').CreateDevice('/dev/serial0', devicesInfo.esc.baudRate);
     const app = require('./Application.js').CreateApplication();
     app.start();
 });

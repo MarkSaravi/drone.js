@@ -1,10 +1,11 @@
 module.exports.CreateApplication = function () {
     let imuIsOpen = false;
     let escIsOpen = false;
+    let bleIsOpen = false;
     process.stdin.setEncoding('utf8');
 
     process.on('imu-data', (r) => {
-        console.log(`Process: roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
+        //console.log(`Imu: roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
     });
 
     process.on('imu-connected', () => {
@@ -25,8 +26,23 @@ module.exports.CreateApplication = function () {
         exitApplication();
     });
 
+    process.on('ble-connected', () => {
+        bleIsOpen = true;
+    });
+
+    process.on('ble-disconnected', () => {
+        bleIsOpen = false;
+        exitApplication();
+    });
+
+    process.on('ble-data', (cmd) => {
+        console.log(`Command: ${cmd}`);
+    });
+
     function exitApplication() {
-        if (imuIsOpen || escIsOpen) return;
+        if (imuIsOpen || escIsOpen || bleIsOpen) {
+            return;
+        }
         process.exit();
     }
 
