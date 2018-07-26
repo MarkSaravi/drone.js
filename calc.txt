@@ -1,0 +1,20 @@
+let wb = 100;
+let g = 100;
+let Tr = 1.7 * g;
+let Tp = 1.5 * g;
+let Ty = 0.0 * g;
+
+let k1 = -Tp / 4 / wb;
+
+let w1 = wb + k1;
+let w3 = wb - k1;
+let w2 = Math.sqrt((2 * w1 * w1 + Ty - Tr + Tp) / 2);
+//console.log(w2);
+let k2 = w2 - wb;
+let w4 = Math.sqrt(w2 * w2 + Tr);
+//console.log(w4);
+console.log(`w1: ${w1}`);
+console.log(`w2: ${w2}`);
+console.log(`w3: ${w3}`);
+console.log(`w4: ${w4}`);
+console.log(Ty - w2 * w2 - w4 * w4 + w1 * w1 + w3 * w3);
