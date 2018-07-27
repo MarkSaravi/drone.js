@@ -6,6 +6,7 @@ export default class Application extends EventEmitter {
     constructor() {
         super();
     }
+
     greeting(name: String) {
         console.log(`Greeting ${name}`);
     }

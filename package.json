@@ -8,10 +8,11 @@
         "build-ts": "tsc",
         "clean": "rm -rf dist",
         "build": "npm run clean && npm run build-ts",
-        "start": "npm run build && node ./dist/drone.js"
+        "start": "node ./dist/drone.js"
     },
     "dependencies": {
         "@types/node": "^10.5.3",
+        "@types/serialport": "^6.0.4",
         "serialport": "6.2.1"
     },
     "devDependencies": {
