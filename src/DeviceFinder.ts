@@ -4,17 +4,24 @@ import { EventEmitter } from 'events';
 import SerialPort from 'serialport';
 
 export default class DeviceFinder extends EventEmitter {
-    portFound: boolean = false;
-    buffer: any[] = [];
-    tryCounter: number = 0;
-    serialport: SerialPort;
-
     constructor() {
         super();
     }
 
     findDevices(portName: string, baudRate: number, pattern: string, portType: string) {
-        this.serialport = new SerialPort(portName, {
+        this.on('port-closed',(portFound) => {
+            if (portFound) {
+                console.log(`${portName} is ${portType}`);
+            }
+        });
+        this.findDevice(portName, baudRate, pattern, portType);
+    }
+
+    findDevice(portName: string, baudRate: number, pattern: string, portType: string) {
+        let portFound: boolean = false;
+        let tryCounter = 0;
+        let buffer: any[] = [];
+        let serialport = new SerialPort(portName, {
             baudRate: baudRate,
             autoOpen: false
         });
@@ -22,45 +29,36 @@ export default class DeviceFinder extends EventEmitter {
         const onDataCallback = (data: any) => {
             for (let b of data) {
                 if (b == 10) {
-                    this.tryCounter++;
-                    let str = new Buffer(this.buffer).toString('ascii');
-                    this.portFound = str.indexOf(pattern) >= 0;
+                    tryCounter++;
+                    let str = new Buffer(buffer).toString('ascii');
+                    portFound = str.indexOf(pattern) >= 0;
                     console.log(str);
-                    if (this.portFound || this.tryCounter > 3) {
-                        this.serialport.removeListener('data', onDataCallback);
-                        this.serialport.close();
+                    if (portFound || tryCounter > 3) {
+                        serialport.removeListener('data', onDataCallback);
+                        serialport.close();
                         return;
                     }
-                    this.buffer = [];
+                    buffer = [];
                 } else {
-                    this.buffer.push(b);
+                    buffer.push(b);
                 }
             }
         }
 
-        this.serialport.open((err) => {
+        serialport.open((err) => {
             console.log(err);
             if (err) {
                 console.log(`Error: Can not open ${portName}`);
             }
         });
 
-        this.serialport.on('open', () => {
+        serialport.on('open', () => {
             console.log(`Listening to ${portName}`);
-            this.serialport.on('data', onDataCallback);
+            serialport.on('data', onDataCallback);
         });
 
-        this.serialport.on('close', () => {
-            if (this.portFound) {
-
-            }
-            this.emit('port-closed', this.portFound);
-        });
-
-        this.on('port-closed',() => {
-            if (this.portFound) {
-                console.log(`${portName} is ${portType}`);
-            }
+        serialport.on('close', () => {
+            this.emit('port-closed', portFound);
         });
 
     }

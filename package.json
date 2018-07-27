@@ -6,8 +6,7 @@
     "license": "ISC",
     "scripts": {
         "build-ts": "tsc",
-        "clean": "rm -rf dist",
-        "build": "npm run clean && npm run build-ts",
+        "build": "npm run build-ts",
         "start": "node ./dist/drone.js"
     },
     "dependencies": {
