@@ -5,8 +5,8 @@ module.exports.CreateApplication = function () {
     process.stdin.setEncoding('utf8');
 
     process.on('imu-data', (r) => {
-        //console.log(`Imu: roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
-    });
+        console.log(`Imu: roll: ${r.roll}, pitch: ${r.pitch}, yaw: ${r.yaw}, timeInterval: ${r.dt}`);
+    }); 
 
     process.on('imu-connected', () => {
         imuIsOpen = true;
