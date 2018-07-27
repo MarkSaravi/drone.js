@@ -2,7 +2,7 @@ import Application from './Application';
 import DeviceFinder from './DeviceFinder';
 
 let deviceFinder = new DeviceFinder();
-//deviceFinder.findDevices('/dev/ttyUSB0', 115200, 'pitch', 'imu');
+deviceFinder.findDevices('/dev/ttyUSB0', 115200, 'pitch', 'imu');
 //let app = new Application(); 
 //app.greeting('Mark');
 
