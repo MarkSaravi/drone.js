@@ -4,6 +4,12 @@ import { EventEmitter } from 'events';
 import SerialPort from 'serialport';
 import PortInfo from './models/PortInfo';
 
+interface PortClosedInfo {
+    found: boolean,
+    name: string,
+    baudRate: number,
+    type: string
+}
 export default class DeviceFinder extends EventEmitter {
     constructor() {
         super();
@@ -12,14 +18,12 @@ export default class DeviceFinder extends EventEmitter {
     findDevices(portsInfo: PortInfo[]) {
         let portCounter: number = -1;
         let infoCounter: number = 0;
-        let skipList: string[] = [];
         let detectedList: PortInfo[] = [];
 
-        this.on('port-closed',(portFound, portName, baudRate, portType) => {
-            if (portFound) {
-                console.log(`${portName} is ${portType}`);
-                detectedList.push({ name: portName, type: portType, baudRate: baudRate, pattern: ''});
-                skipList.push(portName);
+        this.on('port-closed',(info: PortClosedInfo) => {
+            if (info.found) {
+                console.log(`${info.name} is ${info.type}`);
+                detectedList.push({ name: info.name, type: info.type, baudRate: info.baudRate, pattern: ''});
                 infoCounter++;
             }
             portCounter++;
@@ -28,13 +32,13 @@ export default class DeviceFinder extends EventEmitter {
                 infoCounter++;
             }
             if (infoCounter >= portsInfo.length) {
-                this.emit('search-over',{});
+                this.emit('device-detection-completed', detectedList);
             } else {
-                let newPortName = portsInfo[infoCounter].name + portCounter;
-                if (skipList.indexOf(newPortName) >= 0) {
+                let searchPortName = portsInfo[infoCounter].name + portCounter;
+                if (detectedList.filter(i => i.name == searchPortName).length > 0) {
                     this.emit('port-closed', false, '', 0, '');
                 } else {
-                    this.findDevice(portsInfo[infoCounter].name + portCounter,
+                    this.findDevice(searchPortName,
                         portsInfo[infoCounter].baudRate,
                         portsInfo[infoCounter].type,
                         portsInfo[infoCounter].pattern
@@ -46,7 +50,8 @@ export default class DeviceFinder extends EventEmitter {
         this.emit('port-closed', false, '' ,0 , '');
     }
 
-    findDevice(portName: string, baudRate: number, pattern: string, portType: string) {
+    findDevice(portName: string, baudRate: number, portType: string, pattern: string) {
+        console.log(`Searching for ${portType} on ${portName}`);
         let portFound: boolean = false;
         let tryCounter = 0;
         let buffer: any[] = [];
@@ -61,7 +66,7 @@ export default class DeviceFinder extends EventEmitter {
                     tryCounter++;
                     let str = new Buffer(buffer).toString('ascii');
                     portFound = str.indexOf(pattern) >= 0;
-                    console.log(str);
+                    //console.log(str);
                     if (portFound || tryCounter > 3) {
                         serialport.removeListener('data', onDataCallback);
                         serialport.close();
@@ -75,19 +80,19 @@ export default class DeviceFinder extends EventEmitter {
         }
 
         serialport.open((err) => {
-            console.log(err);
             if (err) {
-                console.log(`Error: Can not open ${portName}`);
+                console.log(`Error: Cann't open ${portName}`);
+                this.emit('port-closed', {found: false, name: '', baudRate: 0, type: ''});
             }
         });
 
         serialport.on('open', () => {
-            console.log(`Listening to ${portName}`);
+            //console.log(`Listening to ${portName}`);
             serialport.on('data', onDataCallback);
         });
 
         serialport.on('close', () => {
-            this.emit('port-closed', portFound, portName, portType, baudRate);
+            this.emit('port-closed', {found: portFound, name: portName, type: portType, baudRate: baudRate});
         });
     }
 
