@@ -2,19 +2,48 @@
 
 import { EventEmitter } from 'events';
 import SerialPort from 'serialport';
+import PortInfo from './models/PortInfo';
 
 export default class DeviceFinder extends EventEmitter {
     constructor() {
         super();
     }
 
-    findDevices(portName: string, baudRate: number, pattern: string, portType: string) {
-        this.on('port-closed',(portFound) => {
+    findDevices(portsInfo: PortInfo[]) {
+        let portCounter: number = -1;
+        let infoCounter: number = 0;
+        let skipList: string[] = [];
+        let detectedList: PortInfo[] = [];
+
+        this.on('port-closed',(portFound, portName, baudRate, portType) => {
             if (portFound) {
                 console.log(`${portName} is ${portType}`);
+                detectedList.push({ name: portName, type: portType, baudRate: baudRate, pattern: ''});
+                skipList.push(portName);
+                infoCounter++;
+            }
+            portCounter++;
+            if (portCounter == 10) {
+                portCounter = 0;
+                infoCounter++;
+            }
+            if (infoCounter >= portsInfo.length) {
+                this.emit('search-over',{});
+            } else {
+                let newPortName = portsInfo[infoCounter].name + portCounter;
+                if (skipList.indexOf(newPortName) >= 0) {
+                    this.emit('port-closed', false, '', 0, '');
+                } else {
+                    this.findDevice(portsInfo[infoCounter].name + portCounter,
+                        portsInfo[infoCounter].baudRate,
+                        portsInfo[infoCounter].type,
+                        portsInfo[infoCounter].pattern
+                    );
+                }
             }
         });
-        this.findDevice(portName, baudRate, pattern, portType);
+
+        this.emit('port-closed', false, '' ,0 , '');
     }
 
     findDevice(portName: string, baudRate: number, pattern: string, portType: string) {
@@ -58,9 +87,8 @@ export default class DeviceFinder extends EventEmitter {
         });
 
         serialport.on('close', () => {
-            this.emit('port-closed', portFound);
+            this.emit('port-closed', portFound, portName, portType, baudRate);
         });
-
     }
 
 }
