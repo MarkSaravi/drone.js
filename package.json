@@ -11,6 +11,7 @@
         "start": "npm run build && node ./dist/drone.js"
     },
     "dependencies": {
+        "@types/node": "^10.5.3",
         "serialport": "6.2.1"
     },
     "devDependencies": {
