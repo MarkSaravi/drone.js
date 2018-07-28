@@ -1,8 +1,9 @@
 ///<reference path="../../node_modules/@types/serialport/index.d.ts" />
+import ISerialDevice from './ISerialDevice';
 import SerialPort from 'serialport';
 import { EventEmitter } from 'events';
 
-export default class SerialDevice extends EventEmitter {
+export default class SerialDevice extends EventEmitter implements ISerialDevice {
     port: SerialPort;
     buffer:any[]=[];
     isopen: boolean = false;
@@ -19,18 +20,12 @@ export default class SerialDevice extends EventEmitter {
         });
     }
 
-    processData(incomingStr: string) {
-        console.log(incomingStr);
-    }
-
     onData(data: any[]) {
         for (let b of data) {
             if (b === 10) {
                 try {
                     const incomingStr = new Buffer(this.buffer).toString('ascii');
-                    //let r = JSON.parse();
-                    //process.emit('imu-data', r);
-                    this.processData(incomingStr);
+                    this.emit('data-ready', incomingStr);
                 } catch (ex) {
                 }
                 this.buffer = [];
@@ -73,5 +68,13 @@ export default class SerialDevice extends EventEmitter {
 
     close() {
         this.port.close();
+    }
+
+    registerCloseEvent(eventType: string, callback: () => void){
+        this.on(eventType, callback);
+    }
+
+    registerDataEvent(callback: (data: string) => void){
+        this.on('data-ready', callback);
     }
 }

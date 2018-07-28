@@ -1,12 +1,12 @@
 ///<reference path="../node_modules/@types/node/index.d.ts" />
 import { EventEmitter } from 'events';
 import PortInfo from './models/PortInfo';
-import ImuDevice from './devices/ImuDevice';
+import ISerialDevice from './devices/ISerialDevice';
 import SerialDevice from './devices/SerialDevice';
 
 export default class Application extends EventEmitter {
-    devices: PortInfo[] = [];
-    imuDevice: ImuDevice;
+    imuDevice: ISerialDevice;
+    devices: ISerialDevice[]= [];
 
     constructor() {
         super();
@@ -14,6 +14,11 @@ export default class Application extends EventEmitter {
 
     start() {
         this.registerEvents();
+    }
+
+    onImuData(imuData: string) {
+        let r = JSON.parse(imuData);
+        console.log(`Roll: ${r.roll}, Pitch: ${r.pitch}, Yaw: ${r.yaw}, TimeInterval: ${r.dt}`);
     }
 
     registerEvents() {
@@ -28,26 +33,23 @@ export default class Application extends EventEmitter {
             process.exit(0);
         });
 
-        this.on('devices-ready', (devices: PortInfo[]) => {
-            this.devices = devices;
-            for (let d of this.devices) {
-                console.log(`${d.type}: ${d.name}, ${d.baudRate}`);
+        this.on('devices-ready', (configs: PortInfo[]) => {
+            for (let c of configs) {
+                console.log(`${c.type}: ${c.name}, ${c.baudRate}`);
             }
-            this.initDevices();
+            this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); });
+            this.devices.push(this.imuDevice);
         });
     }
 
-    initDevices() {
-        this.imuDevice = this.openDevice('imu');
-    }
-
-    openDevice(type: string): SerialDevice {
-        let config = this.devices.filter(d => d.type == type)[0];
+    openDevice(type: string, configs: PortInfo[], dataEventCallback:(data: string) => void): SerialDevice {
+        let config = configs.filter(d => d.type == type)[0];
         const device: SerialDevice = new SerialDevice(type, config.name, config.baudRate);
         device.open();
-        device.on('device-closed', () => {
+        device.registerCloseEvent('device-closed', () => {
             this.emit('stop-application');
         });
+        device.registerDataEvent(dataEventCallback);
         return device;
     }
 }
