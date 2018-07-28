@@ -35,13 +35,6 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         }
     }
 
-    onConnectionError(err: any) {
-    }
-
-    onConnected() {
-
-    }
-
     isOpen(): boolean {
         return this.isopen;
     }
@@ -49,7 +42,6 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
     open() {
         this.port.on('open', () => {
             this.isopen = true;
-            this.onConnected();
         });
 
         this.port.on('close', () => {
@@ -62,7 +54,9 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         });
 
         this.port.open((err) => {
-            this.onConnectionError(err);
+            if (err) {
+                console.error(`Faile to open ${this.portName}. ${err}`);
+            }
         });
     }
 

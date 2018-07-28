@@ -6,6 +6,9 @@ import SerialDevice from './devices/SerialDevice';
 
 export default class Application extends EventEmitter {
     imuDevice: ISerialDevice;
+    escDevice: ISerialDevice;
+    bleDevice: ISerialDevice;
+
     devices: ISerialDevice[]= [];
 
     constructor() {
@@ -23,12 +26,16 @@ export default class Application extends EventEmitter {
 
     registerEvents() {
         this.on('stopping-application', () => {
-            this.imuDevice.close();
+            for (let d of this.devices) {
+                d.close();
+            }
         });
 
         this.on('stop-application', () => {
-            if (this.imuDevice.isOpen()) {
-                return;
+            for (let d of this.devices) {
+                if (d.isOpen()) {
+                    return;
+                }
             }
             process.exit(0);
         });
@@ -38,7 +45,8 @@ export default class Application extends EventEmitter {
                 console.log(`${c.type}: ${c.name}, ${c.baudRate}`);
             }
             this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); });
-            this.devices.push(this.imuDevice);
+            this.escDevice = this.openDevice('esc', configs, (s) => {});
+            this.bleDevice = this.openDevice('ble', configs, (s) => {});
         });
     }
 
@@ -50,6 +58,7 @@ export default class Application extends EventEmitter {
             this.emit('stop-application');
         });
         device.registerDataEvent(dataEventCallback);
+        this.devices.push(device);
         return device;
     }
 }
