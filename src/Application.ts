@@ -13,13 +13,8 @@ export default class Application extends EventEmitter {
             process.exit(0);
         });
 
-        this.on('devices-ready', (dynamicDevices: PortInfo[], staticDevices: PortInfo[]) => {
-            for (let d of dynamicDevices) {
-                this.devices.push(d);
-            }
-            for (let d of staticDevices) {
-                this.devices.push(d);
-            }
+        this.on('devices-ready', (devices: PortInfo[]) => {
+            this.devices = devices;
             for (let d of this.devices) {
                 console.log(`${d.type}: ${d.name}, ${d.baudRate}`);
             }

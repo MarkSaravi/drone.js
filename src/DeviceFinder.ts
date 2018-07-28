@@ -4,6 +4,14 @@ import { EventEmitter } from 'events';
 import SerialPort from 'serialport';
 import PortInfo from './models/PortInfo';
 
+let dynamicPortsInfo = [
+    {name: "/dev/ttyUSB", baudRate: 115200, type: 'imu', pattern: 'pitch'},
+    {name: "/dev/ttyUSB", baudRate: 115200, type: 'esc', pattern: 'esc'}
+];
+
+let staticPortsInfo = [
+    {name: "/dev/ttyS0", baudRate: 115200, type: 'ble', pattern: 'pitch'}
+];
 interface PortClosedInfo {
     found: boolean,
     name: string,
@@ -15,7 +23,8 @@ export default class DeviceFinder extends EventEmitter {
         super();
     }
 
-    findDevices(portsInfo: PortInfo[]) {
+    findDevices() {
+        let portsInfo = dynamicPortsInfo;
         let portCounter: number = -1;
         let infoCounter: number = 0;
         let detectedList: PortInfo[] = [];
@@ -32,7 +41,11 @@ export default class DeviceFinder extends EventEmitter {
                 infoCounter++;
             }
             if (infoCounter >= portsInfo.length) {
-                this.emit('device-detection-completed', detectedList);
+                let devices:PortInfo[] =  detectedList;
+                for (let d of staticPortsInfo) {
+                    devices.push(d);
+                }
+                this.emit('devices-ready', devices);
             } else {
                 let searchPortName = portsInfo[infoCounter].name + portCounter;
                 if (detectedList.filter(i => i.name == searchPortName).length > 0) {
