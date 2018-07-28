@@ -3,15 +3,16 @@
 import { EventEmitter } from 'events';
 import SerialPort from 'serialport';
 import PortInfo from './models/PortInfo';
+const portsConfig = require('config.json')('./config.ports.json');
 
-let dynamicPortsInfo = [
-    {name: "/dev/ttyUSB", baudRate: 115200, type: 'imu', pattern: 'pitch'},
-    {name: "/dev/ttyUSB", baudRate: 115200, type: 'esc', pattern: 'esc'}
-];
+// let dynamicPortsInfo = [
+//     {name: "/dev/ttyUSB", baudRate: 115200, type: 'imu', pattern: 'pitch'},
+//     {name: "/dev/ttyUSB", baudRate: 115200, type: 'esc', pattern: 'esc'}
+// ];
 
-let staticPortsInfo = [
-    {name: "/dev/serial0", baudRate: 115200, type: 'ble', pattern: 'pitch'}
-];
+// let staticPortsInfo = [
+//     {name: "/dev/serial0", baudRate: 115200, type: 'ble', pattern: 'pitch'}
+// ];
 interface PortClosedInfo {
     found: boolean,
     name: string,
@@ -24,7 +25,7 @@ export default class DeviceFinder extends EventEmitter {
     }
 
     findDevices() {
-        let portsInfo = dynamicPortsInfo;
+        let portsInfo = portsConfig.dynamicports;//dynamicPortsInfo;
         let portCounter: number = -1;
         let infoCounter: number = 0;
         let detectedList: PortInfo[] = [];
@@ -42,7 +43,7 @@ export default class DeviceFinder extends EventEmitter {
             }
             if (infoCounter >= portsInfo.length) {
                 let devices:PortInfo[] =  detectedList;
-                for (let d of staticPortsInfo) {
+                for (let d of portsConfig.staticports) {
                     devices.push(d);
                 }
                 this.emit('devices-ready', devices);

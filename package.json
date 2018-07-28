@@ -12,6 +12,7 @@
     "dependencies": {
         "@types/node": "^10.5.3",
         "@types/serialport": "^6.0.4",
+        "config.json": "0.0.4",
         "serialport": "6.2.1"
     },
     "devDependencies": {
