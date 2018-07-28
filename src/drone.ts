@@ -15,6 +15,6 @@ deviceFinder.findDevices();
 process.stdin.on('readable', () => {
     const chunk = process.stdin.read();
     if (chunk != null ) {
-        app.emit('stop-application');
+        app.emit('stopping-application');
     }
 });
