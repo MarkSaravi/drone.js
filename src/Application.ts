@@ -6,6 +6,14 @@ export default class Application extends EventEmitter {
     devices: PortInfo[] = [];
     constructor() {
         super();
+        
+    }
+
+    start() {
+        this.registerEvents();
+    }
+
+    registerEvents() {
         this.on('stopping-application', () => {
         });
 
@@ -19,6 +27,5 @@ export default class Application extends EventEmitter {
                 console.log(`${d.type}: ${d.name}, ${d.baudRate}`);
             }
         });
-
     }
 }
