@@ -3,13 +3,14 @@ import { EventEmitter } from 'events';
 import PortInfo from './models/PortInfo';
 import ISerialDevice from './devices/ISerialDevice';
 import SerialDevice from './devices/SerialDevice';
+import {RotateAroundZ} from './EulerTransforms';
 
 export default class Application extends EventEmitter {
     imuDevice: ISerialDevice;
     escDevice: ISerialDevice;
     bleDevice: ISerialDevice;
 
-    devices: ISerialDevice[]= [];
+    devices: ISerialDevice[] = [];
 
     constructor() {
         super();
@@ -21,7 +22,13 @@ export default class Application extends EventEmitter {
 
     onImuData(imuData: string) {
         let r = JSON.parse(imuData);
-        console.log(`Roll: ${r.roll}, Pitch: ${r.pitch}, Yaw: ${r.yaw}, TimeInterval: ${r.dt}`);
+        let [nr, np] = RotateAroundZ(r.roll, r.pitch, Math.PI / 4);
+        let rotations = {
+            roll: nr,
+            pitch: np,
+            yaw: r.yaw
+        };
+        console.log(`${rotations.roll}, ${rotations.pitch}, ${rotations.yaw}`);
     }
 
     registerEvents() {
@@ -45,12 +52,12 @@ export default class Application extends EventEmitter {
                 console.log(`${c.type}: ${c.name}, ${c.baudRate}`);
             }
             this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); });
-            this.escDevice = this.openDevice('esc', configs, (s) => {});
-            this.bleDevice = this.openDevice('ble', configs, (s) => {});
+            this.escDevice = this.openDevice('esc', configs, (s) => { });
+            this.bleDevice = this.openDevice('ble', configs, (s) => { });
         });
     }
 
-    openDevice(type: string, configs: PortInfo[], dataEventCallback:(data: string) => void): SerialDevice {
+    openDevice(type: string, configs: PortInfo[], dataEventCallback: (data: string) => void): SerialDevice {
         let config = configs.filter(d => d.type == type)[0];
         const device: SerialDevice = new SerialDevice(type, config.name, config.baudRate);
         device.open();

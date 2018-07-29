@@ -25,7 +25,7 @@ export default class DeviceFinder extends EventEmitter {
     }
 
     findDevices() {
-        let portsInfo = portsConfig.dynamicports;//dynamicPortsInfo;
+        let portsInfo = portsConfig.dynamicports;
         let portCounter: number = -1;
         let infoCounter: number = 0;
         let detectedList: PortInfo[] = [];
