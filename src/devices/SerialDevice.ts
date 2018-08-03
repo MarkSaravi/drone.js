@@ -20,12 +20,23 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         });
     }
 
+    write(data: string): void {
+        this.port.write(data, function(err) {
+            if (err) {
+              return console.log('Error on write: ', err.message);
+            }
+            console.log('message written');
+          });
+        console.log(`Writing: ${data}`);
+    }
+
     onData(data: any[]) {
+        console.log(data);
         for (let b of data) {
             if (b === 10) {
                 try {
                     const incomingStr = new Buffer(this.buffer).toString('ascii');
-                    this.emit('data-ready', incomingStr);
+                    this.emit('data', incomingStr);
                 } catch (ex) {
                 }
                 this.buffer = [];
@@ -42,12 +53,13 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
     open() {
         this.port.on('open', () => {
             this.isopen = true;
+            this.emit('open');
         });
 
         this.port.on('close', () => {
             this.isopen = false;
             console.log(`${this.deviceName} on ${this.portName} is closed`);
-            this.emit('device-closed');
+            this.emit('close');
         });
         this.port.on('data', (data) => {
             this.onData(data);
@@ -64,11 +76,15 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         this.port.close();
     }
 
-    registerCloseEvent(eventType: string, callback: () => void){
-        this.on(eventType, callback);
+    registerCloseEvent(callback: () => void){
+        this.on('close', callback);
     }
 
     registerDataEvent(callback: (data: string) => void){
-        this.on('data-ready', callback);
+        this.on('data', callback);
+    }
+
+    registerOpenEvent(callback: () => void){
+        this.on('open', callback);
     }
 }

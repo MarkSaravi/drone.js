@@ -2,6 +2,8 @@ export default interface ISerialDevice {
     open(): void;
     close(): void;
     isOpen(): boolean;
-    registerCloseEvent(eventType: string, callback: () => void): void;
+    write(data: string): void;
+    registerCloseEvent(callback: () => void): void;
     registerDataEvent(callback: (data: string) => void): void;
+    registerOpenEvent(callback: () => void): void;
 }

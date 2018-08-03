@@ -7,7 +7,8 @@
     "scripts": {
         "build-ts": "tsc",
         "build": "npm run build-ts",
-        "start": "node ./dist/drone.js"
+        "run-app": "node ./dist/drone.js",
+        "start": "npm run build && npm run run-app"
     },
     "dependencies": {
         "@types/node": "^10.5.3",
