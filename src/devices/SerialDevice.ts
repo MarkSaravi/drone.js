@@ -31,7 +31,6 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
     }
 
     onData(data: any[]) {
-        console.log(data);
         for (let b of data) {
             if (b === 10) {
                 try {

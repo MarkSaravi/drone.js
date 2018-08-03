@@ -22,7 +22,7 @@ export default class Application extends EventEmitter {
 
     writeBLE(s: string): void {
         if (this.bleDevice) {
-            this.bleDevice.write(s);
+            //this.bleDevice.write(s);
         }
     }
 
@@ -43,7 +43,25 @@ export default class Application extends EventEmitter {
     }
 
     onBleData(bleData: string) {
-        console.log(`BLE: ${bleData}`);
+        if (bleData.length === 3) {
+            let cmd = bleData.charCodeAt(0);
+            let val1 = bleData.charCodeAt(1) - 100;
+            let val2 = bleData.charCodeAt(2) - 100;
+            switch (cmd) {
+                case 104:
+                    console.log(`heading: ${val1}`);
+                    break;
+                case 114:
+                    console.log(`x: ${val1}, y: ${val2}`);
+                    break;
+                case 112:
+                    console.log(`power: ${val1}`);
+                    break;
+                case 115:
+                    console.log(`stop`);
+                    break;
+            }
+        }
     }
 
     registerEvents() {
