@@ -43,6 +43,7 @@ export default class Application extends EventEmitter {
     }
 
     onBleData(bleData: string) {
+        console.log(bleData);
         if (bleData.length === 3) {
             let cmd = bleData.charCodeAt(0);
             let val1 = bleData.charCodeAt(1) - 100;
