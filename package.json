@@ -5,10 +5,8 @@
     "author": "Mark Saravi",
     "license": "ISC",
     "scripts": {
-        "build-ts": "tsc",
-        "build": "npm run build-ts",
-        "run-app": "node ./dist/drone.js",
-        "start": "npm run build && npm run run-app"
+        "build": "tsc",
+        "start": "node ./dist/drone.js"
     },
     "dependencies": {
         "@types/node": "^10.5.3",
