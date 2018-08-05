@@ -3,7 +3,10 @@ import { EventEmitter } from 'events';
 import PortInfo from './models/PortInfo';
 import ISerialDevice from './devices/ISerialDevice';
 import SerialDevice from './devices/SerialDevice';
-import { RotateAroundZ } from './EulerTransforms';
+import FlightController from './FlightController';
+import ImuData from './models/ImuData';
+import Command from './models/Command';
+import * as convertors from './convertors';
 
 export default class Application extends EventEmitter {
     imuDevice: ISerialDevice;
@@ -13,7 +16,7 @@ export default class Application extends EventEmitter {
 
     devices: ISerialDevice[] = [];
 
-    constructor() {
+    constructor(private readonly flightController: FlightController) {
         super();
     }
 
@@ -22,31 +25,20 @@ export default class Application extends EventEmitter {
     }
 
     writeBLE(s: string): void {
-        if (this.bleDevice) {
-            //this.bleDevice.write(s);
-        }
     }
 
-    onImuData(imuData: string) {
-        let r = JSON.parse(imuData);
-        let [nr, np] = RotateAroundZ(r.roll, r.pitch, Math.PI / 4);
-        let rotations = {
-            roll: nr,
-            pitch: np,
-            yaw: r.yaw
-        };
-        if (this.imuCounter++ >= 50) {
-            console.log(`${rotations.roll}, ${rotations.pitch}, ${rotations.yaw}`);
-            this.imuCounter = 0;
-        }
+    onImuData(imuJson: string) {
+        const imuData = convertors.JsonToImuData(imuJson);
+        this.flightController.applyImuData(imuData);
     }
 
     onBleOpen() {
         console.log(`BLE is connected.`);
     }
 
-    onBleData(bleData: string) {
-        let r = JSON.parse(bleData);
+    onBleData(bleJson: string) {
+        const cmd = convertors.JsonToCommand(bleJson);
+        this.flightController.applyCommand(cmd);
     }
 
     registerEvents() {

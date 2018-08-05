@@ -1,9 +1,10 @@
 import Application from './Application';
 import DeviceFinder from './DeviceFinder';
 import PortInfo from './models/PortInfo';
+import FlightController from './FlightController';
 
 let deviceFinder = new DeviceFinder();
-let app = new Application();
+let app = new Application(new FlightController());
 
 app.on('ble-send', (s) => {
     app.writeBLE(s);
