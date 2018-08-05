@@ -40,7 +40,8 @@ export default class Application extends EventEmitter {
         const cmd = convertors.JsonToCommand(bleJson);
         this.flightController.applyCommand(cmd);
         const p = this.flightController.getPower();
-        const escCommand = `a${p}b${p}c${p}d${p}\n`
+        //const escCommand = `a${p}b${p}c${p}d${p}\n`
+        const escCommand = this.flightController.calcMotorsPower();
         this.escDevice.write(escCommand);
     }
 
