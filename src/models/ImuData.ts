@@ -1,9 +1,10 @@
-export default class FlightState {
+export default class ImuData {
     constructor(
         readonly roll: number,
         readonly pitch: number,
         readonly yaw: number,
-        readonly power: number,
+        readonly dt: number,
     ){
+        
     }
 }

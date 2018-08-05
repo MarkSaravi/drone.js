@@ -9,6 +9,7 @@ export default class Application extends EventEmitter {
     imuDevice: ISerialDevice;
     escDevice: ISerialDevice;
     bleDevice: ISerialDevice;
+    imuCounter: number = 0;
 
     devices: ISerialDevice[] = [];
 
@@ -34,35 +35,18 @@ export default class Application extends EventEmitter {
             pitch: np,
             yaw: r.yaw
         };
-        //console.log(`${rotations.roll}, ${rotations.pitch}, ${rotations.yaw}`);
+        if (this.imuCounter++ >= 50) {
+            console.log(`${rotations.roll}, ${rotations.pitch}, ${rotations.yaw}`);
+            this.imuCounter = 0;
+        }
     }
 
     onBleOpen() {
         console.log(`BLE is connected.`);
-        this.bleDevice.write('active');
     }
 
     onBleData(bleData: string) {
-        console.log(bleData);
-        if (bleData.length === 3) {
-            let cmd = bleData.charCodeAt(0);
-            let val1 = bleData.charCodeAt(1) - 100;
-            let val2 = bleData.charCodeAt(2) - 100;
-            switch (cmd) {
-                case 104:
-                    console.log(`heading: ${val1}`);
-                    break;
-                case 114:
-                    console.log(`x: ${val1}, y: ${val2}`);
-                    break;
-                case 112:
-                    console.log(`power: ${val1}`);
-                    break;
-                case 115:
-                    console.log(`stop`);
-                    break;
-            }
-        }
+        let r = JSON.parse(bleData);
     }
 
     registerEvents() {
@@ -85,8 +69,8 @@ export default class Application extends EventEmitter {
             for (let c of configs) {
                 console.log(`${c.type}: ${c.name}, ${c.baudRate}`);
             }
-            //this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => {});
-            //this.escDevice = this.openDevice('esc', configs, (s) => { }, () => {});
+            this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => {});
+            this.escDevice = this.openDevice('esc', configs, (s) => { }, () => {});
             this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { this.onBleOpen(); });
         });
     }
