@@ -39,6 +39,9 @@ export default class Application extends EventEmitter {
     onBleData(bleJson: string) {
         const cmd = convertors.JsonToCommand(bleJson);
         this.flightController.applyCommand(cmd);
+        const p = this.flightController.getPower();
+        const escCommand = `a${p}b${p}c${p}d${p}\n`
+        this.escDevice.write(escCommand);
     }
 
     registerEvents() {

@@ -3,6 +3,7 @@ import Command from './models/Command';
 import ImuData from './models/ImuData';
 import * as convertors from './convertors';
 import * as services from './services';
+import * as flightLogics from './flight-logics';
 
 
 export default class FlightController {
@@ -18,6 +19,8 @@ export default class FlightController {
     applyCommand(command: Command) {
         this.targetFlightState = convertors.CommandToFlightStatus(command, this.targetFlightState);
         services.printFlightState(this.targetFlightState,'Target: ');
+        this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
+
     }
 
     applyImuData(imuData: ImuData) {
@@ -27,5 +30,9 @@ export default class FlightController {
             services.printFlightState(this.actualFlightState,'Actual: ');
             this.imuCounter = 0;
         }
+    }
+
+    getPower(): number {
+        return this.actualFlightState.power;
     }
 }
