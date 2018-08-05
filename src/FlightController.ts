@@ -9,18 +9,19 @@ import * as flightLogics from './flight-logics';
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
+    private config: any;
     imuCounter: number = 0;
 
     constructor() {
         this.actualFlightState = new FlightState(0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0);
+        this.config = require('config.json')('./config.flight.json');
     }
 
     applyCommand(command: Command) {
         this.targetFlightState = convertors.CommandToFlightStatus(command, this.targetFlightState);
         services.printFlightState(this.targetFlightState,'Target: ');
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
-
     }
 
     applyImuData(imuData: ImuData) {
@@ -34,5 +35,10 @@ export default class FlightController {
 
     getPower(): number {
         return this.actualFlightState.power;
+    }
+
+    calcMotorsPower() {
+
+        //const escCommand = `a${p}b${p}c${p}d${p}\n`
     }
 }
