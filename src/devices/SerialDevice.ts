@@ -25,9 +25,9 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
             if (err) {
               return console.log('Error on write: ', err.message);
             }
-            console.log('message written');
+            //console.log('message written');
           });
-        console.log(`Writing: ${data}`);
+        //console.log(`Writing: ${data}`);
     }
 
     onData(data: any[]) {

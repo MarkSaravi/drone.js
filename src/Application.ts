@@ -4,8 +4,6 @@ import PortInfo from './models/PortInfo';
 import ISerialDevice from './devices/ISerialDevice';
 import SerialDevice from './devices/SerialDevice';
 import FlightController from './FlightController';
-import ImuData from './models/ImuData';
-import Command from './models/Command';
 import * as convertors from './convertors';
 
 export default class Application extends EventEmitter {
@@ -32,6 +30,7 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
+        //console.log(escCommand);
         this.escDevice.write(escCommand);
     }
 

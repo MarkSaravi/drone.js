@@ -31,16 +31,16 @@ export default class FlightController {
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData, this.actualFlightState);
         if (this.imuCounter++ >= 100) {
-            //console.log("==========================================");
+            // console.log("==========================================");
             services.printFlightState(this.actualFlightState, 'Actual: ');
-            this.imuCounter = 0;
+           this.imuCounter = 0;
         }
     }
 
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
-        const dp = this.pidControl.P(this.actualFlightState);
+        const dp = this.pidControl.P(this.actualFlightState.power ,stateError);
         const p = this.actualFlightState.power;
         return `a${(p + dp.p1).toFixed(3)}b${(p + dp.p2).toFixed(3)}c${(p + dp.p3).toFixed(3)}d${(p + dp.p4).toFixed(3)}\n`
     }
