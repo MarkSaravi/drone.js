@@ -30,6 +30,9 @@ export default class Application extends EventEmitter {
     onImuData(imuJson: string) {
         const imuData = convertors.JsonToImuData(imuJson);
         this.flightController.applyImuData(imuData);
+
+        const escCommand = this.flightController.calcMotorsPower();
+        this.escDevice.write(escCommand);
     }
 
     onBleOpen() {
@@ -39,10 +42,6 @@ export default class Application extends EventEmitter {
     onBleData(bleJson: string) {
         const cmd = convertors.JsonToCommand(bleJson);
         this.flightController.applyCommand(cmd);
-        const p = this.flightController.getPower();
-        //const escCommand = `a${p}b${p}c${p}d${p}\n`
-        const escCommand = this.flightController.calcMotorsPower();
-        this.escDevice.write(escCommand);
     }
 
     registerEvents() {

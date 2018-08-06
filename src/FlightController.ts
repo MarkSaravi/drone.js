@@ -1,6 +1,8 @@
 import FlightState from './models/FlightState';
 import Command from './models/Command';
 import ImuData from './models/ImuData';
+import IFlightStateError from './models/IFlightStateError';
+import IPowerCompensations from './models/IPowerCompensations';
 import * as convertors from './convertors';
 import * as services from './services';
 import * as flightLogics from './flight-logics';
@@ -24,7 +26,6 @@ export default class FlightController {
     applyCommand(command: Command) {
         this.targetFlightState = convertors.CommandToFlightStatus(command, this.targetFlightState);
         services.printFlightState(this.targetFlightState, 'Target: ');
-        this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
     }
 
     applyImuData(imuData: ImuData) {
@@ -36,13 +37,11 @@ export default class FlightController {
         }
     }
 
-    getPower(): number {
-        return this.actualFlightState.power;
-    }
-
     calcMotorsPower() {
-        const [p1, p2, p3, p4] = this.pidControl.P(this.actualFlightState);
+        this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
+        let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
+        const dp = this.pidControl.P(this.actualFlightState);
         const p = this.actualFlightState.power;
-        return `a${(p + p1).toFixed(3)}b${(p + p2).toFixed(3)}c${(p + p3).toFixed(3)}d${(p + p4).toFixed(3)}\n`
+        return `a${(p + dp.p1).toFixed(3)}b${(p + dp.p2).toFixed(3)}c${(p + dp.p3).toFixed(3)}d${(p + dp.p4).toFixed(3)}\n`
     }
 }
