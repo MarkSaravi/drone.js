@@ -1,4 +1,5 @@
 import * as flightLogics from '../flight-logics';
+ 
 class TestRunner {
     static currTestTitle: String;
 
@@ -8,9 +9,9 @@ class TestRunner {
 
     static assert(expected: any, actual: any): void {
         if (expected === actual) {
-            console.log(`${TestRunner.currTestTitle} is passed`);
+            console.log('\x1b[32m', `${TestRunner.currTestTitle} is passed` ,'\x1b[0m');
         } else {
-            console.log(`${TestRunner.currTestTitle} is failed`);
+            console.log('\x1b[31m', `${TestRunner.currTestTitle} is failed` ,'\x1b[0m');
         }
     }
 
@@ -25,5 +26,10 @@ const runner = new TestRunner();
 runner.test('Hellow World', () => {
     TestRunner.assert(true, true);
 });
+
+runner.test('Hellow World failing', () => {
+    TestRunner.assert(true, false);
+});
+
 
 console.log('testing...');
