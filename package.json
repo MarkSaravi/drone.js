@@ -6,7 +6,8 @@
     "license": "ISC",
     "scripts": {
         "build": "tsc",
-        "start": "node ./dist/drone.js"
+        "start": "node ./dist/drone.js",
+        "test": "node ./dist/tests/test.js"
     },
     "dependencies": {
         "@types/node": "^10.5.3",
