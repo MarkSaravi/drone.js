@@ -5,7 +5,10 @@
     "author": "Mark Saravi",
     "license": "ISC",
     "scripts": {
+        "clean": "rm -rf /Volumes/PiShare/drone.js/dist/",
+        "copy": "cp -r ./dist/ /Volumes/PiShare/drone.js/dist/",
         "build": "tsc",
+        "build-copy": "npm run build && npm run clean && npm run copy",
         "start": "node ./dist/drone.js",
         "test": "node ./dist/tests/test.js"
     },
