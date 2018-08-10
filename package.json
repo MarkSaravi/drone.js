@@ -5,10 +5,12 @@
     "author": "Mark Saravi",
     "license": "ISC",
     "scripts": {
-        "clean": "rm -rf /Volumes/PiShare/drone.js/dist/",
-        "copy": "cp -r ./dist/ /Volumes/PiShare/drone.js/dist/",
+        "zip": "zip -r dist.zip ./dist/",
+        "clean": "rm -rf ./dist",
+        "unzip": "unzip ./dist.zip",
+        "copy": "cp -r ./dist.zip /Volumes/PiShare/drone.js/",
         "build": "tsc",
-        "build-copy": "npm run build && npm run clean && npm run copy",
+        "build-copy": "npm run build && npm run zip && npm run copy",
         "start": "node ./dist/drone.js",
         "test": "node ./dist/tests/test.js"
     },
@@ -25,4 +27,3 @@
         "type": "git",
         "url": ""
     }
-}
