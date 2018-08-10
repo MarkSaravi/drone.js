@@ -4,14 +4,6 @@ import IPowerCompensations from '../models/IPowerCompensations';
 
 const runner = new TestRunner();
 
-runner.test('Hellow World passed', () => {
-    TestRunner.assert(true, true);
-});
-
-runner.test('Hellow World failed', () => {
-    TestRunner.assert(true, false);
-});
-
 runner.test('Same rpm when zero torque', () => {
     const tr = 0;
     const tp = 0;
@@ -24,10 +16,7 @@ runner.test('Same rpm when zero torque', () => {
         p4: 50
     };
     const actualValues:IPowerCompensations = flightLogics.calcTorques(pb, tr, tp, ty);
-    console.log(`p1: ${actualValues.p1}`);
-    console.log(`p2: ${actualValues.p2}`);
-    console.log(`p3: ${actualValues.p3}`);
-    console.log(`p4: ${actualValues.p4}`);
+    console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         expectedValue.p1 === actualValues.p1 &&
         expectedValue.p2 === actualValues.p2 &&
@@ -36,4 +25,34 @@ runner.test('Same rpm when zero torque', () => {
     );
 });
 
-console.log('testing...');
+runner.test('Same rpm when zero torque', () => {
+    const tr = 0.1;
+    const tp = 0;
+    const ty = 0;
+    const pb = 50;
+
+    const actualValues:IPowerCompensations = flightLogics.calcTorques(pb, tr, tp, ty);
+    console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
+    TestRunner.assert(true, 
+        pb === actualValues.p1 &&
+        pb > actualValues.p2 &&
+        pb === actualValues.p3 &&
+        pb < actualValues.p4
+    );
+});
+
+runner.test('Same rpm when zero torque', () => {
+    const tr = 0;
+    const tp = 0.1;
+    const ty = 0;
+    const pb = 50;
+
+    const actualValues:IPowerCompensations = flightLogics.calcTorques(pb, tr, tp, ty);
+    console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
+    TestRunner.assert(true, 
+        pb > actualValues.p1 &&
+        pb === Math.round(actualValues.p2) &&
+        pb < actualValues.p3 &&
+        pb === Math.round(actualValues.p4)
+    );
+});
