@@ -7,11 +7,12 @@
     "scripts": {
         "zip": "zip -r dist.zip ./dist/",
         "clean": "rm -rf ./dist",
+        "clean-zip": "npm run clean && rm ./dist.zip",
         "unzip": "unzip ./dist.zip",
         "copy": "cp -r ./dist.zip /Volumes/PiShare/drone.js/",
         "build": "tsc",
         "build-copy": "npm run build && npm run zip && npm run copy",
-        "start": "node ./dist/drone.js",
+        "start": "npm run clean && npm run unzip && node ./dist/drone.js",
         "test": "node ./dist/tests/test.js"
     },
     "dependencies": {
