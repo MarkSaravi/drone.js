@@ -12,7 +12,9 @@
         "copy": "cp -r ./dist.zip /Volumes/PiShare/drone.js/",
         "build": "tsc",
         "build-copy": "npm run build && npm run zip && npm run copy",
-        "start": "npm run clean && npm run unzip && node ./dist/drone.js",
+        "run-drone": "node ./dist/drone.js",
+        "unzip-start": "npm run clean && npm run unzip && npm run run-drone",
+        "start": "npm run run-drone",
         "test": "node ./dist/tests/test.js"
     },
     "dependencies": {
