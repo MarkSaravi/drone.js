@@ -1,10 +1,10 @@
-///<reference path="../node_modules/@types/node/index.d.ts" />
+///<reference path="../../node_modules/@types/node/index.d.ts" />
 import { EventEmitter } from 'events';
-import PortInfo from './models/PortInfo';
-import ISerialDevice from './devices/ISerialDevice';
-import SerialDevice from './devices/SerialDevice';
+import PortInfo from '../models/PortInfo';
+import ISerialDevice from '../devices/ISerialDevice';
+import SerialDevice from '../devices/SerialDevice';
 import FlightController from './FlightController';
-import * as convertors from './convertors';
+import * as convertors from '../convertors';
 
 export default class Application extends EventEmitter {
     imuDevice: ISerialDevice;

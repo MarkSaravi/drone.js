@@ -1,12 +1,12 @@
-import FlightState from './models/FlightState';
-import Command from './models/Command';
-import ImuData from './models/ImuData';
-import IFlightStateError from './models/IFlightStateError';
-import IPowerCompensations from './models/IPowerCompensations';
-import * as convertors from './convertors';
-import * as services from './services';
-import * as flightLogics from './flight-logics';
-import { PIDControl } from './flight-logics';
+import FlightState from '../models/FlightState';
+import Command from '../models/Command';
+import ImuData from '../models/ImuData';
+import IFlightStateError from '../models/IFlightStateError';
+import IPowerCompensations from '../models/IPowerCompensations';
+import * as convertors from '../convertors';
+import * as services from '../services';
+import * as flightLogics from '../flight-logics';
+import { PIDControl } from '../flight-logics';
 
 
 export default class FlightController {

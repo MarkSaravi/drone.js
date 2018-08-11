@@ -1,7 +1,7 @@
-import Application from './Application';
-import DeviceFinder from './DeviceFinder';
+import Application from './main/Application';
+import DeviceFinder from './main/DeviceFinder';
 import PortInfo from './models/PortInfo';
-import FlightController from './FlightController';
+import FlightController from './main/FlightController';
 
 let deviceFinder = new DeviceFinder();
 let app = new Application(new FlightController());
