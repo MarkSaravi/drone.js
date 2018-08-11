@@ -41,7 +41,6 @@ export default class FlightController {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
         const dp = this.pidControl.P(this.actualFlightState.power ,stateError);
-        const p = this.actualFlightState.power;
-        return `a${(p + dp.p1).toFixed(3)}b${(p + dp.p2).toFixed(3)}c${(p + dp.p3).toFixed(3)}d${(p + dp.p4).toFixed(3)}\n`
+        return `a${(dp.p1).toFixed(3)}b${(dp.p2).toFixed(3)}c${(dp.p3).toFixed(3)}d${(dp.p4).toFixed(3)}\n`
     }
 }

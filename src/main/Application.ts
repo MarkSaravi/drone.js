@@ -30,7 +30,6 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
-        //console.log(escCommand);
         this.escDevice.write(escCommand);
     }
 
@@ -39,6 +38,7 @@ export default class Application extends EventEmitter {
     }
 
     onBleData(bleJson: string) {
+        console.log(bleJson);
         const cmd = convertors.JsonToCommand(bleJson);
         this.flightController.applyCommand(cmd);
     }

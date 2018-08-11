@@ -1,18 +1,10 @@
 ///<reference path="../../node_modules/@types/serialport/index.d.ts" />
-//"sudo chown pi:pi /dev/serial0
+
 import { EventEmitter } from 'events';
 import SerialPort from 'serialport';
 import PortInfo from '../models/PortInfo';
 const portsConfig = require('config.json')('./config.ports.json');
 
-// let dynamicPortsInfo = [
-//     {name: "/dev/ttyUSB", baudRate: 115200, type: 'imu', pattern: 'pitch'},
-//     {name: "/dev/ttyUSB", baudRate: 115200, type: 'esc', pattern: 'esc'}
-// ];
-
-// let staticPortsInfo = [
-//     {name: "/dev/serial0", baudRate: 115200, type: 'ble', pattern: 'pitch'}
-// ];
 interface PortClosedInfo {
     found: boolean,
     name: string,
