@@ -18,7 +18,8 @@ export default class FlightController {
 
     constructor() {
         this.config = require('config.json')('./config.flight.json');
-        this.pidControl = new PIDControl(this.config.gain);
+        console.log(`Gain: ${this.config.gain}`);
+        this.pidControl = new PIDControl(this.config);
         this.actualFlightState = new FlightState(0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0);
     }
