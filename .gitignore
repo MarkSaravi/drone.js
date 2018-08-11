@@ -29,8 +29,6 @@ node_modules
 #dist folder
 dist
 dist.zip
-config.ports.json
-config.flight.json
 
 #Webstorm metadata
 .idea
@@ -42,3 +40,5 @@ config.flight.json
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 package-lock.json
+config.ports.json
+config.flight.json
