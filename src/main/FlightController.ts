@@ -41,7 +41,15 @@ export default class FlightController {
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
+        stateError.yawError = 0;
+        //const er = stateError.rollError;
+        //const ep = stateError.pitchError;
+        //stateError.pitchError = er;
+        //stateError.rollError = ep;
+        const stateErrors = `${stateError.rollError.toFixed(3)}, ${stateError.pitchError.toFixed(3)}, ${stateError.yawError.toFixed(3)}`;
         const dp = this.pidControl.P(this.actualFlightState.power ,stateError);
-        return `a${(dp.p1).toFixed(3)}b${(dp.p2).toFixed(3)}c${(dp.p3).toFixed(3)}d${(dp.p4).toFixed(3)}\n`
+        const escCommand = `a${(dp.p1).toFixed(3)}b${(dp.p2).toFixed(3)}c${(dp.p3).toFixed(3)}d${(dp.p4).toFixed(3)}\n`;
+        console.log(`State Errors: ${stateErrors}, ESC command: ${escCommand}`);
+        return escCommand
     }
 }
