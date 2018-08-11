@@ -9,6 +9,6 @@ export default function getStateError(target:FlightState, actual: FlightState): 
         powerError: target.power - actual.power,
         altitudeError: 0
     };
-    console.log(`Error: ${error.rollError}, ${error.pitchError}, ${error.yawError}`)
+    //console.log(`State Error: ${error.rollError}, ${error.pitchError}, ${error.yawError}`)
     return error;
 }

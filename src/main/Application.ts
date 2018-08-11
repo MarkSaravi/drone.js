@@ -30,6 +30,7 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
+        console.log(escCommand);
         this.escDevice.write(escCommand);
     }
 

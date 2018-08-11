@@ -1,0 +1,21 @@
+{
+    "dynamicports": [{
+            "name": "/dev/ttyUSB",
+            "baudRate": 115200,
+            "type": "imu",
+            "pattern": "pitch"
+        },
+        {
+            "name": "/dev/ttyUSB",
+            "baudRate": 115200,
+            "type": "esc",
+            "pattern": "esc"
+        }
+    ],
+    "staticports": [{
+        "name": "/dev/serial0",
+        "baudRate": 9600,
+        "type": "ble",
+        "pattern": "none"
+    }]
+}

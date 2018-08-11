@@ -29,6 +29,8 @@ node_modules
 #dist folder
 dist
 dist.zip
+config.ports.json
+config.flight.json
 
 #Webstorm metadata
 .idea
