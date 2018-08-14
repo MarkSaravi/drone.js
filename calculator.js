@@ -64,21 +64,20 @@ function calcYs(m) {
     return y;
 }
 
-function generateFnMatrix() {
-    
-}
-
-function calc(x1, x2, x3, x4, tr, tp, ty, T) {
+function calcJx(x1, x2, x3, x4, tr, tp, ty, T) {
     function f1() {
-        return x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4 - T;
+        //return x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4 - T;
+        return 3*x1-Math.cos(x2*x3)-1/2;
     }
 
     function f2() {
-        return x2 * x2 - x4 * x4 + tp;
+        //return x2 * x2 - x4 * x4 + tp;
+        return x1*x1-81*(x2+0.1)*(x2+0.1)+Math.sin(x3)+1.06;
     }
 
     function f3() {
-        return x1 * x1 - x3 * x3 + tr;
+        //return x1 * x1 - x3 * x3 + tr;
+        return Math.exp(-x1*x2)+20*x3+(10*Math.PI-3)/3;
     }
 
     function f4() {
@@ -87,49 +86,60 @@ function calc(x1, x2, x3, x4, tr, tp, ty, T) {
 
     //--------------------------------------------------
     function df1x1() {
-        return 2 * x1;
+        //return 2 * x1;
+        return 3;
     }
 
     function df1x2() {
-        return 2 * x2;
+        //return 2 * x2;
+        return x3* Math.sin(x2*x3);
     }
 
     function df1x3() {
-        return 2 * x3;
+        //return 2 * x3;
+        return x2*Math.sin(x2*x3);
     }
 
     function df1x4() {
-        return 2 * x4;
+        //return 2 * x4;
+        return 0;
     }
 
     //--------------------------------------------------
     function df2x1() {
-        return 0;
+        //return 0;
+        return 2*x1;
     }
 
     function df2x2() {
-        return 2 * x2;
+        //return 2 * x2;
+        return -162*(x2+0.1);
     }
 
     function df2x3() {
-        return 0;
+        //return 0;
+        return Math.cos(x3);
     }
 
     function df2x4() {
-        return -2 * x4;
+        //return -2 * x4;
+        return 0;
     }
 
     //--------------------------------------------------
     function df3x1() {
-        return 2 * x1;
+        //return 2 * x1;
+        return -x2* Math.exp(-x1*x2);
     }
 
     function df3x2() {
-        return 0;
+        //return 0;
+        return -x1*Math.exp(-x1*x2);
     }
 
     function df3x3() {
-        return -2 * x3;
+        //return -2 * x3;
+        return 20;
     }
 
     function df3x4() {
@@ -154,23 +164,18 @@ function calc(x1, x2, x3, x4, tr, tp, ty, T) {
     }
 
     let fx = [f1(), f2(), f3(), f4()];
+    // let jx = [
+    //     [df1x1(), df1x2(), df1x3(), df1x4(), fx[0]],
+    //     [df2x1(), df2x2(), df2x3(), df2x4(), fx[1]],
+    //     [df3x1(), df3x2(), df3x3(), df3x4(), fx[2]],
+    //     [df4x1(), df4x2(), df4x3(), df4x4(), fx[3]]
+    // ];
     let jx = [
-        [df1x1(), df1x2(), df1x3(), df1x4(), fx[0]],
-        [df2x1(), df2x2(), df2x3(), df2x4(), fx[1]],
-        [df3x1(), df3x2(), df3x3(), df3x4(), fx[2]],
-        [df4x1(), df4x2(), df4x3(), df4x4(), fx[3]]
+        [df1x1(), df1x2(), df1x3(), fx[0]],
+        [df2x1(), df2x2(), df2x3(), fx[1]],
+        [df3x1(), df3x2(), df3x3(), fx[2]]
     ];
-    //showRowMatrix(fx);
-    console.log('                     ');
-    showMatrix(jx);
-    console.log('                     ');
-    GaussElimination(jx, 4, 5);
-    showMatrix(jx);
-    console.log('                     ');
-    //console.log(fx);
-    let y = calcYs(jx, 4, 5);
-    //console.log(y);
-    return y;
+    return jx;
 }
 
 // const wb = 2;
@@ -187,9 +192,13 @@ function calc(x1, x2, x3, x4, tr, tp, ty, T) {
 //     }
 //     showRowMatrix(x);
 // }
-let matrix = [[1,3,-2,5],[3,5,6,7],[2,4,3,8]];
+//let matrix = [[1,3,-2,5],[3,5,6,7],[2,4,3,8]];
+let matrix=[[3,2,-4,5,7],[-1,4,1,-2.5,1],[5,1,-1,3,14],[4,3,2,-1,16]];
 showMatrix(matrix);
 GaussElimination(matrix);
 showMatrix(matrix);
 let y = calcYs(matrix);
-console.log(showRowMatrix(y, 3));
+//console.log(showRowMatrix(y, 3));
+
+let jx = calcJx(0.1,0.1,-0.1);
+console.log(jx);
