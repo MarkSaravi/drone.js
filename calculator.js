@@ -67,17 +67,17 @@ function calcYs(m) {
 function calcJx(x1, x2, x3, x4, tr, tp, ty, T) {
     function f1() {
         //return x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4 - T;
-        return 3*x1-Math.cos(x2*x3)-1/2;
+        return -(3*x1-Math.cos(x2*x3)-1/2);
     }
 
     function f2() {
         //return x2 * x2 - x4 * x4 + tp;
-        return x1*x1-81*(x2+0.1)*(x2+0.1)+Math.sin(x3)+1.06;
+        return -(x1*x1-81*(x2+0.1)*(x2+0.1)+Math.sin(x3)+1.06);
     }
 
     function f3() {
         //return x1 * x1 - x3 * x3 + tr;
-        return Math.exp(-x1*x2)+20*x3+(10*Math.PI-3)/3;
+        return -(Math.exp(-x1*x2)+20*x3+(10*Math.PI-3)/3);
     }
 
     function f4() {
@@ -185,20 +185,23 @@ function calcJx(x1, x2, x3, x4, tr, tp, ty, T) {
 // const ty = 0;
 // let x = [wb, wb, wb, wb];
 
-// for (let loop = 0; loop < 10; loop++) {
-//     let y = calc(x[0], x[1], x[2], x[3], tr, tp, ty, T);
-//     for (let i = 0; i < 4; i++) {
-//         x[i] = x[i] + y[i];
-//     }
-//     showRowMatrix(x);
-// }
 //let matrix = [[1,3,-2,5],[3,5,6,7],[2,4,3,8]];
-let matrix=[[3,2,-4,5,7],[-1,4,1,-2.5,1],[5,1,-1,3,14],[4,3,2,-1,16]];
-showMatrix(matrix);
-GaussElimination(matrix);
-showMatrix(matrix);
-let y = calcYs(matrix);
+// let matrix=[[3,2,-4,5,7],[-1,4,1,-2.5,1],[5,1,-1,3,14],[4,3,2,-1,16]];
+// showMatrix(matrix);
+// GaussElimination(matrix);
+// showMatrix(matrix);
+// let y = calcYs(matrix);
 //console.log(showRowMatrix(y, 3));
+let x = [0.1,0.1,-0.1];
 
-let jx = calcJx(0.1,0.1,-0.1);
-console.log(jx);
+for (let loop = 0; loop<7; loop++) {
+    let jx = calcJx(x[0],x[1],x[2]);
+    //console.log(jx);
+    GaussElimination(jx);
+    let y = calcYs(jx);
+    //console.log(y);
+    for (let i=0; i<y.length; i++) {
+        x[i] = x[i] + y[i];
+    }
+    console.log(x);
+}
