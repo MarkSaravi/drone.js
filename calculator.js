@@ -8,17 +8,30 @@ function pad(x) {
 }
 
 function showRowMatrix(m) {
-    console.log(`${pad(m[0])}${pad(m[1])}${pad(m[2])}${pad(m[3])}`)
+    const nCol = m.length;
+ 
+    let s = '';
+        for (let c=0; c< nCol; c++){
+            s = s+`${pad(m[c])}`;
+        }
+        return s;
 }
 
 function showMatrix(m) {
-    for (let r = 0; r < 4; r++) {
-        console.log(`${pad(m[r][0])}${pad(m[r][1])}${pad(m[r][2])}${pad(m[r][3])}${pad(m[r][4])}`)
-            //showRowMatrix(m[r]);
+    const nRow = m.length;
+    const nCol = m[0].length;
+ 
+    for (let r = 0; r < nRow; r++) {
+        let s = showRowMatrix(m[r], nCol);
+        console.log(s)
     }
+    console.log('                  ');
 }
 
-function GaussElimination(m, nRow, nCol) {
+function GaussElimination(m) {
+    const nRow = m.length;
+    const nCol = m[0].length;
+
     for (let r = 0; r < nRow-1; r++) {
         const K = m[r][r];
         for (let c = 0; c < nCol; c++) {
@@ -33,14 +46,20 @@ function GaussElimination(m, nRow, nCol) {
     }
 }
 
-function calcYs(m, nRow, nCol) {
-    let y = [0, 0, 0, 0];
+function calcYs(m) {
+    const nRow = m.length;
+    const nCol = m[0].length;
+    let y = [];
+    for (let i=0; i< nCol; i++){
+        y.push[0];
+    }
+
     for (let r = nRow -1; r >= 0; r--) {
         let sum = 0;
         for (let c = r+1; c<nCol-1; c++) {
             sum += y[c] * m[r][c];
         }
-        y[r] = (m[r][4] - sum) / m[r][r];
+        y[r] = (m[r][nCol-1] - sum) / m[r][r];
     }
     return y;
 }
@@ -154,17 +173,23 @@ function calc(x1, x2, x3, x4, tr, tp, ty, T) {
     return y;
 }
 
-const wb = 2;
-const T = 4 * wb * wb;
-const tr = 2;
-const tp = 0;
-const ty = 0;
-let x = [wb, wb, wb, wb];
+// const wb = 2;
+// const T = 4 * wb * wb;
+// const tr = 2;
+// const tp = 0;
+// const ty = 0;
+// let x = [wb, wb, wb, wb];
 
-for (let loop = 0; loop < 10; loop++) {
-    let y = calc(x[0], x[1], x[2], x[3], tr, tp, ty, T);
-    for (let i = 0; i < 4; i++) {
-        x[i] = x[i] + y[i];
-    }
-    showRowMatrix(x);
-}
+// for (let loop = 0; loop < 10; loop++) {
+//     let y = calc(x[0], x[1], x[2], x[3], tr, tp, ty, T);
+//     for (let i = 0; i < 4; i++) {
+//         x[i] = x[i] + y[i];
+//     }
+//     showRowMatrix(x);
+// }
+let matrix = [[1,3,-2,5],[3,5,6,7],[2,4,3,8]];
+showMatrix(matrix);
+GaussElimination(matrix);
+showMatrix(matrix);
+let y = calcYs(matrix);
+console.log(showRowMatrix(y, 3));
