@@ -13,9 +13,40 @@ function showRowMatrix(m) {
 
 function showMatrix(m) {
     for (let r = 0; r < 4; r++) {
-        //console.log(`${pad(m[r][0])}${pad(m[r][1])}${pad(m[r][2])}${pad(m[r][3])}`)
-        showRowMatrix(m[r]);
+        console.log(`${pad(m[r][0])}${pad(m[r][1])}${pad(m[r][2])}${pad(m[r][3])}${pad(m[r][4])}`)
+            //showRowMatrix(m[r]);
     }
+}
+
+function GaussElimination(m, nRow, nCol) {
+    for (let r = 0; r < nRow-1; r++) {
+        const K = m[r][r];
+        for (let c = 0; c < nCol; c++) {
+            m[r][c] = m[r][c] / K;
+        }
+        for (let i = r + 1; i < nCol-1; i++) {
+            const L = -m[i][r];
+            for (let j = 0; j < nCol; j++) {
+                m[i][j] = m[i][j] + L * m[r][j]
+            }
+        }
+    }
+}
+
+function calcYs(m, nRow, nCol) {
+    let y = [0, 0, 0, 0];
+    for (let r = nRow -1; r >= 0; r--) {
+        let sum = 0;
+        for (let c = r+1; c<nCol-1; c++) {
+            sum += y[c] * m[r][c];
+        }
+        y[r] = (m[r][4] - sum) / m[r][r];
+    }
+    return y;
+}
+
+function generateFnMatrix() {
+    
 }
 
 function calc(x1, x2, x3, x4, tr, tp, ty, T) {
@@ -105,33 +136,35 @@ function calc(x1, x2, x3, x4, tr, tp, ty, T) {
 
     let fx = [f1(), f2(), f3(), f4()];
     let jx = [
-        [df1x1(), df1x2(), df1x3(), df1x4()],
-        [df2x1(), df2x2(), df2x3(), df2x4()],
-        [df3x1(), df3x2(), df3x3(), df3x4()],
-        [df4x1(), df4x2(), df4x3(), df4x4()]
+        [df1x1(), df1x2(), df1x3(), df1x4(), fx[0]],
+        [df2x1(), df2x2(), df2x3(), df2x4(), fx[1]],
+        [df3x1(), df3x2(), df3x3(), df3x4(), fx[2]],
+        [df4x1(), df4x2(), df4x3(), df4x4(), fx[3]]
     ];
+    //showRowMatrix(fx);
+    console.log('                     ');
     showMatrix(jx);
     console.log('                     ');
-    for (let i = 0; i < 3; i++) {
-        for (let j = i + 1; j < 4; j++) {
-            const K = -jx[j][i] / jx[i][i];
-            for (let c = 0; c < 4; c++) {
-                jx[j][c] = K * jx[i][c] + jx[j][c];
-            }
-        }
-    }
+    GaussElimination(jx, 4, 5);
     showMatrix(jx);
-    console.log(fx);
-    let y = [0, 0, 0, 0];
-    for (let i = 3; i >= 0; i--) {
-        let sum = 0;
-        for (j = i + 1; j < 4; j++) {
-            sum += y[j] * jx[i][j];
-        }
-        y[i] = (fx[i] - sum) / jx[i][i];
-    }
-    console.log(y);
+    console.log('                     ');
+    //console.log(fx);
+    let y = calcYs(jx, 4, 5);
+    //console.log(y);
+    return y;
 }
 
-//calc(1, 1, 1, 1, 1, 1, 1, 1);
-calc(1, 1, 1, 1, 0, 0, 0, 4);
+const wb = 2;
+const T = 4 * wb * wb;
+const tr = 2;
+const tp = 0;
+const ty = 0;
+let x = [wb, wb, wb, wb];
+
+for (let loop = 0; loop < 10; loop++) {
+    let y = calc(x[0], x[1], x[2], x[3], tr, tp, ty, T);
+    for (let i = 0; i < 4; i++) {
+        x[i] = x[i] + y[i];
+    }
+    showRowMatrix(x);
+}
