@@ -7,9 +7,14 @@ function pad(x) {
     return s;
 }
 
+function showRowMatrix(m) {
+    console.log(`${pad(m[0])}${pad(m[1])}${pad(m[2])}${pad(m[3])}`)
+}
+
 function showMatrix(m) {
     for (let r = 0; r < 4; r++) {
-        console.log(`${pad(m[r][0])}${pad(m[r][1])}${pad(m[r][2])}${pad(m[r][3])}`)
+        //console.log(`${pad(m[r][0])}${pad(m[r][1])}${pad(m[r][2])}${pad(m[r][3])}`)
+        showRowMatrix(m[r]);
     }
 }
 
@@ -116,6 +121,17 @@ function calc(x1, x2, x3, x4, tr, tp, ty, T) {
         }
     }
     showMatrix(jx);
+    console.log(fx);
+    let y = [0, 0, 0, 0];
+    for (let i = 3; i >= 0; i--) {
+        let sum = 0;
+        for (j = i + 1; j < 4; j++) {
+            sum += y[j] * jx[i][j];
+        }
+        y[i] = (fx[i] - sum) / jx[i][i];
+    }
+    console.log(y);
 }
 
-calc(1, 1, 1, 1, 1, 1, 1, 1);
+//calc(1, 1, 1, 1, 1, 1, 1, 1);
+calc(1, 1, 1, 1, 0, 0, 0, 4);
