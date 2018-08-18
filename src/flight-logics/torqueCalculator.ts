@@ -36,21 +36,21 @@ function calcYs(m: any) {
     return y;
 }
 
-function calcJx(x1: number, x2: number, x3: number, x4: number, tr: number, tp: number, ty: number, T: number) {
+function calcJx(x1: number, x2: number, x3: number, x4: number, t1: number, t2: number, t3: number, T: number) {
     function f1() {
         return -(x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4 - T);
     }
 
     function f2() {
-        return -(x2 * x2 - x4 * x4 + tp);
+        return -(x2 * x2 - x4 * x4 + t2);
     }
 
     function f3() {
-        return -(x1 * x1 - x3 * x3 + tr);
+        return -(x1 * x1 - x3 * x3 + t1);
     }
 
     function f4() {
-        return -(x1 * x1 - x2 * x2 + x3 * x3 - x4 * x4 + ty);
+        return -(x1 * x1 - x2 * x2 + x3 * x3 - x4 * x4 + t3);
     }
 
     // x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4 - T  --------------------------------------------------
@@ -70,7 +70,7 @@ function calcJx(x1: number, x2: number, x3: number, x4: number, tr: number, tp: 
         return 2 * x4;
     }
 
-    // x2 * x2 - x4 * x4 + tp --------------------------------------------------
+    // x2 * x2 - x4 * x4 + t2 --------------------------------------------------
     function df2x1() {
         return 0;
     }
@@ -87,7 +87,7 @@ function calcJx(x1: number, x2: number, x3: number, x4: number, tr: number, tp: 
         return -2 * x4;
     }
 
-    // x1 * x1 - x3 * x3 + tr --------------------------------------------------
+    // x1 * x1 - x3 * x3 + t1 --------------------------------------------------
     function df3x1() {
         return 2 * x1;
     }
@@ -104,7 +104,7 @@ function calcJx(x1: number, x2: number, x3: number, x4: number, tr: number, tp: 
         return 0;
     }
 
-    // x1 * x1 - x2 * x2 + x3 * x3 - x4 * x4 + ty --------------------------------------------------
+    // x1 * x1 - x2 * x2 + x3 * x3 - x4 * x4 + t3 --------------------------------------------------
     function df4x1() {
         return 2 * x1;
     }
@@ -135,13 +135,13 @@ function calcJx(x1: number, x2: number, x3: number, x4: number, tr: number, tp: 
 function torqueCalculator(power: number, torqueRoll: number, torquePitch: number, torqueYaw: number): IPowerCompensations {
     const wb = power;
     const Twb = 4 * wb * wb;
-    const Tr = torqueRoll;
-    const Tp = torquePitch;
-    const Ty = torqueYaw;
+    const T1 = torquePitch;
+    const T2 = torqueRoll;
+    const T3 = torqueYaw;
     let x = [wb, wb, wb, wb];
     
     for (let loop = 0; loop<10; loop++) {
-        let jx = calcJx(x[0],x[1],x[2], x[3], Tr, Tp, Ty, Twb);
+        let jx = calcJx(x[0],x[1],x[2], x[3], T1, T2, T3, Twb);
         GaussElimination(jx);
         let y = calcYs(jx);
         for (let i=0; i<y.length; i++) {

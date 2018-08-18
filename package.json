@@ -15,7 +15,7 @@
         "run-drone": "node ./dist/drone.js",
         "unzip-start": "npm run clean && npm run unzip && npm run run-drone",
         "start": "npm run run-drone",
-        "test-build": "npm run build && npm run test",
+        "build-and-test": "npm run build && npm run test",
         "test": "node ./dist/tests/test.js"
     },
     "dependencies": {

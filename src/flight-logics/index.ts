@@ -1,9 +1,9 @@
 import applyTargetPower from './applyTargetPower';
-import calcTorques from './calcTorques';
 import PIDControl from './PIDControl';
 import getStateError from './getStateErrors';
+import { torqueCalculator } from './torqueCalculator';
 
-export {calcTorques};
-export {applyTargetPower};
-export {PIDControl};
-export {getStateError};
+export { applyTargetPower };
+export { PIDControl };
+export { getStateError };
+export { torqueCalculator }
