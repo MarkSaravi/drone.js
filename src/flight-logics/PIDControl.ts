@@ -13,4 +13,9 @@ export default class PIDControl {
             errors.yawError* this.config.gain * this.config.yawPolarity);
         return r;
     }
+
+    PID(basePower: number, errors: IFlightStateError): ICalculatedPowers {
+        return this.P(basePower, errors);
+    }
+
 }
