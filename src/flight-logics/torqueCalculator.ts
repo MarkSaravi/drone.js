@@ -149,7 +149,13 @@ function torqueCalculator(power: number, torqueRoll: number, torquePitch: number
         }
     }
     
-    return { p1: x[0], p2: x[1], p3: x[2], p4: x[3]};
+    return { 
+        p1: x[0], 
+        p2: x[1], 
+        p3: x[2], 
+        p4: x[3], 
+        isValid: () => !isNaN(x[0]) && !isNaN(x[1]) && !isNaN(x[2]) && !isNaN(x[3])
+    };
 }
 
 export { torqueCalculator };

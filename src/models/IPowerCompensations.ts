@@ -3,4 +3,5 @@ export default interface IPowerCompensations {
     p2: number;
     p3: number;
     p4: number;
+    isValid: () => boolean
 }
