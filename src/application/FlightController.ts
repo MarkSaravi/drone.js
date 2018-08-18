@@ -2,7 +2,7 @@ import FlightState from '../models/FlightState';
 import Command from '../models/Command';
 import ImuData from '../models/ImuData';
 import IFlightStateError from '../models/IFlightStateError';
-import IPowerCompensations from '../models/IPowerCompensations';
+import ICalculatedPowers from '../models/ICalculatedPowers';
 import * as convertors from '../convertors';
 import * as services from '../services';
 import * as flightLogics from '../flight-logics';

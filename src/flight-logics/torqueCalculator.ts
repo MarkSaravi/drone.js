@@ -1,4 +1,4 @@
-import IPowerCompensations from '../models/IPowerCompensations';
+import ICalculatedPowers from '../models/ICalculatedPowers';
 
 function GaussElimination(m: any) {
     const nRow = m.length;
@@ -132,7 +132,7 @@ function calcJx(x1: number, x2: number, x3: number, x4: number, t1: number, t2: 
 }
 
 
-function torqueCalculator(power: number, torqueRoll: number, torquePitch: number, torqueYaw: number): IPowerCompensations {
+function torqueCalculator(power: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
     const wb = power;
     const Twb = 4 * wb * wb;
     const T1 = torquePitch;

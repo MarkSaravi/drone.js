@@ -1,12 +1,12 @@
 import { torqueCalculator } from './torqueCalculator';
-import IPowerCompensations from '../models/IPowerCompensations';
+import ICalculatedPowers from '../models/ICalculatedPowers';
 import IFlightStateError from '../models/IFlightStateError';
 
 export default class PIDControl {
     constructor(private readonly config: any) {
     }
 
-    P(basePower: number, errors: IFlightStateError): IPowerCompensations {
+    P(basePower: number, errors: IFlightStateError): ICalculatedPowers {
         const  r = torqueCalculator(basePower > 0 ? basePower : 1, 
             errors.rollError* this.config.gain * this.config.rollPolarity,
             errors.pitchError* this.config.gain * this.config.pitchPolarity,

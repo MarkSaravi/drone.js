@@ -1,4 +1,4 @@
-export default interface IPowerCompensations {
+export default interface ICalculatedPowers {
     p1: number;
     p2: number;
     p3: number;
