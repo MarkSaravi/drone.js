@@ -1,0 +1,1 @@
+Leostick I2C: SDA is D2 and SCL is D3.
