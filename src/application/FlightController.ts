@@ -12,7 +12,6 @@ export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
     private config: any;
-    imuCounter: number = 0;
     private readonly pidControl: PIDControl;
     private escCommand: string;
 
@@ -27,26 +26,16 @@ export default class FlightController {
 
     applyCommand(command: Command) {
         this.targetFlightState = convertors.CommandToFlightStatus(command, this.targetFlightState);
-        services.printFlightState(this.targetFlightState, 'Target: ');
     }
 
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData, this.actualFlightState);
-        if (this.imuCounter++ >= 100) {
-            // console.log("==========================================");
-            services.printFlightState(this.actualFlightState, 'Actual: ');
-           this.imuCounter = 0;
         }
-    }
 
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
         stateError.yawError = 0;
-        //const er = stateError.rollError;
-        //const ep = stateError.pitchError;
-        //stateError.pitchError = er;
-        //stateError.rollError = ep;
         const stateErrors = `${stateError.rollError.toFixed(3)}, ${stateError.pitchError.toFixed(3)}, ${stateError.yawError.toFixed(3)}`;
         const dp = this.pidControl.PID(this.actualFlightState.power ,stateError);
         if (dp.isValid()) {
