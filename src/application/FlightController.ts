@@ -25,12 +25,12 @@ export default class FlightController {
 
     incGain() {
         this.config.gain = this.config.gain + 0.1;
-        console.log(this.config.gain);
+        console.log(`Gain: ${this.config.gain}`);
     }
 
     decGain() {
         this.config.gain = this.config.gain - 0.1;
-        console.log(this.config.gain);
+        console.log(`Gain: ${this.config.gain}`);
     }
 
     applyCommand(command: Command) {

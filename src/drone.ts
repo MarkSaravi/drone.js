@@ -3,7 +3,7 @@ import Application from './application/Application';
 import DeviceFinder from './devices/DeviceFinder';
 import PortInfo from './models/PortInfo';
 import FlightController from './application/FlightController';
-const keypress = require('keypress');
+const readline = require('readline');
 
 let deviceFinder = new DeviceFinder();
 const flightControl = new FlightController();
@@ -20,38 +20,31 @@ deviceFinder.on('devices-ready', (devices: PortInfo[]) => {
 app.start();
 deviceFinder.findDevices();
 
-keypress(process.stdin);
-process.stdin.on('keypress', function (ch, key) {
-    console.log('got "keypress"', key);
-    if (key && key.ctrl && key.name == 'c') {
-      }
- 
-        // switch(b) {
-        //     case 10: 
-        //         app.emit('stopping-application');
-        //         break;
-        //     case '+': 
-        //         app.emit('inc-gain');
-        //         break;
-        //     case '-':
-        //         app.emit('dec-gain');
-        //         break;
-        // }
+readline.emitKeypressEvents(process.stdin);
+process.stdin.setRawMode(true);
 
-        // if (b === 10) {
-        //     console.log(inputString);
-        //     if (inputString === '.') {
-        //         app.emit('stopping-application');
-        //     } else if (inputString === '+'){
-        //         const emt = new EventEmitter();
-        //         emt.emit('inc-gain', {});
-        //         console.log('inc');
-        //     } else if (inputString === '-'){
-        //         console.log('dec');
-        //     }
-        //     inputString = '';
-        // } else {
-        //     inputString += String.fromCharCode(b as number);
-        // }
+process.stdin.on('keypress', (str, key) => {
+    switch (str) {
+        case '.':
+            app.emit('stopping-application');
+            break;
+        case '+':
+            app.emit('inc-gain');
+            console.log('**** inc-gain');
+            break;
+        case '-':
+            app.emit('dec-gain');
+            console.log('**** dec-gain');
+            break;
+    }
 
 });
+
+// if (key.ctrl && key.name === 'c') {
+//     process.exit();
+// } else {
+//     console.log(`You pressed the "${str}" key`);
+//     console.log();
+//     console.log(key);
+//     console.log();
+// }
