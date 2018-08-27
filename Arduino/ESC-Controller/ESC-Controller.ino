@@ -13,7 +13,7 @@ const double FREQ = 480.0;
 const double PERIOD = 1.0 / FREQ;
 const int PWM_COUNTER = 4096;
 
-const double SPEED_FACTOR = 0.25;
+const double SPEED_FACTOR = 0.5;
 const double MAX_SPEED = 100.0;
 const double SAFE_SPEED_CHANGE = -30.0;
 
