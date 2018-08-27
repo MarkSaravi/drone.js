@@ -1,10 +1,13 @@
+///<reference path="../node_modules/@types/node/index.d.ts" />
 import Application from './application/Application';
 import DeviceFinder from './devices/DeviceFinder';
 import PortInfo from './models/PortInfo';
 import FlightController from './application/FlightController';
+const keypress = require('keypress');
 
 let deviceFinder = new DeviceFinder();
-let app = new Application(new FlightController());
+const flightControl = new FlightController();
+let app = new Application(flightControl);
 
 app.on('ble-send', (s) => {
     app.writeBLE(s);
@@ -17,24 +20,38 @@ deviceFinder.on('devices-ready', (devices: PortInfo[]) => {
 app.start();
 deviceFinder.findDevices();
 
-var inputString = '';
-process.stdin.on('readable', () => {
-    const chunk = process.stdin.read();
-    if (!chunk) return;
-    console.log(chunk);
-    for (let b of chunk) {
-        if (b === 10) {
-            console.log(inputString);
-            if (inputString === '.') {
-                app.emit('stopping-application');
-            } else if (inputString === '+'){
-                app.emit('inc-gain');
-            } else if (inputString === '-'){
-                app.emit('dec-gain');
-            }
-            inputString = '';
-        } else {
-            inputString += String.fromCharCode(b as number);
-        }
-    }
+keypress(process.stdin);
+process.stdin.on('keypress', function (ch, key) {
+    console.log('got "keypress"', key);
+    if (key && key.ctrl && key.name == 'c') {
+      }
+ 
+        // switch(b) {
+        //     case 10: 
+        //         app.emit('stopping-application');
+        //         break;
+        //     case '+': 
+        //         app.emit('inc-gain');
+        //         break;
+        //     case '-':
+        //         app.emit('dec-gain');
+        //         break;
+        // }
+
+        // if (b === 10) {
+        //     console.log(inputString);
+        //     if (inputString === '.') {
+        //         app.emit('stopping-application');
+        //     } else if (inputString === '+'){
+        //         const emt = new EventEmitter();
+        //         emt.emit('inc-gain', {});
+        //         console.log('inc');
+        //     } else if (inputString === '-'){
+        //         console.log('dec');
+        //     }
+        //     inputString = '';
+        // } else {
+        //     inputString += String.fromCharCode(b as number);
+        // }
+
 });
