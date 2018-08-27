@@ -27,8 +27,10 @@ process.stdin.on('readable', () => {
             console.log(inputString);
             if (inputString === '.') {
                 app.emit('stopping-application');
-            } else {
-                app.emit('ble-send', inputString);
+            } else if (inputString === '+'){
+                app.emit('inc-gain');
+            } else if (inputString === '-'){
+                app.emit('dec-gain');
             }
             inputString = '';
         } else {
