@@ -30,11 +30,9 @@ process.stdin.on('keypress', (str, key) => {
             break;
         case '+':
             app.emit('inc-gain');
-            console.log('**** inc-gain');
             break;
         case '-':
             app.emit('dec-gain');
-            console.log('**** dec-gain');
             break;
     }
 
