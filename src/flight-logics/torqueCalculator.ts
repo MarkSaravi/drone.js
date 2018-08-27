@@ -4,12 +4,12 @@ function GaussElimination(m: any) {
     const nRow = m.length;
     const nCol = m[0].length;
 
-    for (let r = 0; r < nRow-1; r++) {
+    for (let r = 0; r < nRow - 1; r++) {
         const K = m[r][r];
         for (let c = 0; c < nCol; c++) {
             m[r][c] = m[r][c] / K;
         }
-        for (let i = r + 1; i < nCol-1; i++) {
+        for (let i = r + 1; i < nCol - 1; i++) {
             const L = -m[i][r];
             for (let j = 0; j < nCol; j++) {
                 m[i][j] = m[i][j] + L * m[r][j]
@@ -22,16 +22,16 @@ function calcYs(m: any) {
     const nRow = m.length;
     const nCol = m[0].length;
     let y: any = [];
-    for (let i=0; i< nCol; i++){
+    for (let i = 0; i < nCol; i++) {
         y.push[0];
     }
 
-    for (let r = nRow -1; r >= 0; r--) {
+    for (let r = nRow - 1; r >= 0; r--) {
         let sum = 0;
-        for (let c = r+1; c<nCol-1; c++) {
+        for (let c = r + 1; c < nCol - 1; c++) {
             sum += y[c] * m[r][c];
         }
-        y[r] = (m[r][nCol-1] - sum) / m[r][r];
+        y[r] = (m[r][nCol - 1] - sum) / m[r][r];
     }
     return y;
 }
@@ -139,22 +139,22 @@ function torqueCalculator(power: number, torqueRoll: number, torquePitch: number
     const T2 = torqueRoll;
     const T3 = torqueYaw;
     let x = [wb, wb, wb, wb];
-    
-    for (let loop = 0; loop<10; loop++) {
-        let jx = calcJx(x[0],x[1],x[2], x[3], T1, T2, T3, Twb);
+
+    for (let loop = 0; loop < 10; loop++) {
+        let jx = calcJx(x[0], x[1], x[2], x[3], T1, T2, T3, Twb);
         GaussElimination(jx);
         let y = calcYs(jx);
-        for (let i=0; i<y.length; i++) {
+        for (let i = 0; i < y.length; i++) {
             x[i] = x[i] + y[i];
         }
     }
-    
-    return { 
-        p1: x[0], 
-        p2: x[1], 
-        p3: x[2], 
-        p4: x[3], 
-        isValid: () => !isNaN(x[0]) && !isNaN(x[1]) && !isNaN(x[2]) && !isNaN(x[3])
+
+    return {
+        p1: x[0],
+        p2: x[1],
+        p3: x[2],
+        p4: x[3],
+        isValid: () => (!isNaN(x[0]) && x[0] >= 0) && (!isNaN(x[1]) && x[1] >= 0) && (!isNaN(x[2]) && x[2] >= 0) && (!isNaN(x[3]) && x[3] >= 0)
     };
 }
 
