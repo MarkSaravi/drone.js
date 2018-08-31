@@ -26,6 +26,7 @@ export default class DeviceFinder extends EventEmitter {
             if (info.found) {
                 console.log(`${info.name} is ${info.type}`);
                 detectedList.push({ name: info.name, type: info.type, baudRate: info.baudRate, pattern: ''});
+                portCounter = -1;
                 infoCounter++;
             }
             portCounter++;
