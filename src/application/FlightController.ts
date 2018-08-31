@@ -59,17 +59,25 @@ export default class FlightController {
         return `a${(p.p1).toFixed(3)}b${(p.p2).toFixed(3)}c${(p.p3).toFixed(3)}d${(p.p4).toFixed(3)}\n`;
     }
 
+    showState(pv: ICalculatedPowers, fsv: IFlightStateError, msg: string) {
+        const ps = `a: ${(pv.p1).toFixed(3)} ,b: ${(pv.p2).toFixed(3)} ,c: ${(pv.p3).toFixed(3)} ,d: ${(pv.p4).toFixed(3)}`;
+        const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)} ,yaw${(fsv.yawError).toFixed(3)}`;
+        const text = `${ps}, ${fss}, ${msg}`;
+        console.clear();
+        console.log(text);
+    }
+
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
         stateError.yawError = 0;
-        const stateErrors = `${stateError.rollError.toFixed(3)}, ${stateError.pitchError.toFixed(3)}, ${stateError.yawError.toFixed(3)}`;
+        //const stateErrors = `${stateError.rollError.toFixed(3)}, ${stateError.pitchError.toFixed(3)}, ${stateError.yawError.toFixed(3)}`;
         const p = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
         if (this.isValodPower(p)) {
             this.powers = p;
-            console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
+            this.showState(this.powers, stateError, '');
         } else {
-            console.log(this.actualFlightState.power , p);
+            this.showState(this.powers, stateError, 'error, using previous values');
         }
         this.escCommand = this.createEscCommand(this.powers);
         //console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
