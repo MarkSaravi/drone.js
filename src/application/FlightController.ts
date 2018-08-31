@@ -48,11 +48,11 @@ export default class FlightController {
 
     isValodPower(p: ICalculatedPowers): boolean
     {
-        return 
+        return (
         !isNaN(p.p1) && p.p1 >= 0 &&
         !isNaN(p.p2) && p.p2 >= 0 &&
         !isNaN(p.p3) && p.p3 >= 0 &&
-        !isNaN(p.p4) && p.p4 >= 0;
+        !isNaN(p.p4) && p.p4 >= 0);
     }
 
     createEscCommand(p: ICalculatedPowers): string {
@@ -67,6 +67,9 @@ export default class FlightController {
         const p = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
         if (this.isValodPower(p)) {
             this.powers = p;
+            console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
+        } else {
+            console.log(this.actualFlightState.power , p);
         }
         this.escCommand = this.createEscCommand(this.powers);
         //console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
