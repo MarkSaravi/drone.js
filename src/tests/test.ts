@@ -147,13 +147,13 @@ runner.test('negative yaw torque', () => {
     );
 });
 
-runner.test('zero poawer should be invalid', () => {
-    const tr = 0;
-    const tp = 0;
-    const ty = 0;
-    const pb = 0;
+// runner.test('zero poawer should be invalid', () => {
+//     const tr = 0;
+//     const tp = 0;
+//     const ty = 0;
+//     const pb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
-    console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
-    TestRunner.assert(false, actualValues.isValid());
-});
+//     const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+//     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
+//     TestRunner.assert(false, actualValues.isValid());
+// });

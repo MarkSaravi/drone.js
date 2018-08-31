@@ -5,6 +5,7 @@ import IFlightStateError from '../models/IFlightStateError';
 import * as convertors from '../convertors';
 import * as flightLogics from '../flight-logics';
 import { PIDControl } from '../flight-logics';
+import ICalculatedPowers from '../models/ICalculatedPowers';
 
 
 export default class FlightController {
@@ -13,6 +14,7 @@ export default class FlightController {
     private config: any;
     private readonly pidControl: PIDControl;
     private escCommand: string;
+    private powers: ICalculatedPowers;
 
     constructor() {
         this.config = require('config.json')('./config.flight.json');
@@ -20,6 +22,9 @@ export default class FlightController {
         this.pidControl = new PIDControl();
         this.actualFlightState = new FlightState(0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0);
+        this.powers = {
+            p1: 0, p2: 0, p3: 0, p4:0
+        };
         this.escCommand = "a0b0c0d0";
     }
 
@@ -39,18 +44,32 @@ export default class FlightController {
 
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData, this.actualFlightState);
-        }
+    }
+
+    isValodPower(p: ICalculatedPowers): boolean
+    {
+        return 
+        !isNaN(p.p1) && p.p1 >= 0 &&
+        !isNaN(p.p2) && p.p2 >= 0 &&
+        !isNaN(p.p3) && p.p3 >= 0 &&
+        !isNaN(p.p4) && p.p4 >= 0;
+    }
+
+    createEscCommand(p: ICalculatedPowers): string {
+        return `a${(p.p1).toFixed(3)}b${(p.p2).toFixed(3)}c${(p.p3).toFixed(3)}d${(p.p4).toFixed(3)}\n`;
+    }
 
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
         stateError.yawError = 0;
         const stateErrors = `${stateError.rollError.toFixed(3)}, ${stateError.pitchError.toFixed(3)}, ${stateError.yawError.toFixed(3)}`;
-        const dp = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
-        if (dp.isValid()) {
-            this.escCommand = `a${(dp.p1).toFixed(3)}b${(dp.p2).toFixed(3)}c${(dp.p3).toFixed(3)}d${(dp.p4).toFixed(3)}\n`;   
+        const p = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
+        if (this.isValodPower(p)) {
+            this.powers = p;
         }
-        console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
+        this.escCommand = this.createEscCommand(this.powers);
+        //console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
         return this.escCommand
     }
 }

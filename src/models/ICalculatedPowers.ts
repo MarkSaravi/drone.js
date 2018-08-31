@@ -3,5 +3,4 @@ export default interface ICalculatedPowers {
     p2: number;
     p3: number;
     p4: number;
-    isValid: () => boolean
 }

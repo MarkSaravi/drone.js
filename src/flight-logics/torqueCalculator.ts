@@ -153,8 +153,8 @@ function torqueCalculator(power: number, torqueRoll: number, torquePitch: number
         p1: x[0],
         p2: x[1],
         p3: x[2],
-        p4: x[3],
-        isValid: () => (!isNaN(x[0]) && x[0] >= 0) && (!isNaN(x[1]) && x[1] >= 0) && (!isNaN(x[2]) && x[2] >= 0) && (!isNaN(x[3]) && x[3] >= 0)
+        p4: x[3]
+        //isValid: () => (!isNaN(x[0]) && x[0] >= 0) && (!isNaN(x[1]) && x[1] >= 0) && (!isNaN(x[2]) && x[2] >= 0) && (!isNaN(x[3]) && x[3] >= 0)
     };
 }
 
