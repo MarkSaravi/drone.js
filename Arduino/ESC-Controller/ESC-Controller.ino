@@ -19,7 +19,7 @@ typedef enum JsonErrors
 JsonErrors readJsonKeyValue(const char *json, int *sIndex, char key, double *value);
 JsonErrors readJson(const char *json, double *a, double *b, double *c, double *d);
 
-#define SHOW_DEBUG_INFO
+//#define SHOW_DEBUG_INFO
 
 const long SERIAL_PORT_SPEED = 115200;
 

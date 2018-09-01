@@ -56,7 +56,7 @@ export default class FlightController {
     }
 
     createEscCommand(p: ICalculatedPowers): string {
-        return `a${(p.p1).toFixed(3)}b${(p.p2).toFixed(3)}c${(p.p3).toFixed(3)}d${(p.p4).toFixed(3)}\n`;
+        return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
     showState(pv: ICalculatedPowers, fsv: IFlightStateError, msg: string) {
@@ -71,7 +71,6 @@ export default class FlightController {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
         stateError.yawError = 0;
-        //const stateErrors = `${stateError.rollError.toFixed(3)}, ${stateError.pitchError.toFixed(3)}, ${stateError.yawError.toFixed(3)}`;
         const p = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
         if (this.isValodPower(p)) {
             this.powers = p;
@@ -80,7 +79,6 @@ export default class FlightController {
             this.showState(this.powers, stateError, 'error, using previous values');
         }
         this.escCommand = this.createEscCommand(this.powers);
-        //console.log(`State Errors: ${stateErrors}, ESC command: ${this.escCommand}`);
         return this.escCommand
     }
 }
