@@ -187,11 +187,14 @@ void readCommand()
     static int counter = 0;
     static double a, b, c, d;
     static JsonErrors err;
+    static char incomingByte;
     while (Serial.available())
     {
+        incomingByte = Serial.read();
+        if (incomingByte == 10 || incomingByte == 13 || incomingByte==' ') continue;
         if (counter >= CMD_MAX_LEN)
             counter = 0;
-        cmdJson[counter] = Serial.read();
+        cmdJson[counter] = incomingByte;
         if (cmdJson[counter] == '}')
         {
             cmdJson[counter + 1] = NULL;
