@@ -1,4 +1,4 @@
-import { torqueCalculator } from './torqueCalculator';
+import torqueCalculator from './torqueCalculator';
 import ICalculatedPowers from '../models/ICalculatedPowers';
 import IFlightStateError from '../models/IFlightStateError';
 
