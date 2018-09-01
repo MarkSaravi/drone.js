@@ -1,11 +1,14 @@
 import ICalculatedPowers from '../models/ICalculatedPowers';
+let gauss = require('gaussian-elimination');
 
 function GaussElimination(m: any) {
     const nRow = m.length;
     const nCol = m[0].length;
 
     for (let r = 0; r < nRow - 1; r++) {
+        showJx(m);
         const K = m[r][r];
+        console.log(`K: ${r}, ${m[r][r]}`);
         for (let c = 0; c < nCol; c++) {
             m[r][c] = m[r][c] / K;
         }
@@ -15,6 +18,8 @@ function GaussElimination(m: any) {
                 m[i][j] = m[i][j] + L * m[r][j]
             }
         }
+        showJx(m);
+        console.log('---------------------------');
     }
 }
 
@@ -36,89 +41,89 @@ function calcYs(m: any) {
     return y;
 }
 
-function calcJx(k1: number, k2: number, k3: number, k4: number, tr: number, tp: number, ty: number, wb: number) {
+function calcJx(a: number, b: number, c: number, d: number, tr: number, tp: number, ty: number, wb: number) {
     function f1() {
-        return (2 * wb * (k1 + k2 + k3 + k4) + k1 * k1 + k2 * k2 + k3 * k3 + k4 * k4);
+        return -(2 * wb * (a + b + c + d) + a * a + b * b + c * c + d * d);
     }
 
     function f2() {
-        return (2 * wb * (k1 + k3 - k2 - k4) + k1 * k1 + k3 * k3 - k2 * k2 - k4 * k4 - ty);
+        return -(2 * wb * (a - b + c - d) + a * a + c * c - b * b - d * d - ty);
     }
 
     function f3() {
-        return (2 * wb * ( k1 -k3) - tp);
+        return (2 * wb * ( b -d) - tr);
     }
 
     function f4() {
-        return (2 * wb * ( k2 - k4) - tr);
+        return (2 * wb * ( a - c) - tp);
     }
 
     // x1 * x1 + x2 * x2 + x3 * x3 + x4 * x4 - T  --------------------------------------------------
     function df1x1() {
-        return 2 * wb + 2 * k1;
+        return 2 * (wb + a);
     }
 
     function df1x2() {
-        return 2 * wb + 2 * k2;
+        return 2 * (wb + b);
     }
 
     function df1x3() {
-        return 2 * wb + 2 * k3;
+        return 2 * (wb + c);
     }
 
     function df1x4() {
-        return 2 * wb + 2 * k4;
+        return 2 * (wb + d);
     }
 
     // x2 * x2 - x4 * x4 + t2 --------------------------------------------------
     function df2x1() {
-        return 2 * wb + 2 * k1;
+        return 2 * (wb + a);
     }
 
     function df2x2() {
-        return 2 * wb + 2 * k3;
+        return -2 * (wb + b);
     }
 
     function df2x3() {
-        return -2 * wb - 2 * k2;
+        return 2 * (wb + c);
     }
 
     function df2x4() {
-        return -2 * wb - 2 * k4;
+        return -2 * (wb + d);
     }
 
     // x1 * x1 - x3 * x3 + t1 --------------------------------------------------
     function df3x1() {
-        return 2 * wb;
+        return 0;
     }
 
     function df3x2() {
-        return 0;
+        return 2 * (wb + b);
     }
 
     function df3x3() {
-        return -2 * wb;
+        return 0;
     }
 
     function df3x4() {
-        return 0;
+        return -2*(wb + d);
     }
 
     // x1 * x1 - x2 * x2 + x3 * x3 - x4 * x4 + t3 --------------------------------------------------
     function df4x1() {
-        return 0;
+        return 2 * (wb + a);
     }
 
     function df4x2() {
-        return 2 * wb;
-    }
-
-    function df4x3() {
         return 0;
     }
 
+    function df4x3() {
+        return -2 * (wb + c);
+    }
+
     function df4x4() {
-        return -2 * wb;
+        return 0;
     }
 
     let fx = [f1(), f2(), f3(), f4()];
@@ -131,18 +136,33 @@ function calcJx(k1: number, k2: number, k3: number, k4: number, tr: number, tp: 
     return jx;
 }
 
+function showJx(jx: any) {
+    for (let r of jx) {
+        console.log(r);
+    }
+    console.log('***********************');
+}
 
 function torqueCalculator2(power: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
+    // let arr = [[3, 0.000999983, -0.000999983, 1.19995],  
+    //        [0.2, -32.4, 0.995004165, 2.269833417],  
+    //        [0.099004984, -0.099004983, 20, -8.462025346]]
+    // let res = gauss(arr)
+    // console.log(res)    
     const wb = power;
     let x = [0, 0, 0, 0];
 
     for (let loop = 0; loop < 10; loop++) {
         let jx = calcJx(x[0], x[1], x[2], x[3], torqueRoll, torquePitch, torqueYaw, wb);
-        GaussElimination(jx);
-        let y = calcYs(jx);
+        showJx(jx);
+        //GaussElimination(jx);
+        let y = gauss(jx);
+        console.log(y);
+        //let y = calcYs(jx);
         for (let i = 0; i < y.length; i++) {
             x[i] = x[i] + y[i];
         }
+        console.log(x);
     }
 
     return {
