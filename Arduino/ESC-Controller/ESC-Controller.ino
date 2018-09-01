@@ -45,7 +45,7 @@ bool isArmed = false;
 void sendDeviceType()
 {
     static long lastIdentifier = millis();
-    if (millis() - lastIdentifier >= 50000)
+    if (millis() - lastIdentifier >= 500)
     {
         lastIdentifier = millis();
         Serial.println("{\"dev\":\"esc\"}");
