@@ -3,7 +3,23 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
-//#define SHOW_DEBUG_INFO
+typedef enum JsonErrors
+{
+    NoError,
+    MissingStart,
+    MissingEnd,
+    MissingComma,
+    LengthError,
+    KeyError,
+    MissingDoubleQouteError,
+    MissingColon,
+    MissingValueError
+} JsonErrors;
+
+JsonErrors readJsonKeyValue(const char *json, int *sIndex, char key, double *value);
+JsonErrors readJson(const char *json, double *a, double *b, double *c, double *d);
+
+#define SHOW_DEBUG_INFO
 
 const long SERIAL_PORT_SPEED = 115200;
 
@@ -20,36 +36,19 @@ const double SAFE_SPEED_CHANGE = -30.0;
 const int BATTERY_PIN = 0;
 const int NUM_MOTORS = 4;
 
-const int SPEED_APPLY_DELAY = 1; //milli seconds
-
 double currSpeeds[NUM_MOTORS];
-double prevSpeeds[NUM_MOTORS];
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
-int motorIndex = 0; //motor A has index 0
-int numBytes;
-
 bool isArmed = false;
 
-double inoutSpeed = 0;
-double currValue = 0;
-int currDecimalPlace = 0;
-bool hasDecimal = false;
-long lastIdentifier = millis();
-
-void sendDeviceType() {
-    if (millis() - lastIdentifier >= 500) {
+void sendDeviceType()
+{
+    static long lastIdentifier = millis();
+    if (millis() - lastIdentifier >= 50000)
+    {
         lastIdentifier = millis();
         Serial.println("{\"dev\":\"esc\"}");
-    }
-}
-
-void syncSpeeds()
-{
-    for (int i = 0; i < NUM_MOTORS; i++)
-    {
-        prevSpeeds[i] = currSpeeds[i];
     }
 }
 
@@ -59,20 +58,16 @@ void initSpeeds()
     {
         currSpeeds[i] = 0; //force to send first 0
     }
-    syncSpeeds();
 }
 
 void setup()
 {
     Serial.begin(SERIAL_PORT_SPEED);
     Serial.println("{\"info\":\"ESC controller started\"}");
-    // Serial.println(FREQ);
-    // Serial.println(PERIOD * 1000);
     pwm.begin();
     pwm.setPWMFreq(FREQ); // This is the maximum PWM frequency
     isArmed = false;
     initSpeeds();
-    motorIndex = -1;
 }
 
 void setEscPulseWidth(int index, double pw)
@@ -87,15 +82,11 @@ void setEscPulseWidth(int index, double pw)
 #endif
 }
 
-void validateSpeeds()
+double validateSpeed(double ps, double cs)
 {
-    for (int i = 0; i < NUM_MOTORS; i++)
-    {
-        double speed = currSpeeds[i];
-        speed = speed <= MAX_SPEED ? speed : MAX_SPEED;
-        speed = speed >= 0 ? speed : 0;
-        currSpeeds[i] = speed;
-    }
+    if (cs < 0 || cs > MAX_SPEED)
+        return ps;
+    return cs;
 }
 
 void applySpeed(int index)
@@ -103,52 +94,12 @@ void applySpeed(int index)
     setEscPulseWidth(index, currSpeeds[index] * SPEED_FACTOR / 100 * (ARMING_MAX_PULSEWIDTH - ARMING_MIN_PULSEWIDTH) + ARMING_MIN_PULSEWIDTH);
 }
 
-int getNumSteps()
-{
-    double maxSpeedReduce = 0, d=0; //looking for max negative
-    for (int i = 0; i < NUM_MOTORS; i++)
-    {
-        d = (currSpeeds[i] - prevSpeeds[i]);
-        if (d < maxSpeedReduce) {
-            maxSpeedReduce = d;
-        }
-    }
-    if (maxSpeedReduce < SAFE_SPEED_CHANGE)
-    {
-        return (int)-maxSpeedReduce;
-    }
-    return 1;
-}
-
-void safeChangeMotors()
-{
-    bool next = true;
-    double dSpeeds[NUM_MOTORS];
-    int numSteps = getNumSteps();
-
-    for (int i = 0; i < NUM_MOTORS; i++)
-    {
-        dSpeeds[i] = (currSpeeds[i] - prevSpeeds[i]) / numSteps;
-        currSpeeds[i] = prevSpeeds[i];
-    }
-
-    for (int step = 0; step < numSteps; step++)
-    {
-        for (int i = 0; i < NUM_MOTORS; i++)
-        {
-            currSpeeds[i] += dSpeeds[i];
-            applySpeed(i);
-        }
-        if (numSteps > 1)
-            delay(SPEED_APPLY_DELAY);
-    }
-}
-
 void applySpeeds()
 {
-    validateSpeeds();
-    safeChangeMotors();
-    syncSpeeds();
+    for (int i = 0; i < NUM_MOTORS; i++)
+    {
+        applySpeed(i);
+    }
 }
 
 void setAllEscPulseWidth(double pw)
@@ -182,10 +133,12 @@ void waitForBatteryState(bool connected)
         if (millis() - lastMessage > 2000)
         {
             lastMessage = millis();
-            if (connected) {
+            if (connected)
+            {
                 Serial.println("{\"warning\":\"waiting to connect the battery\"}");
             }
-            else {
+            else
+            {
                 Serial.println("{\"warning\":\"waiting to disconnect the battery\"}");
             }
         }
@@ -229,75 +182,40 @@ void clearInputBuffer()
 
 void readCommand()
 {
-    numBytes = Serial.available();
-    for (int i = 0; i < numBytes; i++)
+    const int CMD_MAX_LEN = 128;
+    static char cmdJson[CMD_MAX_LEN];
+    static int counter = 0;
+    static double a, b, c, d;
+    static JsonErrors err;
+    while (Serial.available())
     {
-        int incomingByte = Serial.read();
-        switch (incomingByte)
+        if (counter >= CMD_MAX_LEN)
+            counter = 0;
+        cmdJson[counter] = Serial.read();
+        if (cmdJson[counter] == '}')
         {
-        case '\n':
-            applySpeeds();
-            motorIndex = -1; //safety after applying speeds
-            break;
-        case 'e':
-            for (int i = 0; i < NUM_MOTORS; i++)
+            cmdJson[counter + 1] = NULL;
+            Serial.println(cmdJson);
+            err = readJson(cmdJson, &a, &b, &c, &d);
+            if (err == NoError)
             {
-                currSpeeds[i] = 0;
+                currSpeeds[0] = validateSpeed(currSpeeds[0], a);
+                currSpeeds[1] = validateSpeed(currSpeeds[1], b);
+                currSpeeds[2] = validateSpeed(currSpeeds[2], c);
+                currSpeeds[3] = validateSpeed(currSpeeds[3], d);
+                applySpeeds();
             }
-            applySpeeds();
-            break;
-        case ',':
-            motorIndex++;
-            break;
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'g':
-            motorIndex = incomingByte - 'a';
-            //Serial.print("Motor Index: ");
-            //Serial.println(motorIndex);
-            inoutSpeed = 0;
-            hasDecimal = false;
-            currDecimalPlace = 1;
-            break;
-        case '.':
-            hasDecimal = true;
-            break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            if (motorIndex < 0) //if not a,b,c,d,g
-                break;
-            if (inoutSpeed < 10000)
+            else
             {
-                inoutSpeed = inoutSpeed * 10 + incomingByte - '0';
-                if (hasDecimal)
-                    currDecimalPlace = currDecimalPlace * 10;
-                currValue = inoutSpeed / currDecimalPlace;
+                Serial.println(err);
             }
-
-            if (motorIndex < NUM_MOTORS && motorIndex >= 0)
-            { //g char
-                currSpeeds[motorIndex] = currValue;
-            }
-            if (motorIndex == 6) //g char
-            {
-                for (int i = 0; i < NUM_MOTORS; i++)
-                {
-                    currSpeeds[i] = currValue;
-                }
-            }
-
-            break;
+            counter = 0;
+        } 
+        else 
+        {
+            counter++;
         }
+        
     }
 }
 
@@ -314,4 +232,68 @@ void loop()
     {
         arm();
     }
+}
+
+JsonErrors readJsonKeyValue(const char *json, int *sIndex, char key, double *value)
+{
+    int startIndex = *sIndex;
+    char buffer[32];
+    char k = json[startIndex + 1];
+    char dq = json[startIndex + 2];
+    char colon = json[startIndex + 3];
+    if (k != key)
+    {
+        return KeyError;
+    }
+    if (dq != '"')
+        return MissingDoubleQouteError;
+    if (colon != ':')
+        return MissingColon;
+    startIndex += 4;
+    int endIndex = startIndex;
+    while ((json[endIndex] >= '0' && json[endIndex] <= '9') || json[endIndex] == '.')
+        endIndex++;
+    if (endIndex == startIndex || (endIndex - startIndex) > 20)
+        return MissingValueError;
+    memcpy(buffer, json + startIndex, endIndex - startIndex);
+    buffer[endIndex - startIndex] = (char)NULL;
+    *value = atof(buffer);
+    *sIndex = endIndex;
+    return NoError;
+}
+
+JsonErrors readJson(const char *json, double *a, double *b, double *c, double *d)
+{
+    int index = 1;
+    double value;
+    double values[4];
+    const char sep[] = {',', ',', ',', '}'};
+    const char keys[] = {'a', 'b', 'c', 'd'};
+
+    int len = strlen(json);
+    if (len < 25)
+        return LengthError;
+    if (json[0] != '{')
+        return MissingStart;
+    if (json[len - 1] == '\n')
+        len--;
+    if (json[len - 1] != '}')
+        return MissingEnd;
+    JsonErrors err = NoError;
+
+    for (int i = 0; i < 4; i++)
+    {
+        err = readJsonKeyValue(json, &index, keys[i], &value);
+        if (err != NoError)
+            return err;
+        if (json[index] != sep[i])
+            return MissingComma;
+        index++;
+        values[i] = value;
+    }
+    *a = values[0];
+    *b = values[1];
+    *c = values[2];
+    *d = values[3];
+    return err;
 }
