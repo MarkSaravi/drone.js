@@ -26,6 +26,15 @@ export default class PIDControl {
         }
     }
 
+    I(errors: IFlightStateError, config: IFlightConfig) {
+        if (this.prevError==null) {
+            this.prevError = errors;
+        }
+        return {
+            
+        }
+    }
+
     PID(basePower: number, errors: IFlightStateError, config: any): ICalculatedPowers {
         return this.Pxxx(basePower, errors, config);
     }

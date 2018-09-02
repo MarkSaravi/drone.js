@@ -7,6 +7,7 @@ export default function getStateError(target:FlightState, actual: FlightState): 
         pitchError: target.pitch - actual.pitch,
         yawError: target.yaw - actual.yaw,
         powerError: target.power - actual.power,
+        dt: actual.dt,
         altitudeError: 0
     };
     //console.log(`State Error: ${error.rollError}, ${error.pitchError}, ${error.yawError}`)

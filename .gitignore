@@ -43,3 +43,4 @@ package-lock.json
 config.ports.json
 config.flight.json
 package-lock.json
+.vscode
