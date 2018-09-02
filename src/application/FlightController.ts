@@ -20,12 +20,12 @@ export default class FlightController {
         this.config = require('config.json')('./config.flight.json');
         console.log(`Gain: ${this.config.gain}`);
         this.pidControl = new PIDControl();
-        this.actualFlightState = new FlightState(0, 0, 0, 0);
-        this.targetFlightState = new FlightState(0, 0, 0, 0);
+        this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
+        this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
         this.powers = {
             p1: 0, p2: 0, p3: 0, p4:0
         };
-        this.escCommand = "a0b0c0d0";
+        this.escCommand = this.createEscCommand({p1:0, p2:0, p3:0, p4:0});
     }
 
     incGain() {

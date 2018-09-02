@@ -1,6 +1,9 @@
 {
-    "rollPolarity": 1,
-    "pitchPolarity": 1,
-    "yawPolarity": 1,
-    "gain": 0.01
+	"rollPolarity": 1,
+	"pitchPolarity": 1,
+	"yawPolarity": 1,
+	"pGain": 1,
+	"iGain": 1,
+	"dGain": 1,
+	"gain": 1
 }
