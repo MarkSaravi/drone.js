@@ -54,14 +54,11 @@ export default class PIDControl {
             this.prevError = errors;
         }
         const dt = errors.dt - this.prevError.dt; //sample value: 19.644
-        const p = this.P(errors, config);
-        const i = this.I(errors, config, dt);
-        const d = this.D(errors, config, dt);
-
         let t : ITorqueResponse = {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-        t = this.apply(t, p);
-        t = this.apply(t, i);
-        t = this.apply(t, d);
+        
+        t = this.apply(t, this.P(errors, config));
+        //t = this.apply(t, this.I(errors, config, dt));
+        //t = this.apply(t, this.D(errors, config, dt));
         t = {
             rollTorque: t.rollTorque * config.gain,
             pitchTorque: t.pitchTorque * config.gain,

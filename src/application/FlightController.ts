@@ -82,7 +82,7 @@ export default class FlightController {
 
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
-        let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
+        let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const powerDiff = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
         this.powers = this.calculatePower(this.actualFlightState.power, powerDiff);
