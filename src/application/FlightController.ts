@@ -76,7 +76,7 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const powerDiff = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
-        this.powers = powerDiff; //this.calculatePower(this.actualFlightState.power, powerDiff);
+        this.powers = this.calculatePower(this.actualFlightState.power, powerDiff);
         this.showState(this.powers, stateError, '');
         this.escCommand = this.createEscCommand(this.powers);
         return this.escCommand
