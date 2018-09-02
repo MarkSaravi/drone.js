@@ -58,11 +58,18 @@ export default class FlightController {
         console.log(text);
     }
 
+    addWithSaftyLimit(base: number, v: number) {
+        const sign = v >= 0 ? 1 : -1;
+        const factor = 3;
+        const i = Math.abs(v) < base / factor ? v : base / factor * sign;
+        return base + i;
+    }
+
     calculatePower(basePower: number, dp: ICalculatedPowers): ICalculatedPowers {
-        const p1 = basePower + dp.p1;
-        const p2 = basePower + dp.p2;
-        const p3 = basePower + dp.p3;
-        const p4 = basePower + dp.p4;
+        const p1 = this.addWithSaftyLimit(basePower, dp.p1);
+        const p2 = this.addWithSaftyLimit(basePower, dp.p2);
+        const p3 = this.addWithSaftyLimit(basePower, dp.p3);
+        const p4 = this.addWithSaftyLimit(basePower, dp.p4);
         return {
             p1,
             p2,

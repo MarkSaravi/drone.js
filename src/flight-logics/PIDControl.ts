@@ -47,7 +47,7 @@ export default class PIDControl {
             pitchTorque: tsum.pitchTorque + t.pitchTorque,
             yawTorque: tsum.yawTorque + t.yawTorque
         }
-        //console.log(`torques: r: ${(r.rollTorque).toFixed(3)}, p: ${(r.pitchTorque).toFixed(3)}, y: ${(r.yawTorque).toFixed(3)}`);
+        console.log(`torques: r: ${(r.rollTorque).toFixed(3)}, p: ${(r.pitchTorque).toFixed(3)}, y: ${(r.yawTorque).toFixed(3)}`);
         return r;
     }
 
@@ -69,7 +69,7 @@ export default class PIDControl {
         
         t = this.apply(t, this.P(errors, config));
         //t = this.apply(t, this.I(errors, config, dt));
-        //t = this.apply(t, this.D(errors, config, dt));
+        t = this.apply(t, this.D(errors, config, dt));
         t = {
             rollTorque: t.rollTorque * config.gain,
             pitchTorque: t.pitchTorque * config.gain,
