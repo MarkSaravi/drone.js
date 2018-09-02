@@ -131,7 +131,7 @@ void loop()
   // from the other side...
   // we have to send data, as requested
   //if (rx_char == '.'){
-  long dt = now - lasttime;
+  long dt = now;
 #ifdef AS_JSON
   sendAsJson(gx, gy, gz, dt);
 #endif // AS_JSON
