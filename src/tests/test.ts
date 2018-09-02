@@ -156,3 +156,13 @@ runner.test('negative yaw torque', () => {
         dpb < actualValues.p4
     );
 });
+
+runner.test('interpolation', () => {
+    let xy = [{x: 20, y: 2660}, {x: 30, y:4150}, {x: 40, y:5550}, {x:45, y:6400}];
+
+    TestRunner.assert(2660, flightLogics.interpolation(20, xy));
+    TestRunner.assert(4150, flightLogics.interpolation(30, xy));
+    TestRunner.assert(5550, flightLogics.interpolation(40, xy));
+    TestRunner.assert(6400, flightLogics.interpolation(45, xy));
+    TestRunner.assert(7448, flightLogics.interpolation(50, xy));
+});
