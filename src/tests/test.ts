@@ -158,11 +158,22 @@ runner.test('negative yaw torque', () => {
 });
 
 runner.test('interpolation', () => {
-    let xy = [{x: 20, y: 2660}, {x: 30, y:4150}, {x: 40, y:5550}, {x:45, y:6400}];
+    let rpms = [{p: 20, rpm: 2660}, {p: 30, rpm:4150}, {p: 40, rpm:5550}, {p:45, rpm:6400}];
+    let xy = rpms.map((i) => ({x: i.p, y: i.rpm}));
+    let yx = rpms.map((i) => ({x: i.rpm, y: i.p}));
+    //let xy = [{x: 20, y: 2660}, {x: 30, y:4150}, {x: 40, y:5550}, {x:45, y:6400}];
 
     TestRunner.assert(2660, flightLogics.interpolation(20, xy));
     TestRunner.assert(4150, flightLogics.interpolation(30, xy));
     TestRunner.assert(5550, flightLogics.interpolation(40, xy));
     TestRunner.assert(6400, flightLogics.interpolation(45, xy));
     TestRunner.assert(7448, flightLogics.interpolation(50, xy));
+
+    TestRunner.assert(20, flightLogics.interpolation(2660, yx));
+    TestRunner.assert(30, flightLogics.interpolation(4150, yx));
+    TestRunner.assert(40, flightLogics.interpolation(5550, yx));
+    TestRunner.assert(45, flightLogics.interpolation(6400, yx));
+    const xxx = flightLogics.interpolation(7448, yx);
+    console.log(xxx);
+    TestRunner.assert(50, flightLogics.interpolation(7448, yx));
 });

@@ -58,32 +58,27 @@ export default class FlightController {
         console.log(text);
     }
 
-    addWithSaftyLimit(base: number, v: number) {
-        const sign = v >= 0 ? 1 : -1;
-        const factor = 3;
-        const i = Math.abs(v) < base / factor ? v : base / factor * sign;
-        return base + i;
-    }
-
-    calculatePower(basePower: number, dp: ICalculatedPowers): ICalculatedPowers {
-        const p1 = this.addWithSaftyLimit(basePower, dp.p1);
-        const p2 = this.addWithSaftyLimit(basePower, dp.p2);
-        const p3 = this.addWithSaftyLimit(basePower, dp.p3);
-        const p4 = this.addWithSaftyLimit(basePower, dp.p4);
-        return {
-            p1,
-            p2,
-            p3,
-            p4
+    calculatePower(angularVelocity: number, angularVelocityDiff: ICalculatedPowers): ICalculatedPowers {
+        const w1 = angularVelocity + angularVelocityDiff.p1;
+        const w2 = angularVelocity + angularVelocityDiff.p2;
+        const w3 = angularVelocity + angularVelocityDiff.p3;
+        const w4 = angularVelocity + angularVelocityDiff.p4;
+        const res =  {
+            p1: flightLogics.angularVelocityToPower(w1, this.config.mRpm, this.config.bRpm),
+            p2: flightLogics.angularVelocityToPower(w2, this.config.mRpm, this.config.bRpm),
+            p3: flightLogics.angularVelocityToPower(w3, this.config.mRpm, this.config.bRpm),
+            p4: flightLogics.angularVelocityToPower(w4, this.config.mRpm, this.config.bRpm)
         }
+        return res;
     }
 
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
-        const powerDiff = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
-        this.powers = this.calculatePower(this.actualFlightState.power, powerDiff);
+        const angularVelocity = flightLogics.powerToAngularVelocity(this.actualFlightState.power, this.config.mRpm, this.config.bRpm);
+        const angularVelocityDiff = this.pidControl.PID(angularVelocity ,stateError, this.config);
+        this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
         this.showState(this.powers, stateError, '');
         this.escCommand = this.createEscCommand(this.powers);
         return this.escCommand
