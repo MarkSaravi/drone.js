@@ -67,17 +67,26 @@ export default class FlightController {
         console.log(text);
     }
 
+    calculatePower(basePower: number, dp: ICalculatedPowers): ICalculatedPowers {
+        const p1 = basePower + dp.p1;
+        const p2 = basePower + dp.p2;
+        const p3 = basePower + dp.p3;
+        const p4 = basePower + dp.p4;
+        return {
+            p1: p1 >= 0 ? p1: 0,
+            p2: p2 >= 0 ? p1: 0,
+            p3: p3 >= 0 ? p1: 0,
+            p4: p4 >= 0 ? p1: 0
+        }
+    }
+
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState);
         stateError.yawError = 0;
-        const p = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
-        if (this.isValodPower(p)) {
-            this.powers = p;
-            this.showState(this.powers, stateError, '');
-        } else {
-            this.showState(this.powers, stateError, 'error, using previous values');
-        }
+        const powerDiff = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
+        this.powers = this.calculatePower(this.actualFlightState.power, powerDiff);
+        this.showState(this.powers, stateError, '');
         this.escCommand = this.createEscCommand(this.powers);
         return this.escCommand
     }
