@@ -13,14 +13,6 @@ export default class PIDControl {
     constructor() {
     }
 
-    Pxxx(basePower: number, errors: IFlightStateError, config: any): ICalculatedPowers {
-        const  r = torqueCalculator(basePower > 0 ? basePower : 1, 
-            errors.rollError* config.gain * config.rollPolarity,
-            errors.pitchError* config.gain * config.pitchPolarity,
-            errors.yawError* config.gain * config.yawPolarity);
-        return r;
-    }
-
     P(errors: IFlightStateError, config: IFlightConfig): ITorqueResponse {
         return {
             rollTorque: errors.rollError * config.pGain,
@@ -49,18 +41,34 @@ export default class PIDControl {
         }
     }
 
+    apply(tsum: ITorqueResponse, t: ITorqueResponse): ITorqueResponse {
+        return {
+            rollTorque: tsum.rollTorque + t.rollTorque,
+            pitchTorque: tsum.pitchTorque + t.pitchTorque,
+            yawTorque: tsum.yawTorque + t.yawTorque
+        }
+    }
+
     PID(basePower: number, errors: IFlightStateError, config: any): ICalculatedPowers {
         if (this.prevError == null) {
             this.prevError = errors;
         }
-        const dt = (errors.dt - this.prevError.dt)/1e6;
+        const dt = (errors.dt - this.prevError.dt)/1000; //sample value: 19.644
         const p = this.P(errors, config);
         const i = this.I(errors, config, dt);
         const d = this.D(errors, config, dt);
 
         let t : ITorqueResponse = {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-
-        return this.Pxxx(basePower, errors, config);
+        t = this.apply(t, p);
+        t = this.apply(t, i);
+        t = this.apply(t, d);
+        t = {
+            rollTorque: t.rollTorque * config.gain,
+            pitchTorque: t.pitchTorque * config.gain,
+            yawTorque: t.yawTorque * config.gain
+        }
+        const dpower = torqueCalculator(basePower, t.rollTorque, t.pitchTorque, t.yawTorque);
+        return dpower;
     }
 
 }
