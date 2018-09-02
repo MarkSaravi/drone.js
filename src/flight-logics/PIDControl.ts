@@ -53,7 +53,7 @@ export default class PIDControl {
         if (this.prevError == null) {
             this.prevError = errors;
         }
-        const dt = (errors.dt - this.prevError.dt)/1000; //sample value: 19.644
+        const dt = errors.dt - this.prevError.dt; //sample value: 19.644
         const p = this.P(errors, config);
         const i = this.I(errors, config, dt);
         const d = this.D(errors, config, dt);

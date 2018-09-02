@@ -25,7 +25,6 @@ double gyrX = 0, gyrY = 0, gyrZ = 0;
 int16_t accX = 0, accY = 0, accZ = 0;
 
 double gyrXoffs = -281.00, gyrYoffs = 18.00, gyrZoffs = -83.00;
-unsigned long lasttime;
 unsigned long now;
 long blink = 0;
 void setup()
@@ -72,10 +71,9 @@ void setup()
   calibrate();
   digitalWrite(13, LOW);
   //  Serial.write("done.");
-  lasttime = 0;
 }
 
-void sendAsRaw(double r, double p, double y, long dt)
+void sendAsRaw(double r, double p, double y, unsigned long dt)
 {
   Serial.print("rpy ");
   Serial.print(r, 2);
@@ -87,7 +85,7 @@ void sendAsRaw(double r, double p, double y, long dt)
   Serial.println(dt);
 }
 
-void sendAsJson(double r, double p, double y, long dt)
+void sendAsJson(double r, double p, double y, unsigned long dt)
 {
   Serial.print("{\"roll\":");
   Serial.print(r, 2);
@@ -108,7 +106,7 @@ void loop()
   unsigned long start_time, end_time;
 
   start_time = millis();
-  now = micros();
+  now = millis();
 
   read_sensor_data();
 
@@ -131,7 +129,7 @@ void loop()
   // from the other side...
   // we have to send data, as requested
   //if (rx_char == '.'){
-  long dt = now;
+  unsigned long dt = now;
 #ifdef AS_JSON
   sendAsJson(gx, gy, gz, dt);
 #endif // AS_JSON
@@ -139,7 +137,6 @@ void loop()
   sendAsRaw(gx, gy, gz, dt);
 #endif // !AS_JSON
 
-  lasttime = now;
 
   //}
   if (Serial.available())
