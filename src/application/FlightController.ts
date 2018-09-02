@@ -46,15 +46,6 @@ export default class FlightController {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData, this.actualFlightState);
     }
 
-    isValodPower(p: ICalculatedPowers): boolean
-    {
-        return (
-        !isNaN(p.p1) && p.p1 >= 0 &&
-        !isNaN(p.p2) && p.p2 >= 0 &&
-        !isNaN(p.p3) && p.p3 >= 0 &&
-        !isNaN(p.p4) && p.p4 >= 0);
-    }
-
     createEscCommand(p: ICalculatedPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
@@ -73,10 +64,10 @@ export default class FlightController {
         const p3 = basePower + dp.p3;
         const p4 = basePower + dp.p4;
         return {
-            p1: p1 >= 0 ? p1: 0,
-            p2: p2 >= 0 ? p1: 0,
-            p3: p3 >= 0 ? p1: 0,
-            p4: p4 >= 0 ? p1: 0
+            p1,
+            p2,
+            p3,
+            p4
         }
     }
 
@@ -85,7 +76,7 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const powerDiff = this.pidControl.PID(this.actualFlightState.power ,stateError, this.config);
-        this.powers = this.calculatePower(this.actualFlightState.power, powerDiff);
+        this.powers = powerDiff; //this.calculatePower(this.actualFlightState.power, powerDiff);
         this.showState(this.powers, stateError, '');
         this.escCommand = this.createEscCommand(this.powers);
         return this.escCommand

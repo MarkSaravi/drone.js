@@ -96,12 +96,16 @@ function calcJx(a: number, b: number, c: number, d: number, tr: number, tp: numb
     return jx;
 }
 
-function torqueCalculator(power: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
-    const wb = power;
+function torqueCalculator(powerBase: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
+    if (powerBase<=0) {
+        return {
+            p1: 0, p2: 0, p3: 0, p4: 0
+        }
+    }
     let x = [0, 0, 0, 0];
 
     for (let loop = 0; loop < 10; loop++) {
-        let jx = calcJx(x[0], x[1], x[2], x[3], torqueRoll, torquePitch, torqueYaw, wb);
+        let jx = calcJx(x[0], x[1], x[2], x[3], torqueRoll, torquePitch, torqueYaw, powerBase);
         let y = gauss(jx);
         for (let i = 0; i < y.length; i++) {
             x[i] = x[i] + y[i];

@@ -42,11 +42,22 @@ export default class PIDControl {
     }
 
     apply(tsum: ITorqueResponse, t: ITorqueResponse): ITorqueResponse {
-        return {
+        const r = {
             rollTorque: tsum.rollTorque + t.rollTorque,
             pitchTorque: tsum.pitchTorque + t.pitchTorque,
             yawTorque: tsum.yawTorque + t.yawTorque
         }
+        //console.log(`torques: r: ${(r.rollTorque).toFixed(3)}, p: ${(r.pitchTorque).toFixed(3)}, y: ${(r.yawTorque).toFixed(3)}`);
+        return r;
+    }
+
+    showState(tr: ITorqueResponse, pv: ICalculatedPowers, fsv: IFlightStateError, msg: string) {
+        const ts = `r: ${(tr.rollTorque).toFixed(3)} ,p: ${(tr.pitchTorque).toFixed(3)} ,y: ${(tr.yawTorque).toFixed(3)}`;
+        const ps = `a: ${(pv.p1).toFixed(3)} ,b: ${(pv.p2).toFixed(3)} ,c: ${(pv.p3).toFixed(3)} ,d: ${(pv.p4).toFixed(3)}`;
+        const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)} ,yaw${(fsv.yawError).toFixed(3)}`;
+        const text = `${ts}, ${ps}, ${fss}, ${msg}`;
+        //console.clear();
+        console.log(text);
     }
 
     PID(basePower: number, errors: IFlightStateError, config: any): ICalculatedPowers {
@@ -65,6 +76,7 @@ export default class PIDControl {
             yawTorque: t.yawTorque * config.gain
         }
         const dpower = torqueCalculator(basePower, t.rollTorque, t.pitchTorque, t.yawTorque);
+        //this.showState(t, dpower, errors, '');
         return dpower;
     }
 
