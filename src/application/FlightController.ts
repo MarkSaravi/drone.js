@@ -50,10 +50,11 @@ export default class FlightController {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
-    showState(pv: ICalculatedPowers, fsv: IFlightStateError, msg: string) {
+    showState(angularVelocity: number, pv: ICalculatedPowers, fsv: IFlightStateError, msg: string) {
         const ps = `a: ${(pv.p1).toFixed(3)} ,b: ${(pv.p2).toFixed(3)} ,c: ${(pv.p3).toFixed(3)} ,d: ${(pv.p4).toFixed(3)}`;
         const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)} ,yaw${(fsv.yawError).toFixed(3)}`;
-        const text = `${ps}, ${fss}, ${msg}`;
+        const av = `av: ${(angularVelocity).toFixed(3)}`;
+        const text = `av: ${av}, ${ps}, ${fss}, ${msg}`;
         console.clear();
         console.log(text);
     }
@@ -79,7 +80,7 @@ export default class FlightController {
         const angularVelocity = flightLogics.powerToAngularVelocity(this.actualFlightState.power, this.config.mRpm, this.config.bRpm);
         const angularVelocityDiff = this.pidControl.PID(angularVelocity ,stateError, this.config);
         this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
-        this.showState(this.powers, stateError, '');
+        this.showState(angularVelocity, this.powers, stateError, '');
         this.escCommand = this.createEscCommand(this.powers);
         return this.escCommand
     }
