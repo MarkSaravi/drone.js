@@ -1,0 +1,11 @@
+{
+    "rollPolarity": -1,
+    "pitchPolarity": 1,
+    "yawPolarity": 1,
+	"pGain": 13,
+	"iGain": 0,
+	"dGain": -3000,
+	"gain": 1,
+	"mRpm": 140,
+	"bRpm": 100
+}

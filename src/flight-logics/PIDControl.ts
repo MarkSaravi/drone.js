@@ -41,13 +41,13 @@ export default class PIDControl {
         }
     }
 
-    apply(tsum: ITorqueResponse, t: ITorqueResponse): ITorqueResponse {
+    apply(tsum: ITorqueResponse, t: ITorqueResponse, type: string): ITorqueResponse {
         const r = {
             rollTorque: tsum.rollTorque + t.rollTorque,
             pitchTorque: tsum.pitchTorque + t.pitchTorque,
             yawTorque: tsum.yawTorque + t.yawTorque
         }
-        console.log(`torques: r: ${(r.rollTorque).toFixed(3)}, p: ${(r.pitchTorque).toFixed(3)}, y: ${(r.yawTorque).toFixed(3)}`);
+        console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
         return r;
     }
 
@@ -56,8 +56,7 @@ export default class PIDControl {
         const ps = `a: ${(pv.p1).toFixed(3)} ,b: ${(pv.p2).toFixed(3)} ,c: ${(pv.p3).toFixed(3)} ,d: ${(pv.p4).toFixed(3)}`;
         const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)} ,yaw${(fsv.yawError).toFixed(3)}`;
         const text = `${ts}, ${ps}, ${fss}, ${msg}`;
-        //console.clear();
-        console.log(text);
+        //console.log(text);
     }
 
     PID(basePower: number, errors: IFlightStateError, config: any): ICalculatedPowers {
@@ -67,16 +66,16 @@ export default class PIDControl {
         const dt = errors.dt - this.prevError.dt; //sample value: 19.644
         let t : ITorqueResponse = {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
         
-        t = this.apply(t, this.P(errors, config));
-        //t = this.apply(t, this.I(errors, config, dt));
-        t = this.apply(t, this.D(errors, config, dt));
+        t = this.apply(t, this.P(errors, config),"P");
+        t = this.apply(t, this.I(errors, config, dt), "I");
+        t = this.apply(t, this.D(errors, config, dt), "D");
         t = {
             rollTorque: t.rollTorque * config.gain,
             pitchTorque: t.pitchTorque * config.gain,
             yawTorque: t.yawTorque * config.gain
         }
         const dpower = torqueCalculator(basePower, t.rollTorque, t.pitchTorque, t.yawTorque);
-        //this.showState(t, dpower, errors, '');
+        this.prevError = errors;
         return dpower;
     }
 

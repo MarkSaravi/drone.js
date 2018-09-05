@@ -40,7 +40,5 @@ dist.zip
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 package-lock.json
-config.ports.json
-config.flight.json
 package-lock.json
 .vscode
