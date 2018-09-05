@@ -177,3 +177,15 @@ runner.test('interpolation', () => {
     console.log(xxx);
     TestRunner.assert(50, flightLogics.interpolation(7448, yx));
 });
+
+runner.test('error smootthings', () => {
+    //const values = [1, 1.21, 1.3225+0.5, 1.44, 1.5625, 1.69];
+    const values = [1, 1.1, 1.2+0.2, 1.3, 1.4, 1.5];
+    let pv = values[0];
+    for (let v of values) {
+        const sv = flightLogics.noiseFilter(v, pv);
+        console.log(`org: ${v}, filtered: ${sv}`);
+        pv = sv;
+    }
+    TestRunner.assert(true, true);
+});
