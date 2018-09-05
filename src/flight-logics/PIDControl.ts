@@ -47,7 +47,7 @@ export default class PIDControl {
             pitchTorque: tsum.pitchTorque + t.pitchTorque,
             yawTorque: tsum.yawTorque + t.yawTorque
         }
-        console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
+        //console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
         return r;
     }
 

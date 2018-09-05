@@ -44,12 +44,20 @@ export default class Application extends EventEmitter {
     }
 
     registerEvents() {
-        this.on('inc-gain', () => {
-            this.flightController.incGain();
+        this.on('inc-p-gain', () => {
+            this.flightController.incPGain();
         });
 
-        this.on('dec-gain', () => {
-            this.flightController.decGain();
+        this.on('dec-p-gain', () => {
+            this.flightController.decPGain();
+        });
+
+        this.on('inc-d-gain', () => {
+            this.flightController.incDGain();
+        });
+
+        this.on('dec-d-gain', () => {
+            this.flightController.decDGain();
         });
 
         this.on('stopping-application', () => {

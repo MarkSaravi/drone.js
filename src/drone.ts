@@ -25,14 +25,20 @@ process.stdin.setRawMode(true);
 
 process.stdin.on('keypress', (str, key) => {
     switch (str) {
-        case '.':
+        case 'q':
             app.emit('stopping-application');
             break;
-        case '+':
-            app.emit('inc-gain');
+        case ']':
+            app.emit('inc-p-gain');
             break;
-        case '-':
-            app.emit('dec-gain');
+        case '[':
+            app.emit('dec-p-gain');
+            break;
+        case '.':
+            app.emit('inc-d-gain');
+            break;
+        case ',':
+            app.emit('dec-d-gain');
             break;
     }
 

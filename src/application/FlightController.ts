@@ -28,14 +28,24 @@ export default class FlightController {
         this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
     }
 
-    incGain() {
-        this.config.gain = this.config.gain + 0.1;
-        console.log(`Gain: ${this.config.gain}`);
+    incPGain() {
+        this.config.pGain = this.config.pGain + 0.1;
+        console.log(`P Gain: ${this.config.pGain}`);
     }
 
-    decGain() {
-        this.config.gain = this.config.gain - 0.1;
-        console.log(`Gain: ${this.config.gain}`);
+    decPGain() {
+        this.config.pGain = this.config.pGain - 0.1;
+        console.log(`P Gain: ${this.config.pGain}`);
+    }
+
+    incDGain() {
+        this.config.dGain = this.config.dGain + 50;
+        console.log(`D Gain: ${this.config.dGain}`);
+    }
+
+    decDGain() {
+        this.config.dGain = this.config.dGain - 50;
+        console.log(`D Gain: ${this.config.dGain}`);
     }
 
     applyCommand(command: Command) {
