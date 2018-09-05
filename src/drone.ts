@@ -40,6 +40,12 @@ process.stdin.on('keypress', (str, key) => {
         case ',':
             app.emit('dec-d-gain');
             break;
+        case 'a':
+            app.emit('inc-power');
+            break;
+        case 'z':
+            app.emit('dec-power');
+            break;
     }
 
 });

@@ -15,6 +15,7 @@ export default class FlightController {
     private readonly pidControl: PIDControl;
     private escCommand: string;
     private powers: ICalculatedPowers;
+    private prevError: IFlightStateError = null;
 
     constructor() {
         this.config = require('config.json')('./config.flight.json');
@@ -48,6 +49,20 @@ export default class FlightController {
         console.log(`D Gain: ${this.config.dGain}`);
     }
 
+    incPower() {
+        if (this.actualFlightState.power<56) {
+            this.applyCommand(new Command(0, 0, 0, this.actualFlightState.power + 1));
+        }
+        console.log(`Power: ${this.actualFlightState.power}`);
+    }
+
+    decPower() {
+        if (this.actualFlightState.power>0) {
+            this.applyCommand(new Command(0, 0, 0, this.actualFlightState.power - 1));
+        }
+        console.log(`Power: ${this.actualFlightState.power}`);
+    }
+
     applyCommand(command: Command) {
         this.targetFlightState = convertors.CommandToFlightStatus(command, this.targetFlightState);
     }
@@ -60,15 +75,16 @@ export default class FlightController {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
-    showState(angularVelocity: number, avd: ICalculatedPowers, pv: ICalculatedPowers, fsv: IFlightStateError, msg: string) {
+    showState(angularVelocity: number, avd: ICalculatedPowers, pv: ICalculatedPowers, fsv: IFlightStateError, sme: IFlightStateError, msg: string = '') {
         const ps = `a: ${(pv.p1).toFixed(3)} ,b: ${(pv.p2).toFixed(3)} ,c: ${(pv.p3).toFixed(3)} ,d: ${(pv.p4).toFixed(3)}`;
         const avds = `p1: ${(avd.p1).toFixed(3)} ,p2: ${(avd.p2).toFixed(3)} ,p3: ${(avd.p3).toFixed(3)} ,p4: ${(avd.p4).toFixed(3)}`;
         const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)}`;
+        const smes = `roll: ${(sme.rollError).toFixed(3)}, pitch: ${(sme.pitchError).toFixed(3)}`;
         const av = `av: ${(angularVelocity).toFixed(3)}`;
-        //const text = `${av}, ${avds}, ${ps}, ${fss}, ${msg}`;
-        const text = `${ps}, ${fss}`;
+        const text = `${ps},     ${fss},,     ${smes},`;
+        //const text = `${ps}, ${fss}`;
         //console.clear();
-        //console.log(text);
+        console.log(text);
     }
 
     safeAdd(base: number, inc: number) {
@@ -91,15 +107,41 @@ export default class FlightController {
         return res;
     }
 
+    signalSmoother(newValue: number, value: number) {
+        const K = 0.45;
+        //Value := Value + K * (New - Value);
+        const a = value + K * (newValue - value);
+        return a;
+    }
+
+    errorNoiseReduction(err: IFlightStateError): IFlightStateError {
+        if (this.prevError == null) {
+            this.prevError = err;
+        }
+        err.rollError = this.signalSmoother(err.rollError, this.prevError.rollError);
+        err.pitchError = this.signalSmoother(err.pitchError, this.prevError.pitchError);
+        err.yawError = this.signalSmoother(err.yawError, this.prevError.yawError);
+        this.prevError = {
+            rollError: err.rollError,
+            pitchError: err.pitchError,
+            yawError: err.yawError,
+            powerError: 0,
+            altitudeError: 0,
+            dt: 0
+        } ;
+        return err;
+    }
+
     calcMotorsPower() {
         this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
+        const smoothedError = this.errorNoiseReduction(stateError);
         stateError.yawError = 0;
         const basePower = this.actualFlightState.power;
         const angularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
         const angularVelocityDiff = this.pidControl.PID(angularVelocity, stateError, this.config);
         this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
-        this.showState(angularVelocity, angularVelocityDiff, this.powers, stateError, '');
+        this.showState(angularVelocity, angularVelocityDiff, this.powers, stateError, smoothedError);
         this.escCommand = this.createEscCommand(this.powers);
         return this.escCommand
     }

@@ -60,6 +60,14 @@ export default class Application extends EventEmitter {
             this.flightController.decDGain();
         });
 
+        this.on('inc-power', () => {
+            this.flightController.incPower();
+        });
+
+        this.on('dec-power', () => {
+            this.flightController.decPower();
+        });
+
         this.on('stopping-application', () => {
             for (let d of this.devices) {
                 d.close();

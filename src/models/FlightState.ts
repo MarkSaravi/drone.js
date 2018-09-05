@@ -4,7 +4,7 @@ export default class FlightState {
         readonly pitch: number,
         readonly yaw: number,
         readonly dt: number,
-        readonly power: number,
+        public power: number,
     ){
     }
 }
