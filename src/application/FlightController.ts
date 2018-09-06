@@ -107,20 +107,13 @@ export default class FlightController {
         return res;
     }
 
-    signalSmoother(newValue: number, value: number) {
-        const K = 0.45;
-        //Value := Value + K * (New - Value);
-        const a = value + K * (newValue - value);
-        return a;
-    }
-
     errorNoiseReduction(err: IFlightStateError): IFlightStateError {
         if (this.prevError == null) {
             this.prevError = err;
         }
-        err.rollError = this.signalSmoother(err.rollError, this.prevError.rollError);
-        err.pitchError = this.signalSmoother(err.pitchError, this.prevError.pitchError);
-        err.yawError = this.signalSmoother(err.yawError, this.prevError.yawError);
+        err.rollError = flightLogics.noiseFilter(err.rollError, this.prevError.rollError);
+        err.pitchError = flightLogics.noiseFilter(err.pitchError, this.prevError.pitchError);
+        err.yawError = flightLogics.noiseFilter(err.yawError, this.prevError.yawError);
         this.prevError = {
             rollError: err.rollError,
             pitchError: err.pitchError,
