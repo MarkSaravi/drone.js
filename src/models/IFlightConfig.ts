@@ -6,4 +6,5 @@ export default interface IFlightConfig {
     iGain: number;
     dGain: number;
     gain: number;
+    iMax: number;
 }

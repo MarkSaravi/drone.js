@@ -39,6 +39,16 @@ export default class FlightController {
         console.log(`P Gain: ${this.config.pGain}`);
     }
 
+    incIGain() {
+        this.config.iGain = this.config.iGain + 0.1;
+        console.log(`P Gain: ${this.config.iGain}`);
+    }
+
+    decIGain() {
+        this.config.iGain = this.config.iGain - 0.1;
+        console.log(`P Gain: ${this.config.iGain}`);
+    }
+
     incDGain() {
         this.config.dGain = this.config.dGain + 50;
         console.log(`D Gain: ${this.config.dGain}`);
@@ -81,7 +91,8 @@ export default class FlightController {
         const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)}`;
         const smes = `roll: ${(sme.rollError).toFixed(3)}, pitch: ${(sme.pitchError).toFixed(3)}`;
         const av = `av: ${(angularVelocity).toFixed(3)}`;
-        const text = `${ps},     ${fss},,     ${smes},`;
+        const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
+        const text = `${ps},\t${fss},\t${smes},\t${pids}`;
         //const text = `${ps}, ${fss}`;
         //console.clear();
         console.log(text);
@@ -111,9 +122,9 @@ export default class FlightController {
         if (this.prevError == null) {
             this.prevError = err;
         }
-        err.rollError = flightLogics.noiseFilter(err.rollError, this.prevError.rollError);
-        err.pitchError = flightLogics.noiseFilter(err.pitchError, this.prevError.pitchError);
-        err.yawError = flightLogics.noiseFilter(err.yawError, this.prevError.yawError);
+        err.rollError = flightLogics.roundErro(flightLogics.noiseFilter(err.rollError, this.prevError.rollError));
+        err.pitchError = flightLogics.roundErro(flightLogics.noiseFilter(err.pitchError, this.prevError.pitchError));
+        err.yawError = flightLogics.roundErro(flightLogics.noiseFilter(err.yawError, this.prevError.yawError));
         this.prevError = {
             rollError: err.rollError,
             pitchError: err.pitchError,

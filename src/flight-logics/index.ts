@@ -5,7 +5,8 @@ import torqueCalculator from './torqueCalculator';
 import { interpolation } from './interpolation';
 import { powerToAngularVelocity } from './interpolation';
 import { angularVelocityToPower } from './interpolation';
-import noiseFilter from './noiseFilter';
+import { noiseFilter } from './noiseFilter';
+import { roundErro } from './noiseFilter';
 
 export { applyTargetPower };
 export { PIDControl };
@@ -15,3 +16,4 @@ export { interpolation };
 export { powerToAngularVelocity };
 export { angularVelocityToPower };
 export { noiseFilter };
+export { roundErro };

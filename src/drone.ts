@@ -31,6 +31,12 @@ process.stdin.on('keypress', (str, key) => {
         case ']':
             app.emit('inc-p-gain');
             break;
+        case '\'':
+            app.emit('dec-i-gain');
+            break;
+        case ';':
+            app.emit('inc-i-gain');
+            break;
         case '[':
             app.emit('dec-p-gain');
             break;

@@ -5,6 +5,7 @@
 	"pGain": 13,
 	"iGain": 0,
 	"dGain": -3000,
+	"iMax": 3,
 	"gain": 1,
 	"mRpm": 140,
 	"bRpm": 100
