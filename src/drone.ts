@@ -26,6 +26,7 @@ process.stdin.setRawMode(true);
 process.stdin.on('keypress', (str, key) => {
     switch (str) {
         case 'q':
+        case 'Q':
             app.emit('stopping-application');
             break;
         case ']':
@@ -47,9 +48,11 @@ process.stdin.on('keypress', (str, key) => {
             app.emit('dec-d-gain');
             break;
         case 'a':
+        case 'A':
             app.emit('inc-power');
             break;
         case 'z':
+        case 'Z':
             app.emit('dec-power');
             break;
     }

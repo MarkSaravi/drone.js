@@ -35,8 +35,8 @@ export default class PIDControl {
         const max = config.iMax;
 
         this.integralSumRoll = this.ICalc(this.integralSumRoll ,this.prevError.rollError, errors.rollError, dt,gain, max);
-        this.integralSumRoll = this.ICalc(this.integralSumRoll ,this.prevError.pitchError, errors.pitchError, dt,gain, max);
-        this.integralSumRoll = this.ICalc(this.integralSumRoll ,this.prevError.yawError, errors.yawError, dt,gain, max);
+        this.integralSumPitch = this.ICalc(this.integralSumPitch ,this.prevError.pitchError, errors.pitchError, dt,gain, max);
+        this.integralSumYaw = this.ICalc(this.integralSumYaw ,this.prevError.yawError, errors.yawError, dt,gain, max);
         return {
             rollTorque: this.integralSumRoll,
             pitchTorque: this.integralSumPitch,
@@ -59,7 +59,7 @@ export default class PIDControl {
             yawTorque: tsum.yawTorque + t.yawTorque
         }
         if (type == 'I') {
-           console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
+           //console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
         }
         return r;
     }
