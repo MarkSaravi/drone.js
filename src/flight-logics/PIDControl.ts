@@ -21,22 +21,26 @@ export default class PIDControl {
         }
     }
 
-    IMaxLimit(value: number, inc: number, config: IFlightConfig): number {
-        if (Math.abs(value + inc) <= config.iMax) {
-            return value + inc;
+    ICalc(sum: number, curr: number, prev: number, dt: number, gain: number, max: number): number {
+        const inc = (prev + curr) * dt / 2 * gain;
+        let res = sum;
+        if (Math.abs(res + inc) <= max) {
+             res += inc;
         }
-        return value;
+        return res;
     }
 
     I(errors: IFlightStateError, config: IFlightConfig, dt: number): ITorqueResponse {
-        
-        this.integralSumRoll = this.IMaxLimit(this.integralSumRoll, (this.prevError.rollError + errors.rollError) / 2, config);
-        this.integralSumPitch = this.IMaxLimit(this.integralSumPitch, (this.prevError.pitchError + errors.pitchError) / 2, config);
-        this.integralSumYaw = this.IMaxLimit(this.integralSumYaw ,(this.prevError.yawError + errors.yawError) / 2, config);
+        const gain = config.iGain;
+        const max = config.iMax;
+
+        this.integralSumRoll = this.ICalc(this.integralSumRoll ,this.prevError.rollError, errors.rollError, dt,gain, max);
+        this.integralSumRoll = this.ICalc(this.integralSumRoll ,this.prevError.pitchError, errors.pitchError, dt,gain, max);
+        this.integralSumRoll = this.ICalc(this.integralSumRoll ,this.prevError.yawError, errors.yawError, dt,gain, max);
         return {
-            rollTorque: this.integralSumRoll * config.iGain,
-            pitchTorque: this.integralSumPitch * config.iGain,
-            yawTorque: this.integralSumYaw * config.iGain
+            rollTorque: this.integralSumRoll,
+            pitchTorque: this.integralSumPitch,
+            yawTorque: this.integralSumYaw
         }
     }
 
@@ -55,7 +59,7 @@ export default class PIDControl {
             yawTorque: tsum.yawTorque + t.yawTorque
         }
         if (type == 'I') {
-           // console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
+           console.log(`${type} torques: roll: ${(t.rollTorque).toFixed(3)}, pitch: ${(t.pitchTorque).toFixed(3)}, yaw: ${(t.yawTorque).toFixed(3)}`);
         }
         return r;
     }
@@ -72,7 +76,7 @@ export default class PIDControl {
         if (this.prevError == null) {
             this.prevError = errors;
         }
-        const dt = errors.dt - this.prevError.dt; //sample value: 19.644
+        const dt = (errors.dt - this.prevError.dt) / 1000; //convert to milliseconds
         let t : ITorqueResponse = {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
         
         t = this.apply(t, this.P(errors, config),"P");

@@ -95,7 +95,7 @@ export default class FlightController {
         const text = `${ps},\t${fss},\t${smes},\t${pids}`;
         //const text = `${ps}, ${fss}`;
         //console.clear();
-        console.log(text);
+        //console.log(text);
     }
 
     safeAdd(base: number, inc: number) {
@@ -121,6 +121,7 @@ export default class FlightController {
     errorNoiseReduction(err: IFlightStateError): IFlightStateError {
         if (this.prevError == null) {
             this.prevError = err;
+            this.prevError.dt -= 20; //simulating dt difference
         }
         err.rollError = flightLogics.roundErro(flightLogics.noiseFilter(err.rollError, this.prevError.rollError));
         err.pitchError = flightLogics.roundErro(flightLogics.noiseFilter(err.pitchError, this.prevError.pitchError));
