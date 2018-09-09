@@ -66,21 +66,10 @@ void setup()
 
   digitalWrite(13, HIGH); //Set digital output 13 high to indicate startup
 
-  //lcd.begin();                                                         //Initialize the LCD
-  //lcd.backlight();                                                     //Activate backlight
-  //lcd.clear();                                                         //Clear the LCD
-
-  //lcd.setCursor(0,0);                                                  //Set the LCD cursor to position to position 0,0
-  Serial.println("  MPU-6050 IMU"); //Print text to screen
-  //lcd.setCursor(0,1);                                                  //Set the LCD cursor to position to position 0,1
-  Serial.println("     V1.0"); //Print text to screen
-
+  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0,\"state\":\"MPU-6050 IMU\"}"); //Print text to screen
+  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0,\"state\":\"V1.0\"}");
   delay(1500); //Delay 1.5 second to display the text
-  //lcd.clear();                                                         //Clear the LCD
-
-  //lcd.setCursor(0,0);                                                  //Set the LCD cursor to position to position 0,0
-  Serial.println("Calibrating gyro"); //Print text to screen
-  //lcd.setCursor(0,1);                                                  //Set the LCD cursor to position to position 0,1
+  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0,\"state\":\"Calibrating gyro\"}");
   for (int cal_int = 0; cal_int < 2000; cal_int++)
   { //Run this code 2000 times
     if (cal_int % 125 == 0)
@@ -98,9 +87,9 @@ void setup()
   //lcd.clear();                                                         //Clear the LCD
 
   //lcd.setCursor(0,0);                                                  //Set the LCD cursor to position to position 0,0
-  Serial.println("Pitch:"); //Print text to screen
+  //Serial.println("Pitch:"); //Print text to screen
   //lcd.setCursor(0,1);                                                  //Set the LCD cursor to position to position 0,1
-  Serial.println("Roll :"); //Print text to screen
+  //Serial.println("Roll :"); //Print text to screen
 
   digitalWrite(13, LOW); //All done, turn the LED off
 
@@ -157,7 +146,7 @@ void loop()
     char json[128], rs[32], ps[32];
     dtostrf(angle_roll_output, 3, 4, rs);
     dtostrf(angle_pitch_output, 3, 4, ps);
-    sprintf(json, "{\"roll\":%s,\"pitch\":%s}", rs, ps);
+    sprintf(json, "{\"roll\":%s,\"pitch\":%s,\"yaw\":0,\"dt\":%d}", rs, ps, curr);
     Serial.println(json);
     last = curr;
   }
