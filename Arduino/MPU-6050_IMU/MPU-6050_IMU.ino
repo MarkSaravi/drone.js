@@ -84,13 +84,7 @@ void setup()
   gyro_y_cal /= 2000; //Divide the gyro_y_cal variable by 2000 to get the avarage offset
   gyro_z_cal /= 2000; //Divide the gyro_z_cal variable by 2000 to get the avarage offset
 
-  //lcd.clear();                                                         //Clear the LCD
-
-  //lcd.setCursor(0,0);                                                  //Set the LCD cursor to position to position 0,0
-  //Serial.println("Pitch:"); //Print text to screen
-  //lcd.setCursor(0,1);                                                  //Set the LCD cursor to position to position 0,1
-  //Serial.println("Roll :"); //Print text to screen
-
+  
   digitalWrite(13, LOW); //All done, turn the LED off
 
   loop_timer = micros(); //Reset the loop timer
