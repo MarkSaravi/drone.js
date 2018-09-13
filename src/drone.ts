@@ -29,24 +29,28 @@ process.stdin.on('keypress', (str, key) => {
         case 'Q':
             app.emit('stopping-application');
             break;
+
         case ']':
             app.emit('inc-p-gain');
             break;
+        case '[':
+            app.emit('dec-p-gain');
+            break;
+
         case '\'':
             app.emit('dec-i-gain');
             break;
         case ';':
             app.emit('inc-i-gain');
             break;
-        case '[':
-            app.emit('dec-p-gain');
-            break;
+
         case '.':
             app.emit('inc-d-gain');
             break;
         case ',':
             app.emit('dec-d-gain');
             break;
+            
         case 'a':
         case 'A':
             app.emit('inc-power');

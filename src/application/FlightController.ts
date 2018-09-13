@@ -30,32 +30,32 @@ export default class FlightController {
     }
 
     incPGain() {
-        this.config.pGain = this.config.pGain + 0.1;
+        this.config.pGain = this.config.pGain + this.config.pGainInc;
         console.log(`P Gain: ${this.config.pGain}`);
     }
 
     decPGain() {
-        this.config.pGain = this.config.pGain - 0.1;
+        this.config.pGain = this.config.pGain - this.config.pGainInc;
         console.log(`P Gain: ${this.config.pGain}`);
     }
 
     incIGain() {
-        this.config.iGain = this.config.iGain + 0.1;
+        this.config.iGain = this.config.iGain + this.config.iGainInc;
         console.log(`P Gain: ${this.config.iGain}`);
     }
 
     decIGain() {
-        this.config.iGain = this.config.iGain - 0.1;
+        this.config.iGain = this.config.iGain - this.config.iGainInc;
         console.log(`P Gain: ${this.config.iGain}`);
     }
 
     incDGain() {
-        this.config.dGain = this.config.dGain + 0.1;
+        this.config.dGain = this.config.dGain + this.config.dGainInc;
         console.log(`D Gain: ${this.config.dGain}`);
     }
 
     decDGain() {
-        this.config.dGain = this.config.dGain - 0.1;
+        this.config.dGain = this.config.dGain - this.config.dGainInc;
         console.log(`D Gain: ${this.config.dGain}`);
     }
 
