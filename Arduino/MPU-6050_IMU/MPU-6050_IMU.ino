@@ -39,7 +39,7 @@ SCL  -  A5
 //Include LCD and I2C library
 #include <Wire.h>
 
-#define ZERO_JSON "{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0}"
+#define ZERO_JSON "{\"roll\":0,\"pitch\":0,\"yaw\":0,\"time\":0,\"state\":\"calibrating gyro\"}"
 //Declaring some global variables
 int gyro_x, gyro_y, gyro_z;
 long acc_x, acc_y, acc_z, acc_total_vector;
@@ -53,8 +53,9 @@ boolean set_gyro_angles;
 float angle_roll_acc, angle_pitch_acc;
 float angle_pitch_output, angle_roll_output;
 
-//Initialize the LCD library
-//LiquidCrystal_I2C lcd(0x27,16,2);
+
+const int DataPerSec = 50;
+const int interval = 1000 / DataPerSec;
 
 void setup()
 {
@@ -66,10 +67,10 @@ void setup()
 
   digitalWrite(13, HIGH); //Set digital output 13 high to indicate startup
 
-  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0,\"state\":\"MPU-6050 IMU\"}"); //Print text to screen
-  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0,\"state\":\"V1.0\"}");
+  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"time\":0,\"state\":\"MPU-6050-IMU\"}"); //Print text to screen
+  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"time\":0,\"state\":\"V1.0\"}");
   delay(1500); //Delay 1.5 second to display the text
-  Serial.println("{\"roll\":0,\"pitch\":0,\"yaw\":0,\"dt\":0,\"state\":\"Calibrating gyro\"}");
+  Serial.println(ZERO_JSON);
   for (int cal_int = 0; cal_int < 2000; cal_int++)
   { //Run this code 2000 times
     if (cal_int % 125 == 0)
@@ -135,12 +136,12 @@ void loop()
   angle_roll_output = angle_roll_output * 0.9 + angle_roll * 0.1;    //Take 90% of the output roll value and add 10% of the raw roll value
   static long last = millis();
   long curr = millis();
-  if (curr - last >= 10)
+  if (curr - last >= interval)
   {
     char json[128], rs[32], ps[32];
     dtostrf(angle_roll_output, 3, 4, rs);
     dtostrf(angle_pitch_output, 3, 4, ps);
-    sprintf(json, "{\"roll\":%s,\"pitch\":%s,\"yaw\":0,\"dt\":%d}", ps, rs, curr);
+    sprintf(json, "{\"roll\":%s,\"pitch\":%s,\"yaw\":0,\"time\":%d,\"state\":\"data\"}", rs, ps, curr);
     Serial.println(json);
     last = curr;
   }
