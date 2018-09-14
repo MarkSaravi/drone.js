@@ -141,7 +141,7 @@ void loop()
     char json[128], rs[32], ps[32];
     dtostrf(angle_roll_output, 3, 4, rs);
     dtostrf(angle_pitch_output, 3, 4, ps);
-    sprintf(json, "{\"roll\":%s,\"pitch\":%s,\"yaw\":0,\"time\":%d,\"state\":\"data\"}", rs, ps, curr);
+    sprintf(json, "{\"roll\":%s,\"pitch\":%s,\"yaw\":0,\"time\":%ld,\"state\":\"data\"}", rs, ps, curr);
     Serial.println(json);
     last = curr;
   }
