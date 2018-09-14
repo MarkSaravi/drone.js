@@ -11,7 +11,7 @@ runner.test('zero torque', () => {
     const ty = 0;
     const pb = powerBase;
     const dpb = 0;
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb === actualValues.p1 &&
@@ -28,7 +28,7 @@ runner.test('positive roll torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb === actualValues.p1 &&
@@ -45,7 +45,7 @@ runner.test('negative roll torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb === actualValues.p1 &&
@@ -62,7 +62,7 @@ runner.test('positive pitch torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb > actualValues.p1 &&
@@ -79,7 +79,7 @@ runner.test('negative pitch torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb < actualValues.p1 &&
@@ -96,7 +96,7 @@ runner.test('positive roll and pitch torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb > actualValues.p1 &&
@@ -113,7 +113,7 @@ runner.test('negative roll and pitch torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb < actualValues.p1 &&
@@ -130,7 +130,7 @@ runner.test('positive yaw torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb < actualValues.p1 &&
@@ -147,7 +147,7 @@ runner.test('negative yaw torque', () => {
     const pb = powerBase;
     const dpb = 0;
 
-    const actualValues:ICalculatedPowers = flightLogics.torqueCalculator(pb, tr, tp, ty);
+    const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
     TestRunner.assert(true, 
         dpb > actualValues.p1 &&

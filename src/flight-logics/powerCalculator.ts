@@ -96,7 +96,7 @@ function calcJx(a: number, b: number, c: number, d: number, tr: number, tp: numb
     return jx;
 }
 
-function torqueCalculator(powerBase: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
+function powerCalculator(powerBase: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
     if (powerBase<=0) {
         return {
             p1: 0, p2: 0, p3: 0, p4: 0
@@ -120,4 +120,4 @@ function torqueCalculator(powerBase: number, torqueRoll: number, torquePitch: nu
     };
 }
 
-export default torqueCalculator;
+export default powerCalculator;

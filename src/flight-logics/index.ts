@@ -1,6 +1,6 @@
 import PIDControl from './PIDControl';
 import getStateError from './getStateErrors';
-import torqueCalculator from './torqueCalculator';
+import powerCalculator from './powerCalculator';
 import { interpolation } from './interpolation';
 import { powerToAngularVelocity } from './interpolation';
 import { angularVelocityToPower } from './interpolation';
@@ -9,7 +9,7 @@ import { roundErro } from './noiseFilter';
 
 export { PIDControl };
 export { getStateError };
-export { torqueCalculator };
+export { powerCalculator };
 export { interpolation };
 export { powerToAngularVelocity };
 export { angularVelocityToPower };

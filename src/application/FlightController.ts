@@ -118,9 +118,14 @@ export default class FlightController {
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
         if (basePower >= 10) {
-            const angularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
-            const angularVelocityDiff = this.pidControl.PID(angularVelocity, stateError, this.config);
-            this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
+            const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
+            const controlTorque = this.pidControl.PID(stateError, this.config);
+            const angularVelocityDiff = flightLogics.powerCalculator(
+                baseAangularVelocity,
+                controlTorque.rollTorque,
+                controlTorque.pitchTorque,
+                controlTorque.yawTorque);
+            this.powers = this.calculatePower(baseAangularVelocity, angularVelocityDiff);
         } else {
             this.powers= { p1: 0, p2: 0, p3: 0, p4: 0 };
         }
