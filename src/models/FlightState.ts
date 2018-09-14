@@ -3,7 +3,7 @@ export default class FlightState {
         readonly roll: number,
         readonly pitch: number,
         readonly yaw: number,
-        readonly dt: number,
+        readonly time: number,
         public power: number,
     ){
     }

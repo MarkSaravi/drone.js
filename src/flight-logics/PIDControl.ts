@@ -76,7 +76,7 @@ export default class PIDControl {
         if (this.prevError == null) {
             this.prevError = errors;
         }
-        const dt = (errors.dt - this.prevError.dt) / 1000; //convert to milliseconds
+        const dt = (errors.time - this.prevError.time) / 1000; //convert to milliseconds
         let t : ITorqueResponse = {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
         
         t = this.apply(t, this.P(errors, config),"P");

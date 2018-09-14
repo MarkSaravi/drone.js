@@ -31,79 +31,63 @@ export default class FlightController {
 
     incPGain() {
         this.config.pGain = this.config.pGain + this.config.pGainInc;
-        console.log(`P Gain: ${this.config.pGain}`);
     }
 
     decPGain() {
         this.config.pGain = this.config.pGain - this.config.pGainInc;
-        console.log(`P Gain: ${this.config.pGain}`);
     }
 
     incIGain() {
         this.config.iGain = this.config.iGain + this.config.iGainInc;
-        console.log(`P Gain: ${this.config.iGain}`);
     }
 
     decIGain() {
         this.config.iGain = this.config.iGain - this.config.iGainInc;
-        console.log(`P Gain: ${this.config.iGain}`);
     }
 
     incDGain() {
         this.config.dGain = this.config.dGain + this.config.dGainInc;
-        console.log(`D Gain: ${this.config.dGain}`);
     }
 
     decDGain() {
         this.config.dGain = this.config.dGain - this.config.dGainInc;
-        console.log(`D Gain: ${this.config.dGain}`);
     }
 
     incPower() {
         if (this.actualFlightState.power < 56) {
             this.applyCommand(new Command(0, 0, 0, this.actualFlightState.power + 1));
         }
-        console.log(`Power: ${this.actualFlightState.power}`);
     }
 
     decPower() {
         if (this.actualFlightState.power > 0) {
             this.applyCommand(new Command(0, 0, 0, this.actualFlightState.power - 1));
         }
-        console.log(`Power: ${this.actualFlightState.power}`);
     }
 
     applyCommand(command: Command) {
-        this.targetFlightState = convertors.CommandToFlightStatus(command, this.targetFlightState);
+        this.targetFlightState = convertors.CommandToFlightStatus(command);
     }
 
     applyImuData(imuData: ImuData) {
-        this.actualFlightState = convertors.ImuDataToFlightStatus(imuData, this.actualFlightState);
+        this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
     }
 
     createEscCommand(p: ICalculatedPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
-    showState(angularVelocity: number, avd: ICalculatedPowers, pv: ICalculatedPowers, fsv: IFlightStateError, sme: IFlightStateError, basePower: number, msg: string = '') {
-        const ps = `a: ${(pv.p1).toFixed(3)} ,b: ${(pv.p2).toFixed(3)} ,c: ${(pv.p3).toFixed(3)} ,d: ${(pv.p4).toFixed(3)}`;
-        const avds = `p1: ${(avd.p1).toFixed(3)} ,p2: ${(avd.p2).toFixed(3)} ,p3: ${(avd.p3).toFixed(3)} ,p4: ${(avd.p4).toFixed(3)}`;
-        const fss = `roll: ${(fsv.rollError).toFixed(3)}, pitch: ${(fsv.pitchError).toFixed(3)}`;
-        const smes = `roll: ${(sme.rollError).toFixed(3)}, pitch: ${(sme.pitchError).toFixed(3)}`;
-        const av = `av: ${(angularVelocity).toFixed(3)}`;
+    showState(powers: ICalculatedPowers, errors: IFlightStateError, basePower: number) {
+        const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
+        const fss = `roll: ${(errors.rollError).toFixed(3)}, pitch: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
-        //const text = `${ps},\t${smes},\t${bps},\t${pids}`;
         const text = `${ps}\t${fss}\t${pids}\t${bps}`;
-        //const text = `${av}, ${avds}`;
-        //console.clear();
         console.log(text);
     }
 
     safeAdd(base: number, inc: number) {
-        const sign = Math.sign(inc);
-        const saftyFactor = 3;
-        return base + (Math.abs(inc) < base / saftyFactor ? inc : base / saftyFactor * sign);
+        return base + inc;
     }
 
     calculatePower(angularVelocity: number, angularVelocityDiff: ICalculatedPowers): ICalculatedPowers {
@@ -120,35 +104,14 @@ export default class FlightController {
         return res;
     }
 
-    errorNoiseReduction(err: IFlightStateError): IFlightStateError {
-        if (this.prevError == null) {
-            this.prevError = err;
-            this.prevError.dt -= 20; //simulating dt difference
-        }
-        err.rollError = flightLogics.roundErro(flightLogics.noiseFilter(err.rollError, this.prevError.rollError));
-        err.pitchError = flightLogics.roundErro(flightLogics.noiseFilter(err.pitchError, this.prevError.pitchError));
-        err.yawError = flightLogics.roundErro(flightLogics.noiseFilter(err.yawError, this.prevError.yawError));
-        this.prevError = {
-            rollError: err.rollError,
-            pitchError: err.pitchError,
-            yawError: err.yawError,
-            powerError: 0,
-            altitudeError: 0,
-            dt: 0
-        };
-        return err;
-    }
-
     calcMotorsPower() {
-        this.actualFlightState = flightLogics.applyTargetPower(this.actualFlightState, this.targetFlightState);
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
-        const smoothedError = this.errorNoiseReduction(stateError);
         stateError.yawError = 0;
-        const basePower = this.actualFlightState.power;
+        const basePower = this.targetFlightState.power;
         const angularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
         const angularVelocityDiff = this.pidControl.PID(angularVelocity, stateError, this.config);
         this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
-        this.showState(angularVelocity, angularVelocityDiff, this.powers, stateError, smoothedError, basePower);
+        this.showState(this.powers, stateError, basePower);
         if (basePower >= 10) {
             this.escCommand = this.createEscCommand(this.powers);
         } else {

@@ -3,7 +3,7 @@ export default class ImuData {
         readonly roll: number,
         readonly pitch: number,
         readonly yaw: number,
-        readonly dt: number,
+        readonly time: number,
     ){
         
     }
