@@ -15,7 +15,7 @@ export default class FlightController {
     private readonly pidControl: PIDControl;
     private escCommand: string;
     private powers: ICalculatedPowers;
-    private prevError: IFlightStateError = null;
+    private prevTime: number;
 
     constructor() {
         this.config = require('config.json')('./config.flight.json');
@@ -23,6 +23,7 @@ export default class FlightController {
         this.pidControl = new PIDControl();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
+        this.prevTime = 0;
         this.powers = {
             p1: 0, p2: 0, p3: 0, p4: 0
         };
@@ -54,14 +55,20 @@ export default class FlightController {
     }
 
     incPower() {
-        if (this.actualFlightState.power < 56) {
-            this.applyCommand(new Command(0, 0, 0, this.actualFlightState.power + 1));
+        if (this.targetFlightState.power < 56) {
+            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
+        }
+        if (this.targetFlightState.power > 0 && this.targetFlightState.power <=1) {
+            this.applyCommand(new Command(0, 0, 0, 10));
         }
     }
 
     decPower() {
-        if (this.actualFlightState.power > 0) {
-            this.applyCommand(new Command(0, 0, 0, this.actualFlightState.power - 1));
+        if (this.targetFlightState.power > 0) {
+            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power - 1));
+        }
+        if (this.targetFlightState.power < 10) {
+            this.applyCommand(new Command(0, 0, 0, 0));
         }
     }
 
@@ -82,7 +89,9 @@ export default class FlightController {
         const fss = `roll: ${(errors.rollError).toFixed(3)}, pitch: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
-        const text = `${ps}\t${fss}\t${pids}\t${bps}`;
+        const text = `${ps}\t${fss}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
+        this.prevTime = errors.time;
+        
         console.log(text);
     }
 
@@ -108,15 +117,15 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
-        const angularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
-        const angularVelocityDiff = this.pidControl.PID(angularVelocity, stateError, this.config);
-        this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
-        this.showState(this.powers, stateError, basePower);
         if (basePower >= 10) {
-            this.escCommand = this.createEscCommand(this.powers);
+            const angularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
+            const angularVelocityDiff = this.pidControl.PID(angularVelocity, stateError, this.config);
+            this.powers = this.calculatePower(angularVelocity, angularVelocityDiff);
         } else {
-            this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
+            this.powers= { p1: 0, p2: 0, p3: 0, p4: 0 };
         }
+        this.escCommand = this.createEscCommand(this.powers);
+        this.showState(this.powers, stateError, basePower);
         return this.escCommand
     }
 }
