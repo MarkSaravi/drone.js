@@ -42,9 +42,9 @@ export default class PIDControl {
         }
         const dt = (errors.time - this.prevError.time) / 1000; //convert to milliseconds
         
-        const tp = this.P(errors, config);
-        const ti = this.I(errors, config, dt);
-        const td = this.D(errors, config, dt);
+        const tp = config.usePGain ? this.P(errors, config) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
+        const ti = config.usePGain ? this.I(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
+        const td = config.usePGain ? this.D(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
         const tsum = {
             rollTorque: (tp.rollTorque + ti.rollTorque + td.rollTorque) * config.gain,
             pitchTorque: (tp.pitchTorque + ti.pitchTorque + td.pitchTorque) * config.gain,
