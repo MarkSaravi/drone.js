@@ -23,8 +23,20 @@ const eqSolver = (fx: (x: number) => number, initx: number): number => {
     return x;
 }
 
-const fix = (x: number) => {
+const fixDigit = (x: number) => {
     return (x).toFixed(6);
+}
+
+const fixLen = (x: number): string => {
+    let s = fixDigit(x);
+    while (s.length<12) {
+        s = ' '+ s;
+    }
+    return s;
+}
+
+const fix = (x: number) => {
+    return fixLen(x);
 }
 
 const getMax = (v: number, p: IPowers) => {
@@ -66,8 +78,9 @@ runner.test('a', () => {
         min: 60,
         max: 60,
     }];
-    const minTorque = -200, maxTorque = 200;
-    const dT = 10;
+    const torqueRane = 200;
+    const minTorque = -torqueRane, maxTorque = torqueRane;
+    const dT = 200;
     for (let i = 0; i < basePowers.length; i++) {
         const angularVelocity = flightLogics.powerToAngularVelocity(basePowers[i].power, mRpm, bRpm);
         for (let rollTorque = minTorque; rollTorque <= maxTorque; rollTorque += dT) {
@@ -88,7 +101,7 @@ runner.test('a', () => {
                     }
                     basePowers[i].min = getMin(basePowers[i].min, nPower);
                     basePowers[i].max = getMax(basePowers[i].min, nPower);
-                    //console.log('\x1b[32m', `power: ${fix(flightLogics.angularVelocityToPower(angularVelocity, mRpm, bRpm))}, p1: ${fix(nPower.p1)}, p2: ${fix(nPower.p2)}, p3: ${fix(nPower.p3)}, p4: ${fix(nPower.p4)},`, '\x1b[0m');
+                    console.log('\x1b[32m', `power: ${fix(flightLogics.angularVelocityToPower(angularVelocity, mRpm, bRpm))},  rollTorque: ${fix(rollTorque)}, pitchTorque: ${fix(pitchTorque)}, yawTorque: ${fix(yawTorque)},p1: ${fix(nPower.p1)}, p2: ${fix(nPower.p2)}, p3: ${fix(nPower.p3)}, p4: ${fix(nPower.p4)},`, '\x1b[0m');
                 }
             }
         }

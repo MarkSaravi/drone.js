@@ -1,7 +1,8 @@
 {
-    "rollPolarity": -1,
+    "rollPolarity": 1,
     "pitchPolarity": -1,
-    "yawPolarity": 1,
+	"yawPolarity": 1,
+	"maxAngle": 30,
 	"pGain": 0.01,
 	"iGain": 0,
 	"dGain": -0.4,
