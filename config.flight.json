@@ -3,7 +3,7 @@
     "pitchPolarity": -1,
 	"yawPolarity": 1,
 	"maxAngle": 30,
-	"pGain": 0.01,
+	"pGain": 6,
 	"iGain": 0,
 	"dGain": -0.4,
 	"usePGain": true,

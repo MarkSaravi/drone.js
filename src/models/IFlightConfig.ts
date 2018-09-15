@@ -6,6 +6,14 @@ export default interface IFlightConfig {
     pGain: number;
     iGain: number;
     dGain: number;
-    gain: number;
+    usePGain: boolean,
+    useIGain: boolean,
+    useDGain: boolean,
+    pGainInc: number;
+    iGainInc: number;
+    dGainInc: number;
     iMax: number;
+    gain: number;
+    mRpm: number;
+    bRpm: number;
 }
