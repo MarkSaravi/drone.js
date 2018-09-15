@@ -1,6 +1,6 @@
 import TestRunner from './TestRunner';
 import * as flightLogics from '../flight-logics';
-import ICalculatedPowers from '../models/ICalculatedPowers';
+import IPowers from '../models/IPowers';
 
 const runner = new TestRunner();
 const powerBase = 5;
@@ -13,13 +13,13 @@ const eqSolver = (fx: (x: number) => number, initx: number): number => {
     let x = initx;
     let loop = 0;
     do {
-        x = x - fx(x)/dfx(x); 
+        x = x - fx(x) / dfx(x);
         //console.log(x);
-        if (loop++>10) {
-            console.log('\x1b[31m', 'no solution','\x1b[0m');
+        if (loop++ > 10) {
+            console.log('\x1b[31m', 'no solution', '\x1b[0m');
             break;
         };
-    } while (Math.abs(fx(x))>dx);
+    } while (Math.abs(fx(x)) > dx);
     return x;
 }
 
@@ -27,21 +27,76 @@ const fix = (x: number) => {
     return (x).toFixed(6);
 }
 
-const fn = (power: number, rollTorque: number = 0, pitchTorque: number = 0, yawTorque: number = 0) => {
-    const angularVelocity = flightLogics.powerToAngularVelocity(power, mRpm, bRpm);
-    console.log('\x1b[32m', `power: ${power}, angularVelocity: ${fix(angularVelocity)}`, '\x1b[0m');
-    const powers = flightLogics.powerCalculator(power, rollTorque, pitchTorque, yawTorque);
-    console.log('\x1b[32m', `p1: ${fix(powers.p1)}, p2: ${fix(powers.p2)}, p3: ${fix(powers.p3)}, p4: ${fix(powers.p4)},`, '\x1b[0m');
-    console.log('----------------------------------------');
+const getMax = (v: number, p: IPowers) => {
+    v = v < p.p1 ? p.p1 : v;
+    v = v < p.p2 ? p.p2 : v;
+    v = v < p.p3 ? p.p3 : v;
+    v = v < p.p4 ? p.p4 : v;
+    return v;
+}
+
+const getMin = (v: number, p: IPowers) => {
+    v = v > p.p1 ? p.p1 : v;
+    v = v > p.p2 ? p.p2 : v;
+    v = v > p.p3 ? p.p3 : v;
+    v = v > p.p4 ? p.p4 : v;
+    return v;
 }
 
 runner.test('a', () => {
-    fn(30);
-    fn(40);
-    fn(50);
-    fn(60);
-    const res = eqSolver((x) => x * x - 9, 6);
-    console.log(res);
+    const basePowers = [{
+        power: 20,
+        min: 20,
+        max: 20,
+    },
+    {
+        power: 30,
+        min: 30,
+        max: 30,
+    }, {
+        power: 40,
+        min: 40,
+        max: 40,
+    }, {
+        power: 50,
+        min: 50,
+        max: 50,
+    }, {
+        power: 60,
+        min: 60,
+        max: 60,
+    }];
+    const minTorque = -200, maxTorque = 200;
+    const dT = 10;
+    for (let i = 0; i < basePowers.length; i++) {
+        const angularVelocity = flightLogics.powerToAngularVelocity(basePowers[i].power, mRpm, bRpm);
+        for (let rollTorque = minTorque; rollTorque <= maxTorque; rollTorque += dT) {
+            for (let pitchTorque = minTorque; pitchTorque <= maxTorque; pitchTorque += dT) {
+                for (let yawTorque = minTorque; yawTorque <= maxTorque; yawTorque += dT) {
+                    const adv = flightLogics.powerCalculator(angularVelocity, rollTorque, pitchTorque, yawTorque);
+                    const nav = {
+                        p1: angularVelocity + adv.p1,
+                        p2: angularVelocity + adv.p2,
+                        p3: angularVelocity + adv.p3,
+                        p4: angularVelocity + adv.p4,
+                    }
+                    const nPower = {
+                        p1: flightLogics.angularVelocityToPower(nav.p1, mRpm, bRpm),
+                        p2: flightLogics.angularVelocityToPower(nav.p2, mRpm, bRpm),
+                        p3: flightLogics.angularVelocityToPower(nav.p3, mRpm, bRpm),
+                        p4: flightLogics.angularVelocityToPower(nav.p4, mRpm, bRpm),
+                    }
+                    basePowers[i].min = getMin(basePowers[i].min, nPower);
+                    basePowers[i].max = getMax(basePowers[i].min, nPower);
+                    //console.log('\x1b[32m', `power: ${fix(flightLogics.angularVelocityToPower(angularVelocity, mRpm, bRpm))}, p1: ${fix(nPower.p1)}, p2: ${fix(nPower.p2)}, p3: ${fix(nPower.p3)}, p4: ${fix(nPower.p4)},`, '\x1b[0m');
+                }
+            }
+        }
+    }
+
+    for (let i = 0; i< basePowers.length; i++) {
+        console.log('\x1b[32m', `power: ${fix(basePowers[i].power)}, min: ${fix(basePowers[i].min)}, max: ${fix(basePowers[i].max)}`, '\x1b[0m');
+    }
 });
 
 
@@ -51,7 +106,7 @@ runner.test('a', () => {
 //     const ty = 0;
 //     const pb = powerBase;
 //     const dpb = 0;
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb === actualValues.p1 &&
@@ -68,7 +123,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb === actualValues.p1 &&
@@ -85,7 +140,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb === actualValues.p1 &&
@@ -102,7 +157,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb > actualValues.p1 &&
@@ -119,7 +174,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb < actualValues.p1 &&
@@ -136,7 +191,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb > actualValues.p1 &&
@@ -153,7 +208,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb < actualValues.p1 &&
@@ -170,7 +225,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb < actualValues.p1 &&
@@ -187,7 +242,7 @@ runner.test('a', () => {
 //     const pb = powerBase;
 //     const dpb = 0;
 
-//     const actualValues:ICalculatedPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
+//     const actualValues:IPowers = flightLogics.powerCalculator(pb, tr, tp, ty);
 //     console.log(`p1: ${actualValues.p1}, p2: ${actualValues.p2}, p3: ${actualValues.p3}, p4: ${actualValues.p4}`);
 //     TestRunner.assert(true, 
 //         dpb > actualValues.p1 &&

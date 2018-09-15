@@ -5,7 +5,7 @@ import IFlightStateError from '../models/IFlightStateError';
 import * as convertors from '../convertors';
 import * as flightLogics from '../flight-logics';
 import { PIDControl } from '../flight-logics';
-import ICalculatedPowers from '../models/ICalculatedPowers';
+import IPowers from '../models/IPowers';
 
 
 export default class FlightController {
@@ -14,7 +14,7 @@ export default class FlightController {
     private config: any;
     private readonly pidControl: PIDControl;
     private escCommand: string;
-    private powers: ICalculatedPowers;
+    private powers: IPowers;
     private prevTime: number;
 
     constructor() {
@@ -80,11 +80,11 @@ export default class FlightController {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
     }
 
-    createEscCommand(p: ICalculatedPowers): string {
+    createEscCommand(p: IPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
-    showState(powers: ICalculatedPowers, errors: IFlightStateError, basePower: number) {
+    showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
         const fss = `roll: ${(errors.rollError).toFixed(3)}, pitch: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
@@ -99,7 +99,7 @@ export default class FlightController {
         return base + inc;
     }
 
-    calculatePower(angularVelocity: number, angularVelocityDiff: ICalculatedPowers): ICalculatedPowers {
+    calculatePower(angularVelocity: number, angularVelocityDiff: IPowers): IPowers {
         const w1 = this.safeAdd(angularVelocity, angularVelocityDiff.p1);
         const w2 = this.safeAdd(angularVelocity, angularVelocityDiff.p2);
         const w3 = this.safeAdd(angularVelocity, angularVelocityDiff.p3);

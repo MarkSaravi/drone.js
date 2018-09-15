@@ -1,4 +1,4 @@
-import ICalculatedPowers from '../models/ICalculatedPowers';
+import IPowers from '../models/IPowers';
 let gauss = require('gaussian-elimination');
 
 function calcJx(a: number, b: number, c: number, d: number, tr: number, tp: number, ty: number, wb: number) {
@@ -96,7 +96,7 @@ function calcJx(a: number, b: number, c: number, d: number, tr: number, tp: numb
     return jx;
 }
 
-function powerCalculator(powerBase: number, torqueRoll: number, torquePitch: number, torqueYaw: number): ICalculatedPowers {
+function powerCalculator(powerBase: number, torqueRoll: number, torquePitch: number, torqueYaw: number): IPowers {
     if (powerBase<=0) {
         return {
             p1: 0, p2: 0, p3: 0, p4: 0
