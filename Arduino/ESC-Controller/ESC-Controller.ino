@@ -31,7 +31,6 @@ const int PWM_COUNTER = 4096;
 
 const double SPEED_FACTOR = 0.5;
 const double MAX_SPEED = 100.0;
-const double SAFE_SPEED_CHANGE = -30.0;
 
 const int BATTERY_PIN = 0;
 const int NUM_MOTORS = 4;
