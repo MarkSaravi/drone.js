@@ -20,10 +20,16 @@ export default class PIDControl {
     }
 
     I(errors: IFlightStateError, config: IFlightConfig, dt: number): ITorqueResponse {
+        const limit = (x: number, y: number) =>  Math.abs(x + y) < config.iMax ? x + y : x;
+        this.integralSumRoll = limit(this.integralSumRoll, (errors.rollError) * dt * config.iGain);
+        this.integralSumPitch = limit(this.integralSumPitch, (errors.pitchError) * dt * config.iGain);
+        // console.log(this.integralSumRoll);
+        // console.log(this.integralSumPitch);
+        this.integralSumYaw = 0;
         return {
-            rollTorque: 0,
-            pitchTorque: 0,
-            yawTorque: 0
+            rollTorque: this.integralSumRoll,
+            pitchTorque: this.integralSumPitch,
+            yawTorque: this.integralSumYaw
         }
     }
 
@@ -43,8 +49,8 @@ export default class PIDControl {
         const dt = (errors.time - this.prevError.time) / 1000; //convert to milliseconds
         
         const tp = config.usePGain ? this.P(errors, config) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-        const ti = config.usePGain ? this.I(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-        const td = config.usePGain ? this.D(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
+        const ti = config.useIGain ? this.I(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
+        const td = config.useDGain ? this.D(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
         const tsum = {
             rollTorque: (tp.rollTorque + ti.rollTorque + td.rollTorque) * config.gain,
             pitchTorque: (tp.pitchTorque + ti.pitchTorque + td.pitchTorque) * config.gain,
