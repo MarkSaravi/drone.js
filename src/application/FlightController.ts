@@ -58,7 +58,7 @@ export default class FlightController {
         if (this.targetFlightState.power < 56) {
             this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
         }
-        if (this.targetFlightState.power > 0 && this.targetFlightState.power <=1) {
+        if (this.targetFlightState.power > 0 && this.targetFlightState.power <= 1) {
             this.applyCommand(new Command(0, 0, 0, 10));
         }
     }
@@ -91,7 +91,7 @@ export default class FlightController {
         const bps = `Base Power: ${basePower}`;
         const text = `${ps}\t${fss}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
         this.prevTime = errors.time;
-        
+
         console.log(text);
     }
 
@@ -120,14 +120,21 @@ export default class FlightController {
         if (basePower >= 10) {
             const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
             const controlTorque = this.pidControl.PID(stateError, this.config);
-            const angularVelocityDiff = flightLogics.powerCalculator(
-                baseAangularVelocity,
-                controlTorque.rollTorque,
-                controlTorque.pitchTorque,
-                controlTorque.yawTorque);
-            this.powers = this.calculatePower(baseAangularVelocity, angularVelocityDiff);
+            const adv = flightLogics.powerCalculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
+            const nav = {
+                p1: baseAangularVelocity + adv.p1,
+                p2: baseAangularVelocity + adv.p2,
+                p3: baseAangularVelocity + adv.p3,
+                p4: baseAangularVelocity + adv.p4,
+            }
+            this.powers = {
+                p1: flightLogics.angularVelocityToPower(nav.p1, this.config.mRpm, this.config.bRpm),
+                p2: flightLogics.angularVelocityToPower(nav.p2, this.config.mRpm, this.config.bRpm),
+                p3: flightLogics.angularVelocityToPower(nav.p3, this.config.mRpm, this.config.bRpm),
+                p4: flightLogics.angularVelocityToPower(nav.p4, this.config.mRpm, this.config.bRpm),
+            }
         } else {
-            this.powers= { p1: 0, p2: 0, p3: 0, p4: 0 };
+            this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };
         }
         this.escCommand = this.createEscCommand(this.powers);
         this.showState(this.powers, stateError, basePower);
