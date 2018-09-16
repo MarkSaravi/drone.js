@@ -15,7 +15,8 @@
     "iMax": 50,
 	"gain": 1,
 	"mRpm": 140,
-	"bRpm": 100
+	"bRpm": 100,
+	"saveData": false
 }
 
 

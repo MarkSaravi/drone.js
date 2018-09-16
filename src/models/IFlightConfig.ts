@@ -16,4 +16,5 @@ export default interface IFlightConfig {
     gain: number;
     mRpm: number;
     bRpm: number;
+    saveData: boolean
 }
