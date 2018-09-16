@@ -6,12 +6,13 @@ import * as convertors from '../convertors';
 import * as flightLogics from '../flight-logics';
 import { PIDControl } from '../flight-logics';
 import IPowers from '../models/IPowers';
+import IFlightConfig from '../models/IFlightConfig';
 
 
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
-    private config: any;
+    private config: IFlightConfig;
     private readonly pidControl: PIDControl;
     private escCommand: string;
     private powers: IPowers;
