@@ -7,6 +7,7 @@ import * as flightLogics from '../flight-logics';
 import { PIDControl } from '../flight-logics';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
+import fileSyatem from 'fs';
 
 
 export default class FlightController {
@@ -17,10 +18,10 @@ export default class FlightController {
     private escCommand: string;
     private powers: IPowers;
     private prevTime: number;
+    private dataLog: string = null;
 
     constructor() {
         this.config = require('config.json')('./config.flight.json');
-        console.log(`Gain: ${this.config.gain}`);
         this.pidControl = new PIDControl();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
@@ -29,6 +30,9 @@ export default class FlightController {
             p1: 0, p2: 0, p3: 0, p4: 0
         };
         this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
+        if (this.config.saveData) {
+            this.dataLog = `/home/pi/drone.js/logs/${Date.now()}`;
+        }
     }
 
     incPGain() {
@@ -92,7 +96,9 @@ export default class FlightController {
         const bps = `Base Power: ${basePower}`;
         const text = `${ps}\t${fss}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
         this.prevTime = errors.time;
-
+        if (this.dataLog) {
+            fileSyatem.appendFileSync(this.dataLog, text + '\n');
+        }
         console.log(text);
     }
 

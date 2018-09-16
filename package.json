@@ -5,6 +5,7 @@
     "author": "Mark Saravi",
     "license": "ISC",
     "scripts": {
+        "createLogFolder": "mkdir ./logs",
         "zip": "zip -r dist.zip ./dist/",
         "clean": "rm -rf ./dist",
         "clean-zip": "npm run clean && rm ./dist.zip",
@@ -13,8 +14,8 @@
         "build": "tsc",
         "build-copy": "npm run build && npm run zip && npm run copy",
         "run-drone": "node ./dist/drone.js",
-        "unzip-start": "npm run clean && npm run unzip && npm run run-drone",
-        "start": "npm run run-drone",
+        "unzip-start": "npm run createLogFolder && npm run clean && npm run unzip && npm run run-drone",
+        "start": "npm run createLogFolder && npm run run-drone",
         "build-and-test": "npm run build && npm run test",
         "test": "node ./dist/tests/test.js"
     },
