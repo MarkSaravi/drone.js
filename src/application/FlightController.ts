@@ -31,7 +31,7 @@ export default class FlightController {
         };
         this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
         if (this.config.saveData) {
-            this.dataLog = `/home/pi/drone.js/logs/${Date.now()}`;
+            this.dataLog = `/home/pi/drone.js/logs/${Date.now()}.flight.log`;
         }
     }
 
@@ -61,13 +61,13 @@ export default class FlightController {
 
     markStart() {
         if (this.dataLog) {
-            fileSyatem.appendFileSync(this.dataLog, 'start --------------------------------------------------------------');
+            fileSyatem.appendFileSync(this.dataLog, 'start --------------------------------------------------------------\n');
         }
     }
 
     markEnd() {
         if (this.dataLog) {
-            fileSyatem.appendFileSync(this.dataLog, 'end ---------------------------------------------------------------');
+            fileSyatem.appendFileSync(this.dataLog, 'end ---------------------------------------------------------------\n');
         }
     }
 
