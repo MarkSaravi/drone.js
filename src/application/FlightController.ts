@@ -59,6 +59,18 @@ export default class FlightController {
         this.config.dGain = this.config.dGain - this.config.dGainInc;
     }
 
+    markStart() {
+        if (this.dataLog) {
+            fileSyatem.appendFileSync(this.dataLog, 'start --------------------------------------------------------------');
+        }
+    }
+
+    markEnd() {
+        if (this.dataLog) {
+            fileSyatem.appendFileSync(this.dataLog, 'end ---------------------------------------------------------------');
+        }
+    }
+
     incPower() {
         if (this.targetFlightState.power < 65) {
             this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
