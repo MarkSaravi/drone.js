@@ -1,116 +1,130 @@
 import TestRunner from './TestRunner';
 import * as flightLogics from '../flight-logics';
-import IPowers from '../models/IPowers';
+import * as models from '../models';
 
 const runner = new TestRunner();
 const powerBase = 5;
 const mRpm = 140;
 const bRpm = 100;
 
-const eqSolver = (fx: (x: number) => number, initx: number): number => {
-    let dx = 0.00001;
-    const dfx = (x: number) => (fx(x + dx) - fx(x)) / dx;
-    let x = initx;
-    let loop = 0;
-    do {
-        x = x - fx(x) / dfx(x);
-        //console.log(x);
-        if (loop++ > 10) {
-            console.log('\x1b[31m', 'no solution', '\x1b[0m');
-            break;
-        };
-    } while (Math.abs(fx(x)) > dx);
-    return x;
-}
-
-const fixDigit = (x: number) => {
-    return (x).toFixed(6);
-}
-
-const fixLen = (x: number): string => {
-    let s = fixDigit(x);
-    while (s.length<12) {
-        s = ' '+ s;
-    }
-    return s;
-}
-
-const fix = (x: number) => {
-    return fixLen(x);
-}
-
-const getMax = (v: number, p: IPowers) => {
-    v = v < p.p1 ? p.p1 : v;
-    v = v < p.p2 ? p.p2 : v;
-    v = v < p.p3 ? p.p3 : v;
-    v = v < p.p4 ? p.p4 : v;
-    return v;
-}
-
-const getMin = (v: number, p: IPowers) => {
-    v = v > p.p1 ? p.p1 : v;
-    v = v > p.p2 ? p.p2 : v;
-    v = v > p.p3 ? p.p3 : v;
-    v = v > p.p4 ? p.p4 : v;
-    return v;
-}
-
-runner.test('a', () => {
-    const basePowers = [{
-        power: 20,
-        min: 20,
-        max: 20,
-    },
-    {
-        power: 30,
-        min: 30,
-        max: 30,
-    }, {
-        power: 40,
-        min: 40,
-        max: 40,
-    }, {
-        power: 50,
-        min: 50,
-        max: 50,
-    }, {
-        power: 60,
-        min: 60,
-        max: 60,
-    }];
-    const torqueRane = 200;
-    const minTorque = -torqueRane, maxTorque = torqueRane;
-    const dT = 200;
-    for (let i = 0; i < basePowers.length; i++) {
-        const angularVelocity = flightLogics.powerToAngularVelocity(basePowers[i].power, mRpm, bRpm);
-        for (let rollTorque = minTorque; rollTorque <= maxTorque; rollTorque += dT) {
-            for (let pitchTorque = minTorque; pitchTorque <= maxTorque; pitchTorque += dT) {
-                for (let yawTorque = minTorque; yawTorque <= maxTorque; yawTorque += dT) {
-                    const adv = flightLogics.powerCalculator(angularVelocity, rollTorque, pitchTorque, yawTorque);
-                    const nav = {
-                        p1: angularVelocity + adv.p1,
-                        p2: angularVelocity + adv.p2,
-                        p3: angularVelocity + adv.p3,
-                        p4: angularVelocity + adv.p4,
-                    }
-                    const nPower = {
-                        p1: flightLogics.angularVelocityToPower(nav.p1, mRpm, bRpm),
-                        p2: flightLogics.angularVelocityToPower(nav.p2, mRpm, bRpm),
-                        p3: flightLogics.angularVelocityToPower(nav.p3, mRpm, bRpm),
-                        p4: flightLogics.angularVelocityToPower(nav.p4, mRpm, bRpm),
-                    }
-                    basePowers[i].min = getMin(basePowers[i].min, nPower);
-                    basePowers[i].max = getMax(basePowers[i].min, nPower);
-                    console.log('\x1b[32m', `power: ${fix(flightLogics.angularVelocityToPower(angularVelocity, mRpm, bRpm))},  rollTorque: ${fix(rollTorque)}, pitchTorque: ${fix(pitchTorque)}, yawTorque: ${fix(yawTorque)},p1: ${fix(nPower.p1)}, p2: ${fix(nPower.p2)}, p3: ${fix(nPower.p3)}, p4: ${fix(nPower.p4)},`, '\x1b[0m');
-                }
-            }
-        }
-    }
-
-    for (let i = 0; i< basePowers.length; i++) {
-        console.log('\x1b[32m', `power: ${fix(basePowers[i].power)}, min: ${fix(basePowers[i].min)}, max: ${fix(basePowers[i].max)}`, '\x1b[0m');
-    }
+runner.test('1', () => {
+    const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
+    const torque = -500;
+    const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
+    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.w1}, w3: ${w1w3.w3}`); 
 });
+
+runner.test('1', () => {
+    const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
+    const torque = 500;
+    const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
+    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.w1}, w3: ${w1w3.w3}`); 
+});
+
+// const eqSolver = (fx: (x: number) => number, initx: number): number => {
+//     let dx = 0.00001;
+//     const dfx = (x: number) => (fx(x + dx) - fx(x)) / dx;
+//     let x = initx;
+//     let loop = 0;
+//     do {
+//         x = x - fx(x) / dfx(x);
+//         //console.log(x);
+//         if (loop++ > 10) {
+//             console.log('\x1b[31m', 'no solution', '\x1b[0m');
+//             break;
+//         };
+//     } while (Math.abs(fx(x)) > dx);
+//     return x;
+// }
+
+// const fixDigit = (x: number) => {
+//     return (x).toFixed(6);
+// }
+
+// const fixLen = (x: number): string => {
+//     let s = fixDigit(x);
+//     while (s.length<12) {
+//         s = ' '+ s;
+//     }
+//     return s;
+// }
+
+// const fix = (x: number) => {
+//     return fixLen(x);
+// }
+
+// const getMax = (v: number, p: IPowers) => {
+//     v = v < p.p1 ? p.p1 : v;
+//     v = v < p.p2 ? p.p2 : v;
+//     v = v < p.p3 ? p.p3 : v;
+//     v = v < p.p4 ? p.p4 : v;
+//     return v;
+// }
+
+// const getMin = (v: number, p: IPowers) => {
+//     v = v > p.p1 ? p.p1 : v;
+//     v = v > p.p2 ? p.p2 : v;
+//     v = v > p.p3 ? p.p3 : v;
+//     v = v > p.p4 ? p.p4 : v;
+//     return v;
+// }
+
+// runner.test('a', () => {
+//     const basePowers = [{
+//         power: 20,
+//         min: 20,
+//         max: 20,
+//     },
+//     {
+//         power: 30,
+//         min: 30,
+//         max: 30,
+//     }, {
+//         power: 40,
+//         min: 40,
+//         max: 40,
+//     }, {
+//         power: 50,
+//         min: 50,
+//         max: 50,
+//     }, {
+//         power: 60,
+//         min: 60,
+//         max: 60,
+//     }];
+//     const torqueRane = 200;
+//     const minTorque = -torqueRane, maxTorque = torqueRane;
+//     const dT = 200;
+//     for (let i = 0; i < basePowers.length; i++) {
+//         const angularVelocity = flightLogics.powerToAngularVelocity(basePowers[i].power, mRpm, bRpm);
+//         for (let rollTorque = minTorque; rollTorque <= maxTorque; rollTorque += dT) {
+//             for (let pitchTorque = minTorque; pitchTorque <= maxTorque; pitchTorque += dT) {
+//                 for (let yawTorque = minTorque; yawTorque <= maxTorque; yawTorque += dT) {
+//                     const adv = flightLogics.powerCalculator(angularVelocity, rollTorque, pitchTorque, yawTorque);
+//                     const nav = {
+//                         p1: angularVelocity + adv.p1,
+//                         p2: angularVelocity + adv.p2,
+//                         p3: angularVelocity + adv.p3,
+//                         p4: angularVelocity + adv.p4,
+//                     }
+//                     const nPower = {
+//                         p1: flightLogics.angularVelocityToPower(nav.p1, mRpm, bRpm),
+//                         p2: flightLogics.angularVelocityToPower(nav.p2, mRpm, bRpm),
+//                         p3: flightLogics.angularVelocityToPower(nav.p3, mRpm, bRpm),
+//                         p4: flightLogics.angularVelocityToPower(nav.p4, mRpm, bRpm),
+//                     }
+//                     basePowers[i].min = getMin(basePowers[i].min, nPower);
+//                     basePowers[i].max = getMax(basePowers[i].min, nPower);
+//                     console.log('\x1b[32m', `power: ${fix(flightLogics.angularVelocityToPower(angularVelocity, mRpm, bRpm))},  rollTorque: ${fix(rollTorque)}, pitchTorque: ${fix(pitchTorque)}, yawTorque: ${fix(yawTorque)},p1: ${fix(nPower.p1)}, p2: ${fix(nPower.p2)}, p3: ${fix(nPower.p3)}, p4: ${fix(nPower.p4)},`, '\x1b[0m');
+//                 }
+//             }
+//         }
+//     }
+
+//     for (let i = 0; i< basePowers.length; i++) {
+//         console.log('\x1b[32m', `power: ${fix(basePowers[i].power)}, min: ${fix(basePowers[i].min)}, max: ${fix(basePowers[i].max)}`, '\x1b[0m');
+//     }
+// });
 
 
 // runner.test('zero torque', () => {

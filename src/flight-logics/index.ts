@@ -6,6 +6,8 @@ import { powerToAngularVelocity } from './interpolation';
 import { angularVelocityToPower } from './interpolation';
 import { noiseFilter } from './noiseFilter';
 import { roundErro } from './noiseFilter';
+import rotorSpeedCacculator from './rotorSpeedsCalculator';
+import { calcTilteCompensationSpeeds } from './rotorSpeedsCalculator';
 
 export { PIDControl };
 export { getStateError };
@@ -15,3 +17,5 @@ export { powerToAngularVelocity };
 export { angularVelocityToPower };
 export { noiseFilter };
 export { roundErro };
+export { calcTilteCompensationSpeeds };
+export { rotorSpeedCacculator };
