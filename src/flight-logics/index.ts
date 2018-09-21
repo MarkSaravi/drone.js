@@ -1,6 +1,6 @@
 import PIDControl from './PIDControl';
+import PIDController from './PIDController';
 import getStateError from './getStateErrors';
-import powerCalculator from './powerCalculator';
 import { interpolation } from './interpolation';
 import { powerToAngularVelocity } from './interpolation';
 import { angularVelocityToPower } from './interpolation';
@@ -10,8 +10,8 @@ import rotorSpeedCacculator from './rotorSpeedsCalculator';
 import { calcTilteCompensationSpeeds } from './rotorSpeedsCalculator';
 
 export { PIDControl };
+export { PIDController };
 export { getStateError };
-export { powerCalculator };
 export { interpolation };
 export { powerToAngularVelocity };
 export { angularVelocityToPower };

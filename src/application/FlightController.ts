@@ -4,7 +4,7 @@ import ImuData from '../models/ImuData';
 import IFlightStateError from '../models/IFlightStateError';
 import * as convertors from '../convertors';
 import * as flightLogics from '../flight-logics';
-import { PIDControl } from '../flight-logics';
+import { PIDController } from '../flight-logics';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
 import fileSyatem from 'fs';
@@ -13,14 +13,14 @@ import fileSyatem from 'fs';
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
-    private readonly pidControl: PIDControl;
+    private readonly pidControl: PIDController;
     private escCommand: string;
     private powers: IPowers;
     private prevTime: number;
     private dataLog: string = null;
 
     constructor(private config: IFlightConfig) {
-        this.pidControl = new PIDControl();
+        this.pidControl = new PIDController(this.config);
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
         this.prevTime = 0;
@@ -104,7 +104,7 @@ export default class FlightController {
 
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
-        const fss = `roll: ${(errors.rollError).toFixed(3)}, pitch: ${(errors.pitchError).toFixed(3)}`;
+        const fss = `roll error: ${(errors.rollError).toFixed(3)}, pitch error: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
         const text = `${ps}\t${fss}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
@@ -137,21 +137,15 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
-        if (basePower >= 10) {
-            const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
+        if (basePower >= 20) {
             const controlTorque = this.pidControl.PID(stateError, this.config);
-            const adv = flightLogics.powerCalculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
-            const nav = {
-                p1: baseAangularVelocity + adv.p1,
-                p2: baseAangularVelocity + adv.p2,
-                p3: baseAangularVelocity + adv.p3,
-                p4: baseAangularVelocity + adv.p4,
-            }
+            const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
+            const rotorsSpeeds = flightLogics.rotorSpeedCacculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
             this.powers = {
-                p1: flightLogics.angularVelocityToPower(nav.p1, this.config.mRpm, this.config.bRpm),
-                p2: flightLogics.angularVelocityToPower(nav.p2, this.config.mRpm, this.config.bRpm),
-                p3: flightLogics.angularVelocityToPower(nav.p3, this.config.mRpm, this.config.bRpm),
-                p4: flightLogics.angularVelocityToPower(nav.p4, this.config.mRpm, this.config.bRpm),
+                p1: flightLogics.angularVelocityToPower(rotorsSpeeds.wa, this.config.mRpm, this.config.bRpm),
+                p2: flightLogics.angularVelocityToPower(rotorsSpeeds.wb, this.config.mRpm, this.config.bRpm),
+                p3: flightLogics.angularVelocityToPower(rotorsSpeeds.wc, this.config.mRpm, this.config.bRpm),
+                p4: flightLogics.angularVelocityToPower(rotorsSpeeds.wd, this.config.mRpm, this.config.bRpm),
             }
         } else {
             this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };

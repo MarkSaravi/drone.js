@@ -1,63 +1,46 @@
-import IFlightStateError from '../models/IFlightStateError';
-import ITorqueResponse from '../models/ITorqueResponse';
 import IFlightConfig from '../models/IFlightConfig';
 
+const PERV_ERROR_EMPTY = -999999;
+
 export default class PIDControl {
-    integralSumRoll: number = 0;
-    integralSumPitch: number = 0;
-    integralSumYaw: number = 0;
-    prevError: IFlightStateError = null;
+    integralSum: number = 0;
+    prevError: number = PERV_ERROR_EMPTY;
+    prevTime: number;
 
-    constructor() {
+    constructor(private config: IFlightConfig) {
     }
 
-    P(errors: IFlightStateError, config: IFlightConfig): ITorqueResponse {
-        return {
-            rollTorque: errors.rollError,
-            pitchTorque: errors.pitchError ,
-            yawTorque: errors.yawError
-        }
+    P(error: number): number {
+        return error;
     }
 
-    I(errors: IFlightStateError, config: IFlightConfig, dt: number): ITorqueResponse {
-        const limit = (x: number, y: number) =>  Math.abs(x + y) < config.iMax ? x + y : x;
-        this.integralSumRoll = limit(this.integralSumRoll, (errors.rollError) * dt);
-        this.integralSumPitch = limit(this.integralSumPitch, (errors.pitchError) * dt);
-        // console.log(this.integralSumRoll);
-        // console.log(this.integralSumPitch);
-        this.integralSumYaw = 0;
-        return {
-            rollTorque: this.integralSumRoll,
-            pitchTorque: this.integralSumPitch,
-            yawTorque: this.integralSumYaw
+    I(error: number, dt: number, ): number {
+        this.integralSum  += error * dt;
+        const sign = Math.sign(this.integralSum);
+        if (Math.abs(this.integralSum) > this.config.iMax) {
+            this.integralSum = this.config.iMax * sign;
         }
+        return this.integralSum;
     }
 
-    D(errors: IFlightStateError, config: IFlightConfig, dt: number): ITorqueResponse {
-        return {
-            rollTorque: (errors.rollError - this.prevError.rollError) / dt,
-            pitchTorque: (errors.pitchError - this.prevError.pitchError) / dt,
-            yawTorque: (errors.yawError - this.prevError.yawError) / dt
-        }
+    D(dError: number, dt: number): number {
+        return dError / dt;
     }
 
-    PID(errors: IFlightStateError, config: IFlightConfig): ITorqueResponse {
-        if (this.prevError == null) {
-            this.prevError = errors;
-            this.prevError.time =this.prevError.time - 10; //10 milliseconds back
+    PID(error: number, time: number, pGain: number, iGain: number, dGain: number): number {
+        if (this.prevError == PERV_ERROR_EMPTY) {
+            this.prevError = error;
+            this.prevTime = time - 25;
         }
-        const dt = (errors.time - this.prevError.time) / 1000; //convert to milliseconds
+        const dt = (time - this.prevTime) / 1000; //convert to milliseconds
+        const dError = error - this.prevError;
+        this.prevTime = time;
+        this.prevError = error;
         
-        const tp = config.usePGain ? this.P(errors, config) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-        const ti = config.useIGain ? this.I(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-        const td = config.useDGain ? this.D(errors, config, dt) : {rollTorque: 0, pitchTorque: 0, yawTorque: 0};
-        const tsum = {
-            rollTorque: (tp.rollTorque * config.pGain + ti.rollTorque * config.iGain + td.rollTorque * config.dGain) * config.gain,
-            pitchTorque: (tp.pitchTorque * config.pGain  + ti.pitchTorque * config.iGain + td.pitchTorque * config.dGain) * config.gain,
-            yawTorque: 0
-        }
-        this.prevError = errors;
-        return tsum;
+        const p = this.config.usePGain ? this.P(error) * pGain : 0;
+        const i = this.config.useIGain ? this.I(error, dt) * iGain : 0;
+        const d = this.config.useDGain ? this.D(dError, dt) * dGain : 0;
+        return p + i + d;
     }
 
 }
