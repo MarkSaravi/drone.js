@@ -4,6 +4,7 @@ import PortInfo from '../models/PortInfo';
 import ISerialDevice from '../devices/ISerialDevice';
 import SerialDevice from '../devices/SerialDevice';
 import FlightController from './FlightController';
+import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 
 export default class Application extends EventEmitter {
@@ -14,7 +15,8 @@ export default class Application extends EventEmitter {
 
     devices: ISerialDevice[] = [];
 
-    constructor(private readonly flightController: FlightController) {
+    constructor(private readonly flightController: FlightController,
+        private config: IFlightConfig) {
         super();
     }
 
@@ -26,7 +28,7 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
-        const imuData = convertors.JsonToImuData(imuJson);
+        const imuData = convertors.JsonToImuData(imuJson, this.config.rollPolarity, this.config.pitchPolarity);
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();

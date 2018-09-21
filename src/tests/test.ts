@@ -11,14 +11,14 @@ runner.test('1', () => {
     const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
     const torque = -500;
     const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
-    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.w1}, w3: ${w1w3.w3}`); 
+    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.first}, w3: ${w1w3.second}`); 
 });
 
 runner.test('1', () => {
     const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
     const torque = 500;
     const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
-    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.w1}, w3: ${w1w3.w3}`); 
+    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.first}, w3: ${w1w3.second}`); 
 });
 
 // const eqSolver = (fx: (x: number) => number, initx: number): number => {

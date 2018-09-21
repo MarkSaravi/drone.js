@@ -4,10 +4,12 @@ import DeviceFinder from './devices/DeviceFinder';
 import PortInfo from './models/PortInfo';
 import FlightController from './application/FlightController';
 const readline = require('readline');
+import IFlightConfig from './models/IFlightConfig';
+const config: IFlightConfig = require('config.json')('./config.flight.json');
 
 let deviceFinder = new DeviceFinder();
-const flightControl = new FlightController();
-let app = new Application(flightControl);
+const flightControl = new FlightController(config);
+let app = new Application(flightControl, config);
 
 app.on('ble-send', (s) => {
     app.writeBLE(s);

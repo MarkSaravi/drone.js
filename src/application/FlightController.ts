@@ -13,15 +13,13 @@ import fileSyatem from 'fs';
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
-    private config: IFlightConfig;
     private readonly pidControl: PIDControl;
     private escCommand: string;
     private powers: IPowers;
     private prevTime: number;
     private dataLog: string = null;
 
-    constructor() {
-        this.config = require('config.json')('./config.flight.json');
+    constructor(private config: IFlightConfig) {
         this.pidControl = new PIDControl();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
@@ -95,6 +93,9 @@ export default class FlightController {
 
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
+        // const s = this.actualFlightState;
+        // const text = `${s.roll}\t${s.pitch}\t${s.yaw}\t`;
+        // console.log(text);
     }
 
     createEscCommand(p: IPowers): string {

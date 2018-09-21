@@ -5,20 +5,26 @@ export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque:
     // w3^2 - w1^2 = t
     // w3^2 + w1^2 = 2*wb^2
     // w1^2 + t = 2*wb^2 - w1^2 -> 2*w1^2 = 2*wb^2 - t -> w1 = sqrt(wb^2 - t/2)
-    const w1 = Math.sqrt(angularVelocityBase * angularVelocityBase - torque / 2);
-    const w3 = Math.sqrt(2 * angularVelocityBase * angularVelocityBase - w1 * w1);
+    const first = Math.sqrt(angularVelocityBase * angularVelocityBase - torque / 2);
+    const second = Math.sqrt(2 * angularVelocityBase * angularVelocityBase - first * first);
     return {
-        w1,
-        w3
+        first,
+        second
     }
 }
 
+export const calcTurnCompensationSpeeds = (speeds: IRotorSpeeds, torque: number): IRotorSpeeds => {
+    return speeds;
+}
+
 const rotorSpeedCacculator = (angularVelocityBase: number, rollTorque: number, pitchTorque: number, yawTorque: number): IRotorSpeeds => {
+    const wAwC = calcTilteCompensationSpeeds(angularVelocityBase, pitchTorque);
+    const wBwD = calcTilteCompensationSpeeds(angularVelocityBase, rollTorque);
     return {
-        wa: 0,
-        wb: 0,
-        wc: 0,
-        wd: 0
+        wa: wAwC.first,
+        wb: wBwD.first,
+        wc: wAwC.second,
+        wd: wBwD.second
     }
 }
 
