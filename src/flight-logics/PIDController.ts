@@ -17,8 +17,8 @@ export default class PIDController {
 
     PID(errors: IFlightStateError, config: IFlightConfig): ITorqueResponse {
         const tsum = {
-            rollTorque: this.rollControl.PID(errors.rollError, errors.time, config.pGain, config.iGain, config.dGain),
-            pitchTorque: this.pitchControl.PID(errors.pitchError, errors.time, config.pGain, config.iGain, config.dGain),
+            rollTorque: this.rollControl.PID(errors.rollError, errors.time, config.pGain, config.iGain, config.dGain) * config.gain,
+            pitchTorque: this.pitchControl.PID(errors.pitchError, errors.time, config.pGain, config.iGain, config.dGain) * config.gain,
             yawTorque: 0
         }
         return tsum;
