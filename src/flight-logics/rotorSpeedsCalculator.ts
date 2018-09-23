@@ -17,14 +17,18 @@ export const calcTurnCompensationSpeeds = (speeds: IRotorSpeeds, torque: number)
     return speeds;
 }
 
+export const isPositveNumber = (x: number): number => {
+    if (isNaN(x)) return 0;
+    return x >= 0 ? x : 0
+}
 const rotorSpeedCacculator = (angularVelocityBase: number, rollTorque: number, pitchTorque: number, yawTorque: number): IRotorSpeeds => {
     const wAwC = calcTilteCompensationSpeeds(angularVelocityBase, pitchTorque);
     const wBwD = calcTilteCompensationSpeeds(angularVelocityBase, rollTorque);
     return {
-        wa: wAwC.first,
-        wb: wBwD.first,
-        wc: wAwC.second,
-        wd: wBwD.second
+        wa: isPositveNumber(wAwC.first),
+        wb: isPositveNumber(wBwD.first),
+        wc: isPositveNumber(wAwC.second),
+        wd: isPositveNumber(wBwD.second)
     }
 }
 

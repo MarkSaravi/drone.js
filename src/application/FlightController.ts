@@ -73,17 +73,11 @@ export default class FlightController {
         if (this.targetFlightState.power < 65) {
             this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
         }
-        if (this.targetFlightState.power > 0 && this.targetFlightState.power <= 1) {
-            this.applyCommand(new Command(0, 0, 0, 10));
-        }
     }
 
     decPower() {
         if (this.targetFlightState.power > 0) {
             this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power - 1));
-        }
-        if (this.targetFlightState.power < 10) {
-            this.applyCommand(new Command(0, 0, 0, 0));
         }
     }
 
@@ -137,15 +131,15 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
-        if (basePower >= 20) {
+        if (basePower >= 0) {
             const controlTorque = this.pidControl.PID(stateError, this.config);
             const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
             const rotorsSpeeds = flightLogics.rotorSpeedCacculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
             this.powers = {
-                p1: flightLogics.angularVelocityToPower(rotorsSpeeds.wa, this.config.mRpm, this.config.bRpm),
-                p2: flightLogics.angularVelocityToPower(rotorsSpeeds.wb, this.config.mRpm, this.config.bRpm),
-                p3: flightLogics.angularVelocityToPower(rotorsSpeeds.wc, this.config.mRpm, this.config.bRpm),
-                p4: flightLogics.angularVelocityToPower(rotorsSpeeds.wd, this.config.mRpm, this.config.bRpm),
+                p1: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wa, this.config.mRpm, this.config.bRpm)),
+                p2: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wb, this.config.mRpm, this.config.bRpm)),
+                p3: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wc, this.config.mRpm, this.config.bRpm)),
+                p4: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wd, this.config.mRpm, this.config.bRpm)),
             }
         } else {
             this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };
