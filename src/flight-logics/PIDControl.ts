@@ -15,11 +15,14 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, ): number {
-        this.integralSum  += error * dt;
-        const sign = Math.sign(this.integralSum);
-        if (Math.abs(this.integralSum) > this.config.iMax) {
-            this.integralSum = this.config.iMax * sign;
+        if (Math.abs(error) < this.config.iMaxAngle || Math.abs(error) > this.config.iMinAngle) {
+            this.integralSum  += error * dt;
         }
+        const sign = Math.sign(this.integralSum);
+        if (Math.abs(this.integralSum) > this.config.iMaxValue) {
+            this.integralSum = this.config.iMaxValue * sign;
+        }
+        // console.log(`${error}, ${this.integralSum}, ${this.config.iMaxAngle}, ${this.config.iMaxValue}`);
         return this.integralSum;
     }
 

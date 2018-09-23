@@ -7,6 +7,7 @@ import * as flightLogics from '../flight-logics';
 import { PIDController } from '../flight-logics';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
+import ITorqueResponse from '../models/ITorqueResponse';
 import fileSyatem from 'fs';
 
 
@@ -96,12 +97,13 @@ export default class FlightController {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
-    showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
+    showState(powers: IPowers, errors: IFlightStateError, basePower: number, controlTorque: ITorqueResponse) {
         const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
+        const trs = `roll res: ${(controlTorque.rollTorque).toFixed(3)}, pitch res: ${(controlTorque.pitchTorque).toFixed(3)}`;
         const fss = `roll error: ${(errors.rollError).toFixed(3)}, pitch error: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
-        const text = `${ps}\t${fss}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
+        const text = `${ps}\t${fss}\t${trs}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
         this.prevTime = errors.time;
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
@@ -131,8 +133,8 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
+        const controlTorque = this.pidControl.PID(stateError, this.config);
         if (basePower >= 0) {
-            const controlTorque = this.pidControl.PID(stateError, this.config);
             const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
             const rotorsSpeeds = flightLogics.rotorSpeedCacculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
             this.powers = {
@@ -145,7 +147,7 @@ export default class FlightController {
             this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };
         }
         this.escCommand = this.createEscCommand(this.powers);
-        this.showState(this.powers, stateError, basePower);
+        this.showState(this.powers, stateError, basePower, controlTorque);
         return this.escCommand
     }
 }
