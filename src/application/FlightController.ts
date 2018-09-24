@@ -34,6 +34,21 @@ export default class FlightController {
         }
     }
 
+    toggleP() {
+        this.config.usePGain = !this.config.usePGain;
+        console.log(`P is ${this.config.usePGain ? 'on': 'off'}`);
+    }
+
+    toggleI() {
+        this.config.useIGain = !this.config.useIGain;
+        console.log(`I is ${this.config.useIGain ? 'on': 'off'}`);
+    }
+
+    toggleD() {
+        this.config.useDGain = !this.config.useDGain;
+        console.log(`D is ${this.config.useDGain ? 'on': 'off'}`);
+    }
+
     incPGain() {
         this.config.pGain = this.config.pGain + this.config.pGainInc;
     }

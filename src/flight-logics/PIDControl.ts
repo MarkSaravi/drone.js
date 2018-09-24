@@ -7,30 +7,27 @@ export default class PIDControl {
     prevError: number = PERV_ERROR_EMPTY;
     prevTime: number;
 
-    constructor(private config: IFlightConfig) {
+    constructor() {
     }
 
-    P(error: number): number {
-        return error;
+    P(error: number, config: IFlightConfig): number {
+        return error * config.pGain;
     }
 
-    I(error: number, dt: number, ): number {
-        if (Math.abs(error) < this.config.iMaxAngle || Math.abs(error) > this.config.iMinAngle) {
-            this.integralSum  += error * dt;
+    I(error: number, dt: number, config: IFlightConfig): number {
+        if (Math.abs(error) < config.iMaxAngle) {
+            this.integralSum += error * dt * config.iGain;
+        } else {
+            this.integralSum = 0;
         }
-        const sign = Math.sign(this.integralSum);
-        if (Math.abs(this.integralSum) > this.config.iMaxValue) {
-            this.integralSum = this.config.iMaxValue * sign;
-        }
-        // console.log(`${error}, ${this.integralSum}, ${this.config.iMaxAngle}, ${this.config.iMaxValue}`);
         return this.integralSum;
     }
 
-    D(dError: number, dt: number): number {
-        return dError / dt;
+    D(dError: number, dt: number, config: IFlightConfig): number {
+        return dError / dt * config.dGain;
     }
 
-    PID(error: number, time: number, pGain: number, iGain: number, dGain: number): number {
+    PID(error: number, time: number, config: IFlightConfig): number {
         if (this.prevError == PERV_ERROR_EMPTY) {
             this.prevError = error;
             this.prevTime = time - 25;
@@ -39,11 +36,11 @@ export default class PIDControl {
         const dError = error - this.prevError;
         this.prevTime = time;
         this.prevError = error;
-        
-        const p = this.config.usePGain ? this.P(error) * pGain : 0;
-        const i = this.config.useIGain ? this.I(error, dt) * iGain : 0;
-        const d = this.config.useDGain ? this.D(dError, dt) * dGain : 0;
-        return p + i + d;
+
+        const p = this.P(error, config);
+        const i = this.I(error, dt, config);
+        const d = this.D(dError, dt, config);
+        return (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
     }
 
 }

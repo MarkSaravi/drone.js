@@ -9,16 +9,16 @@ export default class PIDController {
     // yawControl: PIDControl;
 
     constructor(private readonly config: IFlightConfig) {
-        this.rollControl = new PIDControl(config);
-        this.pitchControl = new PIDControl(config);
+        this.rollControl = new PIDControl();
+        this.pitchControl = new PIDControl();
         // this.yawControl = new PIDControl(config);
     }
 
 
     PID(errors: IFlightStateError, config: IFlightConfig): ITorqueResponse {
         const tsum = {
-            rollTorque: this.rollControl.PID(errors.rollError, errors.time, config.pGain, config.iGain, config.dGain) * config.gain,
-            pitchTorque: this.pitchControl.PID(errors.pitchError, errors.time, config.pGain, config.iGain, config.dGain) * config.gain,
+            rollTorque: this.rollControl.PID(errors.rollError, errors.time, config) * config.gain,
+            pitchTorque: this.pitchControl.PID(errors.pitchError, errors.time, config) * config.gain,
             yawTorque: 0
         }
         return tsum;

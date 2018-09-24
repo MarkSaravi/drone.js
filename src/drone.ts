@@ -69,6 +69,18 @@ process.stdin.on('keypress', (str, key) => {
         case 'H':
             app.emit('mark-end');
             break;
+        case 'p':
+        case 'P':
+            app.emit('toggle-p');
+            break;
+        case 'i':
+        case 'I':
+            app.emit('toggle-i');
+            break;
+        case 'd':
+        case 'D':
+            app.emit('toggle-d');
+            break;
     }
 
 });
