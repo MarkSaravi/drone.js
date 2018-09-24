@@ -17,9 +17,7 @@ export default class PIDControl {
     I(error: number, dt: number, config: IFlightConfig): number {
         if (Math.abs(error) < config.iMaxAngle) {
             this.integralSum += error * dt * config.iGain;
-        } else {
-            this.integralSum = 0;
-        }
+        } 
         return this.integralSum;
     }
 
