@@ -113,12 +113,13 @@ export default class FlightController {
     }
 
     showState(powers: IPowers, errors: IFlightStateError, basePower: number, controlTorque: ITorqueResponse) {
+        const pid = `${this.config.usePGain?'P':''}, ${this.config.useIGain?'I':''}, ${this.config.useDGain?'D':''}`
         const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
         const trs = `roll res: ${(controlTorque.rollTorque).toFixed(3)}, pitch res: ${(controlTorque.pitchTorque).toFixed(3)}`;
         const fss = `roll error: ${(errors.rollError).toFixed(3)}, pitch error: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
-        const text = `${ps}\t${fss}\t${trs}\t${pids}\t${bps}, ${errors.time}, ${errors.time - this.prevTime}`;
+        const text = `${ps}\t${fss}\t${pid}\t${pids}\t${bps}\t${errors.time}\t${errors.time - this.prevTime}`;
         this.prevTime = errors.time;
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
