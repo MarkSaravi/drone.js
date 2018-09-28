@@ -10,7 +10,7 @@
 #include <Servo.h>
 
 #define MPU6050_I2C_ADDRESS 0x68
-
+const long SERIAL_PORT_SPEED = 230400;
 // SoftwareSerial BTSerial(2, 3); // RX | TX
 
 Servo roll_servo;
@@ -33,7 +33,7 @@ void setup()
   uint8_t sample_div;
 
   //BTSerial.begin(38400);
-  Serial.begin(115200);
+  Serial.begin(SERIAL_PORT_SPEED);
 
   // debug led
   pinMode(13, OUTPUT);

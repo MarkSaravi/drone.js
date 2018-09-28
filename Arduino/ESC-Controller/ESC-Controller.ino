@@ -21,7 +21,7 @@ JsonErrors readJson(const char *json, double *a, double *b, double *c, double *d
 
 //#define SHOW_DEBUG_INFO
 
-const long SERIAL_PORT_SPEED = 115200;
+const long SERIAL_PORT_SPEED = 230400;
 
 const double ARMING_MAX_PULSEWIDTH = 0.001968; //seconds
 const double ARMING_MIN_PULSEWIDTH = 0.001024; //seconds
