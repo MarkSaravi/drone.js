@@ -30,7 +30,7 @@ export default class PIDControl {
             this.prevError = error;
             this.prevTime = time - 25;
         }
-        const dt = (time - this.prevTime) / 1000; //convert to milliseconds
+        const dt = (time - this.prevTime) / 1000000; //convert to milliseconds
         const dError = error - this.prevError;
         this.prevTime = time;
         this.prevError = error;

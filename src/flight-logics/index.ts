@@ -8,7 +8,6 @@ import { noiseFilter } from './noiseFilter';
 import { roundErro } from './noiseFilter';
 import rotorSpeedCacculator from './rotorSpeedsCalculator';
 import { calcTilteCompensationSpeeds } from './rotorSpeedsCalculator';
-import { isPositveNumber } from './rotorSpeedsCalculator';
 
 export { TiltPIDControl };
 export { PIDController };
@@ -20,4 +19,3 @@ export { noiseFilter };
 export { roundErro };
 export { calcTilteCompensationSpeeds };
 export { rotorSpeedCacculator };
-export { isPositveNumber };

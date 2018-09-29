@@ -12,16 +12,11 @@ export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque:
     }
 }
 
-export const isPositveNumber = (x: number): number => {
-    if (isNaN(x)) return 0;
-    return x >= 0 ? x : 0
-}
-
 const rotorSpeedCacculator = (angularVelocityBase: number, torque: number): IArmRotorSpeeds => {
-    const wAwC = calcTilteCompensationSpeeds(angularVelocityBase, torque);
+    const { front, back } = calcTilteCompensationSpeeds(angularVelocityBase, torque);
     return {
-        front: isPositveNumber(wAwC.front),
-        back: isPositveNumber(wAwC.back),
+        front,
+        back,
     }
 }
 
