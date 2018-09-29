@@ -158,18 +158,6 @@ export default class FlightController {
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
         this.powers = this.pidControl.PID(basePower, stateError, this.config);
-        // if (basePower > 0) {
-        //     const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
-        //     const rotorsSpeeds = flightLogics.rotorSpeedCacculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
-        //     this.powers = {
-        //         p1: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wa, this.config.mRpm, this.config.bRpm)),
-        //         p2: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wb, this.config.mRpm, this.config.bRpm)),
-        //         p3: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wc, this.config.mRpm, this.config.bRpm)),
-        //         p4: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wd, this.config.mRpm, this.config.bRpm)),
-        //     }
-        // } else {
-        //     this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };
-        // }
         this.escCommand = this.createEscCommand(this.powers);
         if (this.imuDataPerSecond % 10 == 0) {
             this.showState(this.powers, stateError, basePower);
