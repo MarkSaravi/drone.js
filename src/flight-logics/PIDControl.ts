@@ -18,6 +18,7 @@ export default class PIDControl {
         if (Math.abs(error) < config.iMaxAngle && Math.abs(error) > config.iMinAngle) {
             this.integralSum += error * dt * config.iGain;
         } 
+        this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(config.iMaxValue);
         return this.integralSum;
     }
 
@@ -38,6 +39,8 @@ export default class PIDControl {
         const p = this.P(error, config);
         const i = this.I(error, dt, config);
         const d = this.D(dError, dt, config);
+        // const pids = `P: ${(p).toFixed(3)}, I: ${(i).toFixed(3)}, D: ${(d).toFixed(3)}`;
+        // console.log(pids);
         return (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
     }
 
