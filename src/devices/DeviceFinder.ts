@@ -58,7 +58,7 @@ export default class DeviceFinder extends EventEmitter {
     }
 
     findDevice(portName: string, baudRate: number, portType: string, pattern: string) {
-        console.log(`Searching for ${portType} on ${portName}`);
+        console.log(`Searching for ${portType} on ${portName} (${baudRate})`);
         let portFound: boolean = false;
         let tryCounter = 0;
         let buffer: any[] = [];

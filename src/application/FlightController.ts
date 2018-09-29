@@ -15,6 +15,8 @@ export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
     private readonly pidControl: PIDController;
+    private imuDataPerSecond: number;
+    private imuTimerStart: number;
     private escCommand: string;
     private powers: IPowers;
     private prevTime: number;
@@ -22,6 +24,8 @@ export default class FlightController {
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController(this.config);
+        this.imuDataPerSecond = 0;
+        this.imuTimerStart = Date.now();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
         this.prevTime = 0;
@@ -103,19 +107,22 @@ export default class FlightController {
 
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
-        // const s = this.actualFlightState;
-        // const text = `${s.roll}\t${s.pitch}\t${s.yaw}\t`;
-        // console.log(text);
+        this.imuDataPerSecond++;
+        if (Date.now() - this.imuTimerStart >= 1000) {
+            console.log(`IMU Data Per Second: ${this.imuDataPerSecond}`);
+            this.imuTimerStart = Date.now();
+            this.imuDataPerSecond = 0;
+        }
     }
 
     createEscCommand(p: IPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
 
-    showState(powers: IPowers, errors: IFlightStateError, basePower: number, controlTorque: ITorqueResponse) {
+    showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const pid = `${this.config.usePGain?'P':''}, ${this.config.useIGain?'I':''}, ${this.config.useDGain?'D':''}`
         const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
-        const trs = `roll res: ${(controlTorque.rollTorque).toFixed(3)}, pitch res: ${(controlTorque.pitchTorque).toFixed(3)}`;
+        // const trs = controlTorque ? `roll res: ${(controlTorque.rollTorque).toFixed(3)}, pitch res: ${(controlTorque.pitchTorque).toFixed(3)}` : '';
         const fss = `roll error: ${(errors.rollError).toFixed(3)}, pitch error: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
@@ -149,21 +156,23 @@ export default class FlightController {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         stateError.yawError = 0;
         const basePower = this.targetFlightState.power;
-        const controlTorque = this.pidControl.PID(stateError, this.config);
-        if (basePower >= 0) {
-            const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
-            const rotorsSpeeds = flightLogics.rotorSpeedCacculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
-            this.powers = {
-                p1: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wa, this.config.mRpm, this.config.bRpm)),
-                p2: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wb, this.config.mRpm, this.config.bRpm)),
-                p3: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wc, this.config.mRpm, this.config.bRpm)),
-                p4: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wd, this.config.mRpm, this.config.bRpm)),
-            }
-        } else {
-            this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };
-        }
+        this.powers = this.pidControl.PID(basePower, stateError, this.config);
+        // if (basePower > 0) {
+        //     const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, this.config.mRpm, this.config.bRpm);
+        //     const rotorsSpeeds = flightLogics.rotorSpeedCacculator(baseAangularVelocity, controlTorque.rollTorque, controlTorque.pitchTorque, controlTorque.yawTorque);
+        //     this.powers = {
+        //         p1: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wa, this.config.mRpm, this.config.bRpm)),
+        //         p2: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wb, this.config.mRpm, this.config.bRpm)),
+        //         p3: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wc, this.config.mRpm, this.config.bRpm)),
+        //         p4: flightLogics.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.wd, this.config.mRpm, this.config.bRpm)),
+        //     }
+        // } else {
+        //     this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 };
+        // }
         this.escCommand = this.createEscCommand(this.powers);
-        this.showState(this.powers, stateError, basePower, controlTorque);
+        if (this.imuDataPerSecond % 10 == 0) {
+            this.showState(this.powers, stateError, basePower);
+        }
         return this.escCommand
     }
 }

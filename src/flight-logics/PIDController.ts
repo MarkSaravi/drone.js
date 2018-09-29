@@ -1,5 +1,5 @@
 import IFlightStateError from '../models/IFlightStateError';
-import ITorqueResponse from '../models/ITorqueResponse';
+import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
 import PIDControl from './PIDControl';
 
@@ -14,14 +14,13 @@ export default class PIDController {
         // this.yawControl = new PIDControl(config);
     }
 
-
-    PID(errors: IFlightStateError, config: IFlightConfig): ITorqueResponse {
-        const tsum = {
-            rollTorque: this.rollControl.PID(errors.rollError, errors.time, config) * config.gain,
-            pitchTorque: this.pitchControl.PID(errors.pitchError, errors.time, config) * config.gain,
-            yawTorque: 0
+    PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
+        return {
+            p1: basePower,
+            p2: basePower,
+            p3: basePower,
+            p4: basePower
         }
-        return tsum;
     }
 
 }
