@@ -19,7 +19,6 @@ export default class FlightController {
     private imuTimerStart: number;
     private escCommand: string;
     private powers: IPowers;
-    private prevTime: number;
     private dataLog: string = null;
 
     constructor(private config: IFlightConfig) {
@@ -28,7 +27,6 @@ export default class FlightController {
         this.imuTimerStart = Date.now();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
-        this.prevTime = 0;
         this.powers = {
             p1: 0, p2: 0, p3: 0, p4: 0
         };
@@ -127,12 +125,12 @@ export default class FlightController {
         const fss = `roll error: ${(errors.rollError).toFixed(3)}, pitch error: ${(errors.pitchError).toFixed(3)}`;
         const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
         const bps = `Base Power: ${basePower}`;
-        const text = `${ps}\t${fss}\t${pid}\t${pids}\t${bps}\t${errors.time}\t${errors.time - this.prevTime}`;
-        this.prevTime = errors.time;
+        const text = `${ps}\t${fss}\t${pid}\t${pids}\t${bps}\t`;
+
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
         }
-        console.log(text);
+        process.stdout.write(`${text}\n`);
     }
 
     safeAdd(base: number, inc: number) {
@@ -159,9 +157,9 @@ export default class FlightController {
         const basePower = this.targetFlightState.power;
         this.powers = this.pidControl.PID(basePower, stateError, this.config);
         this.escCommand = this.createEscCommand(this.powers);
-        if (this.imuDataPerSecond % 10 == 0) {
-            this.showState(this.powers, stateError, basePower);
-        }
+        // if (this.imuDataPerSecond % 10 == 0) {
+        this.showState(this.powers, stateError, basePower);
+        // }
         return this.escCommand
     }
 }

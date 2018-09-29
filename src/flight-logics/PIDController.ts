@@ -17,6 +17,7 @@ export default class PIDController {
     PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
         const pitchPower = basePower;
         const pitchPowers = this.pitchControl.PID(pitchPower, errors.pitchError, errors.time, config);
+        
         return {
             p1: pitchPowers.front,
             p2: 0,

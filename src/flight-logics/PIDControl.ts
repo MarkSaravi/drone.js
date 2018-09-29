@@ -26,6 +26,14 @@ export default class PIDControl {
         return dError / dt * config.dGain;
     }
 
+    fixLen(x: string): string {
+        let s = x;
+        while (s.length < 8) {
+            s = ' ' + s;
+        }
+        return s;
+    }
+
     PID(error: number, time: number, config: IFlightConfig): number {
         if (this.prevError == PERV_ERROR_EMPTY) {
             this.prevError = error;
@@ -39,8 +47,11 @@ export default class PIDControl {
         const p = this.P(error, config);
         const i = this.I(error, dt, config);
         const d = this.D(dError, dt, config);
-        // const pids = `P: ${(p).toFixed(3)}, I: ${(i).toFixed(3)}, D: ${(d).toFixed(3)}`;
-        // console.log(pids);
+        const ps = (p).toFixed(3);
+        const is = (i).toFixed(3);
+        const ds = (d).toFixed(3);
+        const pids = `P: ${this.fixLen(ps)}, I: ${this.fixLen(is)}, D: ${this.fixLen(ds)}, `;
+        process.stdout.write(pids);
         return (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
     }
 
