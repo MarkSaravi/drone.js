@@ -59,6 +59,14 @@ export default class FlightController {
         this.config.pGain = this.config.pGain - this.config.pGainInc;
     }
 
+    incGain() {
+        this.config.gain = this.config.gain + 1;
+    }
+
+    decGain() {
+        this.config.gain = this.config.gain - 1;
+    }
+
     incIGain() {
         this.config.iGain = this.config.iGain + this.config.iGainInc;
     }
@@ -106,7 +114,7 @@ export default class FlightController {
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
         this.imuDataPerSecond++;
-        // console.log(`roll: ${(imuData.roll).toFixed(3)}, pitch: ${(imuData.pitch).toFixed(3)}, yaw: ${(imuData.yaw).toFixed(3)}, time: ${imuData.time}`);
+        // console.log(`roll: ${(imuData.roll).toFixed(2)}, pitch: ${(imuData.pitch).toFixed(2)}, yaw: ${(imuData.yaw).toFixed(2)}, time: ${imuData.time}`);
         if (Date.now() - this.imuTimerStart >= 1000) {
             console.log(`IMU Data Per Second: ${this.imuDataPerSecond}`);
             this.imuTimerStart = Date.now();
@@ -119,13 +127,13 @@ export default class FlightController {
     }
 
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
-        const pid = `${this.config.usePGain?'P':''}, ${this.config.useIGain?'I':''}, ${this.config.useDGain?'D':''}`
-        const ps = `a: ${(powers.p1).toFixed(3)} ,b: ${(powers.p2).toFixed(3)} ,c: ${(powers.p3).toFixed(3)} ,d: ${(powers.p4).toFixed(3)}`;
-        // const trs = controlTorque ? `roll res: ${(controlTorque.rollTorque).toFixed(3)}, pitch res: ${(controlTorque.pitchTorque).toFixed(3)}` : '';
-        const fss = `roll error: ${(errors.rollError).toFixed(3)}, pitch error: ${(errors.pitchError).toFixed(3)}`;
-        const pids = `P: ${(this.config.pGain).toFixed(3)}, I: ${(this.config.iGain).toFixed(3)}, D: ${(this.config.dGain).toFixed(3)}`
-        const bps = `Base Power: ${basePower}`;
-        const text = `${ps}\t${fss}\t${pid}\t${pids}\t${bps}\t`;
+        const pid = `${this.config.usePGain?'P':''}${this.config.useIGain?'I':''}${this.config.useDGain?'D':''}`
+        const ps = `a: ${(powers.p1).toFixed(2)} ,b: ${(powers.p2).toFixed(2)} ,c: ${(powers.p3).toFixed(2)} ,d: ${(powers.p4).toFixed(2)}`;
+        // const trs = controlTorque ? `roll res: ${(controlTorque.rollTorque).toFixed(2)}, pitch res: ${(controlTorque.pitchTorque).toFixed(2)}` : '';
+        const fss = `roll: ${(errors.rollError).toFixed(2)}, pitch: ${(errors.pitchError).toFixed(2)}`;
+        const pids = `G: ${(this.config.gain).toFixed(2)}, P: ${(this.config.pGain).toFixed(2)}, I: ${(this.config.iGain).toFixed(2)}, D: ${(this.config.dGain).toFixed(2)}`
+        const bps = `Power: ${basePower}`;
+        const text = `${ps}, ${fss}, ${pid}, ${pids}, ${bps}\t`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
