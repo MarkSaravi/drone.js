@@ -10,7 +10,7 @@
 #include <Servo.h>
 
 #define MPU6050_I2C_ADDRESS 0x68
-const long SERIAL_PORT_SPEED = 230400;
+const long SERIAL_PORT_SPEED = 115200;
 // SoftwareSerial BTSerial(2, 3); // RX | TX
 
 Servo roll_servo;
@@ -79,7 +79,7 @@ void sendAsJson(double roll, double pitch, double yaw, unsigned long time)
   dtostrf(roll, 3, 4, rollstr);
   dtostrf(pitch, 3, 4, pitchstr);
   dtostrf(yaw, 3, 4, yawstr);
-  sprintf(json, "{\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"time\":%ld}", rollstr, pitchstr, yawstr, time);
+  sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld}", rollstr, pitchstr, yawstr, time);
   Serial.println(json);
 }
 
