@@ -7,19 +7,19 @@ const powerBase = 5;
 const mRpm = 140;
 const bRpm = 100;
 
-runner.test('1', () => {
-    const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
-    const torque = -1000;
-    const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
-    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.first}, w3: ${w1w3.second}`); 
-});
+// runner.test('1', () => {
+//     const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
+//     const torque = -1000;
+//     const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
+//     console.log(`wbase: ${angularVelocity}, w1: ${w1w3.first}, w3: ${w1w3.second}`); 
+// });
 
-runner.test('1', () => {
-    const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
-    const torque = 1000;
-    const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
-    console.log(`wbase: ${angularVelocity}, w1: ${w1w3.first}, w3: ${w1w3.second}`); 
-});
+// runner.test('1', () => {
+//     const angularVelocity = 600; // flightLogics.powerToAngularVelocity(basePower, mRpm, bRpm) ;;
+//     const torque = 1000;
+//     const w1w3 = flightLogics.calcTilteCompensationSpeeds(angularVelocity, torque);
+//     console.log(`wbase: ${angularVelocity}, w1: ${w1w3.first}, w3: ${w1w3.second}`); 
+// });
 
 // const eqSolver = (fx: (x: number) => number, initx: number): number => {
 //     let dx = 0.00001;

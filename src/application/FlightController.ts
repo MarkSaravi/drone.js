@@ -108,6 +108,7 @@ export default class FlightController {
     applyImuData(imuData: ImuData) {
         this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
         this.imuDataPerSecond++;
+        // console.log(`roll: ${(imuData.roll).toFixed(3)}, pitch: ${(imuData.pitch).toFixed(3)}, yaw: ${(imuData.yaw).toFixed(3)}, time: ${imuData.time}`);
         if (Date.now() - this.imuTimerStart >= 1000) {
             console.log(`IMU Data Per Second: ${this.imuDataPerSecond}`);
             this.imuTimerStart = Date.now();

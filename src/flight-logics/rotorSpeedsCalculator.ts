@@ -1,34 +1,27 @@
-import IDoubleRotorSpeeds from '../models/IDoubleRotorSpeeds';
-import IRotorSpeeds from '../models/IRotorSpeeds';
+import IArmRotorSpeeds from '../models/IArmRotorSpeeds';
 
-export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque: number): IDoubleRotorSpeeds => {
+export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque: number): IArmRotorSpeeds => {
     // w3^2 - w1^2 = t
     // w3^2 + w1^2 = 2*wb^2
     // w1^2 + t = 2*wb^2 - w1^2 -> 2*w1^2 = 2*wb^2 - t -> w1 = sqrt(wb^2 - t/2)
-    const first = Math.sqrt(angularVelocityBase * angularVelocityBase - torque / 2);
-    const second = Math.sqrt(2 * angularVelocityBase * angularVelocityBase - first * first);
+    const front = Math.sqrt(angularVelocityBase * angularVelocityBase - torque / 2);
+    const back = Math.sqrt(2 * angularVelocityBase * angularVelocityBase - front * front);
     return {
-        first,
-        second
+        front,
+        back
     }
-}
-
-export const calcTurnCompensationSpeeds = (speeds: IRotorSpeeds, torque: number): IRotorSpeeds => {
-    return speeds;
 }
 
 export const isPositveNumber = (x: number): number => {
     if (isNaN(x)) return 0;
     return x >= 0 ? x : 0
 }
-const rotorSpeedCacculator = (angularVelocityBase: number, rollTorque: number, pitchTorque: number, yawTorque: number): IRotorSpeeds => {
-    const wAwC = calcTilteCompensationSpeeds(angularVelocityBase, pitchTorque);
-    const wBwD = calcTilteCompensationSpeeds(angularVelocityBase, rollTorque);
+
+const rotorSpeedCacculator = (angularVelocityBase: number, torque: number): IArmRotorSpeeds => {
+    const wAwC = calcTilteCompensationSpeeds(angularVelocityBase, torque);
     return {
-        wa: isPositveNumber(wAwC.first),
-        wb: isPositveNumber(wBwD.first),
-        wc: isPositveNumber(wAwC.second),
-        wd: isPositveNumber(wBwD.second)
+        front: isPositveNumber(wAwC.front),
+        back: isPositveNumber(wAwC.back),
     }
 }
 

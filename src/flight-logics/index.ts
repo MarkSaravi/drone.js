@@ -1,4 +1,4 @@
-import PIDControl from './PIDControl';
+import TiltPIDControl from './TiltPIDControl';
 import PIDController from './PIDController';
 import getStateError from './getStateErrors';
 import { interpolation } from './interpolation';
@@ -10,7 +10,7 @@ import rotorSpeedCacculator from './rotorSpeedsCalculator';
 import { calcTilteCompensationSpeeds } from './rotorSpeedsCalculator';
 import { isPositveNumber } from './rotorSpeedsCalculator';
 
-export { PIDControl };
+export { TiltPIDControl };
 export { PIDController };
 export { getStateError };
 export { interpolation };
