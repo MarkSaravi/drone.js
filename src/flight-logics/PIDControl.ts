@@ -47,12 +47,14 @@ export default class PIDControl {
         const p = this.P(error, config);
         const i = this.I(error, dt, config);
         const d = this.D(dError, dt, config);
+        const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
+        const sums = (sum).toFixed(3);
         const ps = (p).toFixed(3);
         const is = (i).toFixed(3);
         const ds = (d).toFixed(3);
-        const pids = `P: ${this.fixLen(ps)}, I: ${this.fixLen(is)}, D: ${this.fixLen(ds)}, `;
+        const pids = `Sum: ${this.fixLen(sums)}, P: ${this.fixLen(ps)}, I: ${this.fixLen(is)}, D: ${this.fixLen(ds)}, `;
         process.stdout.write(pids);
-        return (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
+        return sum;
     }
 
 }

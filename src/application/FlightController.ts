@@ -7,7 +7,6 @@ import * as flightLogics from '../flight-logics';
 import { PIDController } from '../flight-logics';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
-import ITorqueResponse from '../models/ITorqueResponse';
 import fileSyatem from 'fs';
 
 
@@ -20,6 +19,7 @@ export default class FlightController {
     private escCommand: string;
     private powers: IPowers;
     private dataLog: string = null;
+    // private imu: ImuData = { roll: 0, pitch: 0, yaw: 0, time: 0 };
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController(this.config);
@@ -111,8 +111,18 @@ export default class FlightController {
         this.targetFlightState = convertors.CommandToFlightStatus(command);
     }
 
+    noiseRemover(value: number): number {
+        return  Math.round(value * 10) / 10;
+    }
+
     applyImuData(imuData: ImuData) {
-        this.actualFlightState = convertors.ImuDataToFlightStatus(imuData);
+        const imud = {
+            roll: this.noiseRemover(imuData.roll),
+            pitch: this.noiseRemover(imuData.pitch),
+            yaw: this.noiseRemover(imuData.yaw),
+            time: imuData.time
+        };
+        this.actualFlightState = convertors.ImuDataToFlightStatus(imud);
         this.imuDataPerSecond++;
         // console.log(`roll: ${(imuData.roll).toFixed(2)}, pitch: ${(imuData.pitch).toFixed(2)}, yaw: ${(imuData.yaw).toFixed(2)}, time: ${imuData.time}`);
         if (Date.now() - this.imuTimerStart >= 1000) {
@@ -133,7 +143,7 @@ export default class FlightController {
         const fss = `roll: ${(errors.rollError).toFixed(2)}, pitch: ${(errors.pitchError).toFixed(2)}`;
         const pids = `G: ${(this.config.gain).toFixed(2)}, P: ${(this.config.pGain).toFixed(2)}, I: ${(this.config.iGain).toFixed(2)}, D: ${(this.config.dGain).toFixed(2)}`
         const bps = `Power: ${basePower}`;
-        const text = `${ps}, ${fss}, ${pid}, ${pids}, ${bps}\t`;
+        const text = `${fss}, ${pid}, ${pids}, ${bps}\t`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
