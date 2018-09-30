@@ -20,6 +20,8 @@ export default class FlightController {
     private powers: IPowers;
     private dataLog: string = null;
     private imuData: ImuData = null;
+    private pitchTilt: number = 0;
+    private rollTilt: number = 0;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController(this.config);
@@ -34,6 +36,26 @@ export default class FlightController {
         if (this.config.saveData) {
             this.dataLog = `/home/pi/drone.js/logs/${Date.now()}.flight.log`;
         }
+    }
+
+    tiltForward() {
+        this.pitchTilt++;
+        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
+    }
+
+    tiltBackward() {
+        this.pitchTilt--;
+        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
+    }
+
+    tiltRight() {
+        this.rollTilt++;
+        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
+    }
+
+    tiltLeft() {
+        this.rollTilt--;
+        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
     }
 
     toggleP() {
@@ -153,7 +175,8 @@ export default class FlightController {
         const fss = `roll: ${(errors.rollError).toFixed(2)}, pitch: ${(errors.pitchError).toFixed(2)}`;
         const pids = `G: ${(this.config.gain).toFixed(2)}, P: ${(this.config.pGain).toFixed(2)}, I: ${(this.config.iGain).toFixed(2)}, D: ${(this.config.dGain).toFixed(2)}`
         const bps = `Power: ${basePower}`;
-        const text = `${fss}, ${pid}, ${pids}, ${bps}, ${ps}`;
+        const tilts = `r: ${this.rollTilt}, p: ${this.pitchTilt}`;
+        const text = `${fss}, ${pid}, ${pids}, ${bps}, ${ps}, ${tilts}`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
