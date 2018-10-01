@@ -119,13 +119,13 @@ export default class FlightController {
 
     incPower() {
         if (this.targetFlightState.power < 65) {
-            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
+            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 0.25));
         }
     }
 
     decPower() {
         if (this.targetFlightState.power > 0) {
-            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power - 1));
+            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power - 0.25));
         }
     }
 
