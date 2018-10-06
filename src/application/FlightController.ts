@@ -118,8 +118,12 @@ export default class FlightController {
     }
 
     incPower() {
-        if (this.targetFlightState.power < 65) {
+        if (this.targetFlightState.power < 65 && this.targetFlightState.power>39) {
             this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 0.25));
+        } else if (this.targetFlightState.power == 0 ) {
+            this.applyCommand(new Command(0, 0, 0, 25));
+        } else if (this.targetFlightState.power >= 25 && this.targetFlightState.power <= 39) {
+            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
         }
     }
 
@@ -133,27 +137,17 @@ export default class FlightController {
         this.targetFlightState = convertors.CommandToFlightStatus(command);
     }
 
-    noiseRemover(value: number, newValue: number): number {
-        return  value + 0.45 * (newValue - value);
+    noiseRemover(value: number): number {
+        return Math.round(value * 100) / 100;
     }
 
     applyImuData(rawImuData: ImuData) {
-        if (this.imuData == null) {
-            this.imuData = {
-                roll: rawImuData.roll,
-                pitch: rawImuData.pitch,
-                yaw: rawImuData.yaw,
-                time: rawImuData.time
-            };
-        } else {
-            const { roll, pitch, yaw } = this.imuData;
-            this.imuData = {
-                roll: this.noiseRemover(roll, rawImuData.roll),
-                pitch: this.noiseRemover(pitch, rawImuData.pitch),
-                yaw: this.noiseRemover(yaw, rawImuData.yaw),
-                time: rawImuData.time
-            };
-        }
+        this.imuData = {
+            roll: this.noiseRemover(rawImuData.roll),
+            pitch: this.noiseRemover(rawImuData.pitch),
+            yaw: this.noiseRemover(rawImuData.yaw),
+            time: rawImuData.time
+        };
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
         this.imuDataPerSecond++;
         // console.log(`roll: ${(imuData.roll).toFixed(2)}, pitch: ${(imuData.pitch).toFixed(2)}, yaw: ${(imuData.yaw).toFixed(2)}, time: ${imuData.time}`);
@@ -167,16 +161,19 @@ export default class FlightController {
     createEscCommand(p: IPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
+    
+    signer(x: string): string {
+        return x[0] != '-' ? '+' + x : x;
+    }
 
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
-        const pid = `${this.config.usePGain?'P':''}${this.config.useIGain?'I':''}${this.config.useDGain?'D':''}`
-        const ps = `a: ${(powers.p1).toFixed(2)} ,b: ${(powers.p2).toFixed(2)} ,c: ${(powers.p3).toFixed(2)} ,d: ${(powers.p4).toFixed(2)}`;
-        // const trs = controlTorque ? `roll res: ${(controlTorque.rollTorque).toFixed(2)}, pitch res: ${(controlTorque.pitchTorque).toFixed(2)}` : '';
-        const fss = `roll: ${(errors.rollError).toFixed(2)}, pitch: ${(errors.pitchError).toFixed(2)}`;
-        const pids = `G: ${(this.config.gain).toFixed(2)}, P: ${(this.config.pGain).toFixed(2)}, I: ${(this.config.iGain).toFixed(2)}, D: ${(this.config.dGain).toFixed(2)}`
-        const bps = `Power: ${basePower}`;
-        const tilts = `r: ${this.rollTilt}, p: ${this.pitchTilt}`;
-        const text = `${fss}, ${pid}, ${pids}, ${bps}, ${ps}, ${tilts}`;
+        const pid = `{${this.config.usePGain?'P':''}${this.config.useIGain?'I':''}${this.config.useDGain?'D':''}}`
+        const ps = `a:${(powers.p1).toFixed(2)}, b:${(powers.p2).toFixed(2)}, c:${(powers.p3).toFixed(2)}, d:${(powers.p4).toFixed(2)}`;
+        const fss = `roll:${this.signer((errors.rollError).toFixed(2))}, pitch:${this.signer((errors.pitchError).toFixed(2))}`;
+        const pids = `G:${(this.config.gain).toFixed(2)}, pG:${(this.config.pGain).toFixed(2)}, iG:${(this.config.iGain).toFixed(2)}, dG:${(this.config.dGain).toFixed(2)}`
+        const bps = `P:${basePower}`;
+        const tilts = `r:${this.rollTilt}, p:${this.pitchTilt}`;
+        const text = ` ${fss}, ${pids}, ${bps}, ${ps}, ${tilts}, ${pid}`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
