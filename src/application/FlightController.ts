@@ -138,7 +138,7 @@ export default class FlightController {
     }
 
     noiseRemover(value: number): number {
-        return Math.round(value * 100) / 100;
+        return Math.round(value * 10) / 10;
     }
 
     applyImuData(rawImuData: ImuData) {
@@ -168,12 +168,12 @@ export default class FlightController {
 
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const pid = `{${this.config.usePGain?'P':''}${this.config.useIGain?'I':''}${this.config.useDGain?'D':''}}`
-        const ps = `a:${(powers.p1).toFixed(2)}, b:${(powers.p2).toFixed(2)}, c:${(powers.p3).toFixed(2)}, d:${(powers.p4).toFixed(2)}`;
+        const ps = `b:${(powers.p2).toFixed(2)}, d:${(powers.p4).toFixed(2)}`;
         const fss = `roll:${this.signer((errors.rollError).toFixed(2))}, pitch:${this.signer((errors.pitchError).toFixed(2))}`;
-        const pids = `G:${(this.config.gain).toFixed(2)}, pG:${(this.config.pGain).toFixed(2)}, iG:${(this.config.iGain).toFixed(2)}, dG:${(this.config.dGain).toFixed(2)}`
+        const pids = `G:${(this.config.gain).toFixed(2)}, pG:${(this.config.pGain).toFixed(2)}, dG:${(this.config.dGain).toFixed(2)}`
         const bps = `P:${basePower}`;
-        const tilts = `r:${this.rollTilt}, p:${this.pitchTilt}`;
-        const text = ` ${fss}, ${pids}, ${bps}, ${ps}, ${tilts}, ${pid}`;
+        // const tilts = `r:${this.rollTilt}, p:${this.pitchTilt}`;
+        const text = ` ${fss}, ${pids}, ${bps}, ${ps}, ${pid}`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
@@ -205,9 +205,7 @@ export default class FlightController {
         const basePower = this.targetFlightState.power;
         this.powers = this.pidControl.PID(basePower, stateError, this.config);
         this.escCommand = this.createEscCommand(this.powers);
-        // if (this.imuDataPerSecond % 10 == 0) {
         this.showState(this.powers, stateError, basePower);
-        // }
         return this.escCommand
     }
 }
