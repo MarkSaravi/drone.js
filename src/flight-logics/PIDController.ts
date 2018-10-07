@@ -21,8 +21,9 @@ export default class PIDController {
         this.rollError = errors.rollError;
         const pitchPower = basePower;
         const rollPower = basePower;
-        const pitchPowers = this.pitchControl.PID(pitchPower, this.pitchError, errors.time, config);
+        //const pitchPowers = this.pitchControl.PID(pitchPower, this.pitchError, errors.time, config);
         const rollPowers = this.rollControl.PID(rollPower, this.rollError, errors.time, config);
+        const pitchPowers = { front: 0, back: 0 };
         
         return {
             p1: pitchPowers.front,

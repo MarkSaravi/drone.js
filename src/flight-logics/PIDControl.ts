@@ -14,7 +14,7 @@ export default class PIDControl {
 
     I(error: number, dt: number, config: IFlightConfig): number {
         if (Math.abs(error) <= config.iMaxAngle) {
-            this.integralSum += error * dt * config.iGain;
+            this.integralSum += error * dt / 10 * config.iGain;
         } 
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
@@ -50,7 +50,7 @@ export default class PIDControl {
 
         const d = this.D(dError, dt, config);
         const p = this.P(error, config);
-        const i = this.I(error, 0, config);
+        const i = this.I(error, dt, config);
 
         this.prevTime = time;
         this.prevError = error;        

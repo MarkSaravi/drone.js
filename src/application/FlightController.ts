@@ -151,7 +151,6 @@ export default class FlightController {
         };
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
         this.imuDataPerSecond++;
-        // console.log(`roll: ${(imuData.roll).toFixed(2)}, pitch: ${(imuData.pitch).toFixed(2)}, yaw: ${(imuData.yaw).toFixed(2)}, time: ${imuData.time}`);
         if (Date.now() - this.imuTimerStart >= 1000) {
             console.log(`IMU Data Per Second: ${this.imuDataPerSecond}`);
             this.imuTimerStart = Date.now();
@@ -171,10 +170,9 @@ export default class FlightController {
         const pid = `{${this.config.usePGain?'P':''}${this.config.useIGain?'I':''}${this.config.useDGain?'D':''}}`
         const ps = `b:${(powers.p2).toFixed(2)}, d:${(powers.p4).toFixed(2)}`;
         const fss = `roll:${this.signer((errors.rollError).toFixed(2))}, pitch:${this.signer((errors.pitchError).toFixed(2))}`;
-        const pids = `G:${(this.config.gain).toFixed(2)}, pG:${(this.config.pGain).toFixed(2)}, dG:${(this.config.dGain).toFixed(2)}`
+        const pids = `G:${(this.config.gain).toFixed(2)},pG:${(this.config.pGain).toFixed(2)},iG:${(this.config.iGain).toFixed(2)},dG:${(this.config.dGain).toFixed(2)}`
         const bps = `P:${basePower}`;
-        // const tilts = `r:${this.rollTilt}, p:${this.pitchTilt}`;
-        const text = ` ${fss}, ${pids}, ${bps}, ${ps}, ${pid}`;
+        const text = ` ${fss},${pids},${bps},${ps},${pid}`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
