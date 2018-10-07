@@ -50,7 +50,7 @@ export default class PIDControl {
         const p = this.P(error, config);
         const i = this.I(error, dt, config);
         const d = this.D(dError, dt, config);
-        const sum = (config.usePGain ? p : 0) + (config.useIGain  && p * d < 0 ? i : 0) + (config.useDGain ? d : 0);
+        const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
         const sums = (sum).toFixed(2);
         const ps = (p).toFixed(2);
         const is = (i).toFixed(2);
