@@ -62,15 +62,11 @@ void setup() {
 
   Serial.begin(115200);                                                         //Initialize the LCD
 
-  Serial.print("  MPU-6050 IMU");                                         //Print text to screen
-  Serial.print("     V1.0");                                              //Print text to screen
-
-  delay(1500);                                                         //Delay 1.5 second to display the text
-                                                           //Clear the LCD
-  
-  Serial.print("Calibrating gyro");                                       //Print text to screen
+  Serial.print("{\"r\":0,\"p\":0,\"y\":0,\"t\":0,\"s\":\"MPU-6050 IMU, Calibrating gyro\"}\n");
   for (int cal_int = 0; cal_int < 2000 ; cal_int ++){                  //Run this code 2000 times
-    if(cal_int % 125 == 0)Serial.print(".");                              //Print a dot on the LCD every 125 readings
+    if(cal_int % 125 == 0) {
+      Serial.print("{\"r\":0,\"p\":0,\"y\":0,\"t\":0,\"s\":\".\"}\n");                              //Print a dot on the LCD every 125 readings
+    }
     read_mpu_6050_data();                                              //Read the raw acc and gyro data from the MPU-6050
     gyro_x_cal += gyro_x;                                              //Add the gyro x-axis offset to the gyro_x_cal variable
     gyro_y_cal += gyro_y;                                              //Add the gyro y-axis offset to the gyro_y_cal variable
@@ -80,11 +76,6 @@ void setup() {
   gyro_x_cal /= 2000;                                                  //Divide the gyro_x_cal variable by 2000 to get the avarage offset
   gyro_y_cal /= 2000;                                                  //Divide the gyro_y_cal variable by 2000 to get the avarage offset
   gyro_z_cal /= 2000;                                                  //Divide the gyro_z_cal variable by 2000 to get the avarage offset
-
-                                                           //Clear the LCD
-  
-  Serial.print("Pitch:");                                                 //Print text to screen
-  Serial.print("Roll :");                                                 //Print text to screen
   
   digitalWrite(13, LOW);                                               //All done, turn the LED off
   
@@ -97,8 +88,8 @@ void sendAsJson(double roll, double pitch, double yaw, unsigned long time)
   dtostrf(roll, 3, 4, rollstr);
   dtostrf(pitch, 3, 4, pitchstr);
   dtostrf(yaw, 3, 4, yawstr);
-  sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld}", rollstr, pitchstr, yawstr, time);
-  Serial.println(json);
+  sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld}\n", rollstr, pitchstr, yawstr, time);
+  Serial.print(json);
 }
 
 void loop(){
