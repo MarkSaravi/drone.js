@@ -1,76 +1,94 @@
-// MPU-6050 Accelerometer + Gyro
+///////////////////////////////////////////////////////////////////////////////////////
+/*Terms of use
+///////////////////////////////////////////////////////////////////////////////////////
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//THE SOFTWARE.
 
-// Bluetooth module connected to digital pins 2,3
-// I2C bus on A4, A5
-// Servo on pin 0
 
+///////////////////////////////////////////////////////////////////////////////////////
+//Support
+///////////////////////////////////////////////////////////////////////////////////////
+Website: http://www.brokking.net/imu.html
+Youtube: https://youtu.be/4BoIE8YQwM8
+Version: 1.0 (May 5, 2016)
+
+///////////////////////////////////////////////////////////////////////////////////////
+//Connections
+///////////////////////////////////////////////////////////////////////////////////////
+Power (5V) is provided to the Arduino pro mini by the FTDI programmer
+
+Gyro - Arduino pro mini
+VCC  -  5V
+GND  -  GND
+SDA  -  A4
+SCL  -  A5
+
+LCD  - Arduino pro mini
+VCC  -  5V
+GND  -  GND
+SDA  -  A4
+SCL  -  A5
+*//////////////////////////////////////////////////////////////////////////////////////
+
+//Include LCD and I2C library
 #include <Wire.h>
-//#include <SoftwareSerial.h>
-#include <math.h>
-#include <Servo.h>
 
-#define MPU6050_I2C_ADDRESS 0x68
-const long SERIAL_PORT_SPEED = 115200;
-// SoftwareSerial BTSerial(2, 3); // RX | TX
-
-Servo roll_servo;
-const int FREQ = 250; // sample freq in Hz
-const int INTERVAL = 1000000 / 250;
-
-// global angle, gyro derived
-double gSensitivity = 65.5; // for 500 deg/s, check data sheet
-double gx = 0, gy = 0, gz = 0;
-double gyrX = 0, gyrY = 0, gyrZ = 0;
-int16_t accX = 0, accY = 0, accZ = 0;
+//Declaring some global variables
+int gyro_x, gyro_y, gyro_z;
+long acc_x, acc_y, acc_z, acc_total_vector;
+int temperature;
+long gyro_x_cal, gyro_y_cal, gyro_z_cal;
 long loop_timer;
+int lcd_loop_counter;
+float angle_pitch, angle_roll;
+int angle_pitch_buffer, angle_roll_buffer;
+boolean set_gyro_angles;
+float angle_roll_acc, angle_pitch_acc;
+float angle_pitch_output, angle_roll_output;
 
-double gyrXoffs = -281.00, gyrYoffs = 18.00, gyrZoffs = -83.00;
+void setup() {
+  Wire.begin();                                                        //Start I2C as master
+  //Serial.begin(57600);                                               //Use only for debugging
+  pinMode(13, OUTPUT);                                                 //Set output 13 (LED) as output
+  
+  setup_mpu_6050_registers();                                          //Setup the registers of the MPU-6050 (500dfs / +/-8g) and start the gyro
 
-void setup()
-{
-  int error;
-  uint8_t c;
-  uint8_t sample_div;
+  digitalWrite(13, HIGH);                                              //Set digital output 13 high to indicate startup
 
-  //BTSerial.begin(38400);
-  Serial.begin(SERIAL_PORT_SPEED);
+  Serial.begin(115200);                                                         //Initialize the LCD
 
-  // debug led
-  pinMode(13, OUTPUT);
+  Serial.print("  MPU-6050 IMU");                                         //Print text to screen
+  Serial.print("     V1.0");                                              //Print text to screen
 
-  // servo
-  roll_servo.attach(9, 550, 2550);
+  delay(1500);                                                         //Delay 1.5 second to display the text
+                                                           //Clear the LCD
+  
+  Serial.print("Calibrating gyro");                                       //Print text to screen
+  for (int cal_int = 0; cal_int < 2000 ; cal_int ++){                  //Run this code 2000 times
+    if(cal_int % 125 == 0)Serial.print(".");                              //Print a dot on the LCD every 125 readings
+    read_mpu_6050_data();                                              //Read the raw acc and gyro data from the MPU-6050
+    gyro_x_cal += gyro_x;                                              //Add the gyro x-axis offset to the gyro_x_cal variable
+    gyro_y_cal += gyro_y;                                              //Add the gyro y-axis offset to the gyro_y_cal variable
+    gyro_z_cal += gyro_z;                                              //Add the gyro z-axis offset to the gyro_z_cal variable
+    delay(3);                                                          //Delay 3us to simulate the 250Hz program loop
+  }
+  gyro_x_cal /= 2000;                                                  //Divide the gyro_x_cal variable by 2000 to get the avarage offset
+  gyro_y_cal /= 2000;                                                  //Divide the gyro_y_cal variable by 2000 to get the avarage offset
+  gyro_z_cal /= 2000;                                                  //Divide the gyro_z_cal variable by 2000 to get the avarage offset
 
-  // Initialize the 'Wire' class for the I2C-bus.
-  Wire.begin();
-
-  // PWR_MGMT_1:
-  // wake up
-  i2c_write_reg(MPU6050_I2C_ADDRESS, 0x6b, 0x00);
-
-  // CONFIG:
-  // Low pass filter samples, 1khz sample rate
-  i2c_write_reg(MPU6050_I2C_ADDRESS, 0x1a, 0x01);
-
-  // GYRO_CONFIG:
-  // 500 deg/s, FS_SEL=1
-  // This means 65.5 LSBs/deg/s
-  i2c_write_reg(MPU6050_I2C_ADDRESS, 0x1b, 0x08);
-
-  // CONFIG:
-  // set sample rate
-  // sample rate FREQ = Gyro sample rate / (sample_div + 1)
-  // 1kHz / (div + 1) = FREQ
-  // reg_value = 1khz/FREQ - 1
-  sample_div = 1000 / FREQ - 1;
-  i2c_write_reg(MPU6050_I2C_ADDRESS, 0x19, sample_div);
-
-  //  Serial.write("Calibrating...");
-  digitalWrite(13, HIGH);
-  calibrate();
-  digitalWrite(13, LOW);
-  //  Serial.write("done.");
-  loop_timer = micros();
+                                                           //Clear the LCD
+  
+  Serial.print("Pitch:");                                                 //Print text to screen
+  Serial.print("Roll :");                                                 //Print text to screen
+  
+  digitalWrite(13, LOW);                                               //All done, turn the LED off
+  
+  loop_timer = micros();                                               //Reset the loop timer
 }
 
 void sendAsJson(double roll, double pitch, double yaw, unsigned long time)
@@ -83,146 +101,131 @@ void sendAsJson(double roll, double pitch, double yaw, unsigned long time)
   Serial.println(json);
 }
 
-void loop()
-{
-  int error;
-  double dT;
-  double ax, ay, az;
+void loop(){
 
-  read_sensor_data();
+  read_mpu_6050_data();                                                //Read the raw acc and gyro data from the MPU-6050
 
-  // angles based on accelerometer
-  ay = atan2(accX, sqrt(pow(accY, 2) + pow(accZ, 2))) * 180 / M_PI;
-  ax = atan2(accY, sqrt(pow(accX, 2) + pow(accZ, 2))) * 180 / M_PI;
+  gyro_x -= gyro_x_cal;                                                //Subtract the offset calibration value from the raw gyro_x value
+  gyro_y -= gyro_y_cal;                                                //Subtract the offset calibration value from the raw gyro_y value
+  gyro_z -= gyro_z_cal;                                                //Subtract the offset calibration value from the raw gyro_z value
+  
+  //Gyro angle calculations
+  //0.0000611 = 1 / (250Hz / 65.5)
+  angle_pitch += gyro_x * 0.0000611;                                   //Calculate the traveled pitch angle and add this to the angle_pitch variable
+  angle_roll += gyro_y * 0.0000611;                                    //Calculate the traveled roll angle and add this to the angle_roll variable
+  
+  //0.000001066 = 0.0000611 * (3.142(PI) / 180degr) The Arduino sin function is in radians
+  angle_pitch += angle_roll * sin(gyro_z * 0.000001066);               //If the IMU has yawed transfer the roll angle to the pitch angel
+  angle_roll -= angle_pitch * sin(gyro_z * 0.000001066);               //If the IMU has yawed transfer the pitch angle to the roll angel
+  
+  //Accelerometer angle calculations
+  acc_total_vector = sqrt((acc_x*acc_x)+(acc_y*acc_y)+(acc_z*acc_z));  //Calculate the total accelerometer vector
+  //57.296 = 1 / (3.142 / 180) The Arduino asin function is in radians
+  angle_pitch_acc = asin((float)acc_y/acc_total_vector)* 57.296;       //Calculate the pitch angle
+  angle_roll_acc = asin((float)acc_x/acc_total_vector)* -57.296;       //Calculate the roll angle
+  
+  //Place the MPU-6050 spirit level and note the values in the following two lines for calibration
+  angle_pitch_acc -= 0.0;                                              //Accelerometer calibration value for pitch
+  angle_roll_acc -= 0.0;                                               //Accelerometer calibration value for roll
 
-  // angles based on gyro (deg/s)
-  gx = gx + gyrX / FREQ;
-  gy = gy - gyrY / FREQ;
-  gz = gz + gyrZ / FREQ;
-
-  // complementary filter
-  // tau = DT*(A)/(1-A)
-  // = 0.48sec
-  gx = gx * 0.96 + ax * 0.04;
-  gy = gy * 0.96 + ay * 0.04;
-
-  // check if there is some kind of request
-  // from the other side...
-  // we have to send data, as requested
-  //if (rx_char == '.'){
-
-  sendAsJson(-gy, -gx, -gz, loop_timer);
-
-  roll_servo.write(-gx + 90);
-
-  while (micros() - loop_timer < INTERVAL)
-    ;                    //Wait until the loop_timer reaches {INTERVAL}us (250Hz) before starting the next loop
-  loop_timer = micros(); //Reset the loop timer
-}
-
-void calibrate()
-{
-
-  int x;
-  long xSum = 0, ySum = 0, zSum = 0;
-  uint8_t i2cData[6];
-  int num = 2000;
-  uint8_t error;
-
-  for (x = 0; x < num; x++)
-  {
-
-    error = i2c_read(MPU6050_I2C_ADDRESS, 0x43, i2cData, 6);
-    if (error != 0)
-      return;
-
-    xSum += ((i2cData[0] << 8) | i2cData[1]);
-    ySum += ((i2cData[2] << 8) | i2cData[3]);
-    zSum += ((i2cData[4] << 8) | i2cData[5]);
+  if(set_gyro_angles){                                                 //If the IMU is already started
+    angle_pitch = angle_pitch * 0.9996 + angle_pitch_acc * 0.0004;     //Correct the drift of the gyro pitch angle with the accelerometer pitch angle
+    angle_roll = angle_roll * 0.9996 + angle_roll_acc * 0.0004;        //Correct the drift of the gyro roll angle with the accelerometer roll angle
   }
-  gyrXoffs = xSum / num;
-  gyrYoffs = ySum / num;
-  gyrZoffs = zSum / num;
-
-  Serial.println("Calibration result:");
-  Serial.print(gyrXoffs);
-  Serial.print(", ");
-  Serial.print(gyrYoffs);
-  Serial.print(", ");
-  Serial.println(gyrZoffs);
-}
-
-void read_sensor_data()
-{
-  uint8_t i2cData[14];
-  uint8_t error;
-  // read imu data
-  error = i2c_read(MPU6050_I2C_ADDRESS, 0x3b, i2cData, 14);
-  if (error != 0)
-    return;
-
-  // assemble 16 bit sensor data
-  accX = ((i2cData[0] << 8) | i2cData[1]);
-  accY = ((i2cData[2] << 8) | i2cData[3]);
-  accZ = ((i2cData[4] << 8) | i2cData[5]);
-
-  gyrX = (((i2cData[8] << 8) | i2cData[9]) - gyrXoffs) / gSensitivity;
-  gyrY = (((i2cData[10] << 8) | i2cData[11]) - gyrYoffs) / gSensitivity;
-  gyrZ = (((i2cData[12] << 8) | i2cData[13]) - gyrZoffs) / gSensitivity;
-}
-
-// ---- I2C routines
-
-int i2c_read(int addr, int start, uint8_t *buffer, int size)
-{
-  int i, n, error;
-
-  Wire.beginTransmission(addr);
-  n = Wire.write(start);
-  if (n != 1)
-    return (-10);
-
-  n = Wire.endTransmission(false); // hold the I2C-bus
-  if (n != 0)
-    return (n);
-
-  // Third parameter is true: relase I2C-bus after data is read.
-  Wire.requestFrom(addr, size, true);
-  i = 0;
-  while (Wire.available() && i < size)
-  {
-    buffer[i++] = Wire.read();
+  else{                                                                //At first start
+    angle_pitch = angle_pitch_acc;                                     //Set the gyro pitch angle equal to the accelerometer pitch angle 
+    angle_roll = angle_roll_acc;                                       //Set the gyro roll angle equal to the accelerometer roll angle 
+    set_gyro_angles = true;                                            //Set the IMU started flag
   }
-  if (i != size)
-    return (-11);
+  
+  //To dampen the pitch and roll angles a complementary filter is used
+  angle_pitch_output = angle_pitch_output * 0.9 + angle_pitch * 0.1;   //Take 90% of the output pitch value and add 10% of the raw pitch value
+  angle_roll_output = angle_roll_output * 0.9 + angle_roll * 0.1;      //Take 90% of the output roll value and add 10% of the raw roll value
+  
+  sendAsJson(angle_roll_output, angle_pitch_output, 0, micros());                                                         //Write the roll and pitch values to the LCD display
 
-  return (0); // return : no error
+  while(micros() - loop_timer < 4000);                                 //Wait until the loop_timer reaches 4000us (250Hz) before starting the next loop
+  loop_timer = micros();                                               //Reset the loop timer
 }
 
-int i2c_write(int addr, int start, const uint8_t *pData, int size)
-{
-  int n, error;
 
-  Wire.beginTransmission(addr);
-  n = Wire.write(start); // write the start address
-  if (n != 1)
-    return (-20);
+void read_mpu_6050_data(){                                             //Subroutine for reading the raw gyro and accelerometer data
+  Wire.beginTransmission(0x68);                                        //Start communicating with the MPU-6050
+  Wire.write(0x3B);                                                    //Send the requested starting register
+  Wire.endTransmission();                                              //End the transmission
+  Wire.requestFrom(0x68,14);                                           //Request 14 bytes from the MPU-6050
+  while(Wire.available() < 14);                                        //Wait until all the bytes are received
+  acc_x = Wire.read()<<8|Wire.read();                                  //Add the low and high byte to the acc_x variable
+  acc_y = Wire.read()<<8|Wire.read();                                  //Add the low and high byte to the acc_y variable
+  acc_z = Wire.read()<<8|Wire.read();                                  //Add the low and high byte to the acc_z variable
+  temperature = Wire.read()<<8|Wire.read();                            //Add the low and high byte to the temperature variable
+  gyro_x = Wire.read()<<8|Wire.read();                                 //Add the low and high byte to the gyro_x variable
+  gyro_y = Wire.read()<<8|Wire.read();                                 //Add the low and high byte to the gyro_y variable
+  gyro_z = Wire.read()<<8|Wire.read();                                 //Add the low and high byte to the gyro_z variable
 
-  n = Wire.write(pData, size); // write data bytes
-  if (n != size)
-    return (-21);
-
-  error = Wire.endTransmission(true); // release the I2C-bus
-  if (error != 0)
-    return (error);
-
-  return (0); // return : no error
 }
 
-int i2c_write_reg(int addr, int reg, uint8_t data)
-{
-  int error;
+// void write_LCD(){                                                      //Subroutine for writing the LCD
+//   //To get a 250Hz program loop (4us) it's only possible to write one character per loop
+//   //Writing multiple characters is taking to much time
+//   if(lcd_loop_counter == 14)lcd_loop_counter = 0;                      //Reset the counter after 14 characters
+//   lcd_loop_counter ++;                                                 //Increase the counter
+//   if(lcd_loop_counter == 1){
+//     angle_pitch_buffer = angle_pitch_output * 10;                      //Buffer the pitch angle because it will change
+//     Serial.setCursor(6,0);                                                //Set the LCD cursor to position to position 0,0
+//   }
+//   if(lcd_loop_counter == 2){
+//     if(angle_pitch_buffer < 0)Serial.print("-");                          //Print - if value is negative
+//     else Serial.print("+");                                               //Print + if value is negative
+//   }
+//   if(lcd_loop_counter == 3)Serial.print(abs(angle_pitch_buffer)/1000);    //Print first number
+//   if(lcd_loop_counter == 4)Serial.print((abs(angle_pitch_buffer)/100)%10);//Print second number
+//   if(lcd_loop_counter == 5)Serial.print((abs(angle_pitch_buffer)/10)%10); //Print third number
+//   if(lcd_loop_counter == 6)Serial.print(".");                             //Print decimal point
+//   if(lcd_loop_counter == 7)Serial.print(abs(angle_pitch_buffer)%10);      //Print decimal number
 
-  error = i2c_write(addr, reg, &data, 1);
-  return (error);
+//   if(lcd_loop_counter == 8){
+//     angle_roll_buffer = angle_roll_output * 10;
+//     Serial.setCursor(6,1);
+//   }
+//   if(lcd_loop_counter == 9){
+//     if(angle_roll_buffer < 0)Serial.print("-");                           //Print - if value is negative
+//     else Serial.print("+");                                               //Print + if value is negative
+//   }
+//   if(lcd_loop_counter == 10)Serial.print(abs(angle_roll_buffer)/1000);    //Print first number
+//   if(lcd_loop_counter == 11)Serial.print((abs(angle_roll_buffer)/100)%10);//Print second number
+//   if(lcd_loop_counter == 12)Serial.print((abs(angle_roll_buffer)/10)%10); //Print third number
+//   if(lcd_loop_counter == 13)Serial.print(".");                            //Print decimal point
+//   if(lcd_loop_counter == 14)Serial.print(abs(angle_roll_buffer)%10);      //Print decimal number
+// }
+
+void setup_mpu_6050_registers(){
+  //Activate the MPU-6050
+  Wire.beginTransmission(0x68);                                        //Start communicating with the MPU-6050
+  Wire.write(0x6B);                                                    //Send the requested starting register
+  Wire.write(0x00);                                                    //Set the requested starting register
+  Wire.endTransmission();                                              //End the transmission
+  //Configure the accelerometer (+/-8g)
+  Wire.beginTransmission(0x68);                                        //Start communicating with the MPU-6050
+  Wire.write(0x1C);                                                    //Send the requested starting register
+  Wire.write(0x10);                                                    //Set the requested starting register
+  Wire.endTransmission();                                              //End the transmission
+  //Configure the gyro (500dps full scale)
+  Wire.beginTransmission(0x68);                                        //Start communicating with the MPU-6050
+  Wire.write(0x1B);                                                    //Send the requested starting register
+  Wire.write(0x08);                                                    //Set the requested starting register
+  Wire.endTransmission();                                              //End the transmission
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
