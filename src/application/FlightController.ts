@@ -138,7 +138,8 @@ export default class FlightController {
     }
 
     noiseRemover(value: number): number {
-        return Math.round(value * 10) / 10;
+        // return Math.round(value * 10) / 10;
+        return value;
     }
 
     applyImuData(rawImuData: ImuData) {

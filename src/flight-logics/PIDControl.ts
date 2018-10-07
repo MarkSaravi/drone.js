@@ -4,7 +4,6 @@ export default class PIDControl {
     integralSum: number = 0;
     prevError: number = 0;
     prevTime: number = 0;
-    dataCounter: number = 0;
 
     constructor() {
     }
@@ -39,26 +38,22 @@ export default class PIDControl {
     showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number) {
         const sums = (sum).toFixed(2);
         const ps = (p).toFixed(2);
-        // const is = (i).toFixed(2);
+        const is = (i).toFixed(2);
         const ds = (d).toFixed(2);
-        const pids = `S:${this.fixLen(sums)},P:${this.fixLen(ps)},D:${this.fixLen(ds)},dE:${this.fixLen(dError.toString())},t:${this.fixLen(t.toString())},dt:${this.fixLen((dt*1000000).toString())},`;
+        const pids = `S:${this.fixLen(sums)},P:${this.fixLen(ps)},I:${this.fixLen(is)},D:${this.fixLen(ds)},dE:${this.fixLen(dError.toString())},t:${this.fixLen(t.toString())},dt:${this.fixLen((dt*1000000).toString())},`;
         process.stdout.write(pids);
     }
 
-    PID(error: number, time: number, config: IFlightConfig): number {
-        this.dataCounter++;
+    PID(error: number, time: number, config: IFlightConfig): number {        
         const dt = (time - this.prevTime) / 10000; //convert to milliseconds
         const dError = error - this.prevError;
-        const NUMDATA = 1;
-        if (this.dataCounter == NUMDATA) {
-            this.prevTime = time;
-            this.prevError = error;
-            this.dataCounter = 0;
-        }
 
-        const p = this.P(error, config);
-        const i = this.I(error, dt, config);
         const d = this.D(dError, dt, config);
+        const p = this.P(error, config);
+        const i = this.I(error, 0, config);
+
+        this.prevTime = time;
+        this.prevError = error;        
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
         this.showStatus(sum * config.gain, p, i, d, dError, time, dt);
         return sum;
