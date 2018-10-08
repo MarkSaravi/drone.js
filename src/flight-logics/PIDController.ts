@@ -7,8 +7,6 @@ export default class PIDController {
     rollControl: TiltPIDControl;
     pitchControl: TiltPIDControl;
     // yawControl: TurnPIDControl;
-    private pitchError: number = 0;
-    private rollError: number =0;
 
     constructor(private readonly config: IFlightConfig) {
         this.rollControl = new TiltPIDControl();
@@ -16,13 +14,17 @@ export default class PIDController {
         // this.yawControl = new TurnPIDControl();
     }
 
+    getRootSqure(x: number) {
+        return Math.sqrt(Math.abs(x)) * Math.sign(x);
+    }
+
     PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
-        this.pitchError = errors.pitchError ;// this.pitchError + 0.45 * (errors.pitchError - this.pitchError); 
-        this.rollError = errors.rollError;
+        const pitchError = this.getRootSqure(errors.pitchError);
+        const rollError = this.getRootSqure(errors.rollError);
         const pitchPower = basePower;
         const rollPower = basePower;
-        //const pitchPowers = this.pitchControl.PID(pitchPower, this.pitchError, errors.time, config);
-        const rollPowers = this.rollControl.PID(rollPower, this.rollError, errors.time, config);
+        //const pitchPowers = this.pitchControl.PID(pitchPower, pitchError, errors.time, config);
+        const rollPowers = this.rollControl.PID(rollPower, rollError, errors.time, config);
         const pitchPowers = { front: 0, back: 0 };
         
         return {
