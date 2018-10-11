@@ -23,8 +23,8 @@ JsonErrors readJson(const char *json, double *a, double *b, double *c, double *d
 
 const long SERIAL_PORT_SPEED = 115200;
 
-const double ARMING_MAX_PULSEWIDTH = 0.001968; //seconds
-const double ARMING_MIN_PULSEWIDTH = 0.001024; //seconds
+const double ARMING_MAX_PULSEWIDTH = 0.001900; //seconds
+const double ARMING_MIN_PULSEWIDTH = 0.001100; //seconds
 const double FREQ = 480.0;
 const double PERIOD = 1.0 / FREQ;
 const int PWM_COUNTER = 4096;
