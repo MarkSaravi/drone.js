@@ -242,6 +242,16 @@ void setup() {
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
+void sendAsJson(double roll, double pitch, double yaw, unsigned long time)
+{
+  static char json[128], rollstr[32], pitchstr[32], yawstr[32];
+  dtostrf(roll, 3, 4, rollstr);
+  dtostrf(pitch, 3, 4, pitchstr);
+  dtostrf(yaw, 3, 4, yawstr);
+  sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld}\n", rollstr, pitchstr, yawstr, time);
+  Serial.print(json);
+}
+
 void loop() {
     // if programming failed, don't try to do anything
     if (!dmpReady) return;
@@ -315,12 +325,13 @@ void loop() {
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            Serial.print("ypr\t");
-            Serial.print(ypr[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.println(ypr[2] * 180/M_PI);
+            // Serial.print("ypr\t");
+            // Serial.print(ypr[0] * 180/M_PI);
+            // Serial.print("\t");
+            // Serial.print(ypr[1] * 180/M_PI);
+            // Serial.print("\t");
+            // Serial.println(ypr[2] * 180/M_PI);
+            sendAsJson(ypr[2] * 180/M_PI, ypr[1] * 180/M_PI, ypr[0] * 180/M_PI,micros());
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
