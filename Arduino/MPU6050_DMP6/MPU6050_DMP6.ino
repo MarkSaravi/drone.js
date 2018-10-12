@@ -338,7 +338,7 @@ void loop() {
             // Serial.print(ypr[1] * 180/M_PI);
             // Serial.print("\t");
             // Serial.println(ypr[2] * 180/M_PI);
-            sendAsJson(ypr[2] * 180/M_PI, ypr[1] * 180/M_PI, ypr[0] * 180/M_PI,micros());
+            sendAsJson(-ypr[1] * 180/M_PI, -ypr[2] * 180/M_PI, ypr[0] * 180/M_PI,micros());
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
