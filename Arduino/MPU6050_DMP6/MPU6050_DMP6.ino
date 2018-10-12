@@ -189,11 +189,11 @@ void setup() {
     Serial.println(F("Testing device connections..."));
     Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
 
-    // wait for ready
-    Serial.println(F("\nSend any character to begin DMP programming and demo: "));
-    while (Serial.available() && Serial.read()); // empty buffer
-    while (!Serial.available());                 // wait for data
-    while (Serial.available() && Serial.read()); // empty buffer again
+    // // wait for ready
+    // Serial.println(F("\nSend any character to begin DMP programming and demo: "));
+    // while (Serial.available() && Serial.read()); // empty buffer
+    // while (!Serial.available());                 // wait for data
+    // while (Serial.available() && Serial.read()); // empty buffer again
 
     // load and configure the DMP
     Serial.println(F("Initializing DMP..."));
@@ -244,12 +244,19 @@ void setup() {
 
 void sendAsJson(double roll, double pitch, double yaw, unsigned long time)
 {
-  static char json[128], rollstr[32], pitchstr[32], yawstr[32];
-  dtostrf(roll, 3, 4, rollstr);
-  dtostrf(pitch, 3, 4, pitchstr);
-  dtostrf(yaw, 3, 4, yawstr);
-  sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld}\n", rollstr, pitchstr, yawstr, time);
-  Serial.print(json);
+    static long last_time = 0;
+    static int status = 0;
+    static char json[128], rollstr[32], pitchstr[32], yawstr[32];
+    if (millis() - last_time >= 1000) 
+    {
+        last_time = millis();
+        status = 0;
+    }
+    dtostrf(roll, 3, 4, rollstr);
+    dtostrf(pitch, 3, 4, pitchstr);
+    dtostrf(yaw, 3, 4, yawstr);
+    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld,\"s\":%d}\n", rollstr, pitchstr, yawstr, time, ++status);
+    Serial.print(json);
 }
 
 void loop() {
