@@ -13,16 +13,16 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IFlightConfig): number {
-        if (Math.abs(error) > config.iMaxAngle) {
-            return 0; 
-        }
+        // if (Math.abs(error) > config.iMaxAngle) {
+        //     return this.integralSum; 
+        // }
         this.integralSum += error * dt / 1000 * config.iGain;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
     }
 
     D(dError: number, dt: number, config: IFlightConfig): number {
-        return dError / dt * config.dGain;
+        return dError / dt * config.dGain * 10;
     }
 
     fixLen(x: string): string {

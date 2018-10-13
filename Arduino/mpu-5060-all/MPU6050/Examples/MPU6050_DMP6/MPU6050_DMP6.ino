@@ -188,20 +188,20 @@ void setup() {
     Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
 
     // wait for ready
-    // Serial.println(F("\nSend any character to begin DMP programming and demo: "));
-    // while (Serial.available() && Serial.read()); // empty buffer
-    // while (!Serial.available());                 // wait for data
-    // while (Serial.available() && Serial.read()); // empty buffer again
+    Serial.println(F("\nSend any character to begin DMP programming and demo: "));
+    while (Serial.available() && Serial.read()); // empty buffer
+    while (!Serial.available());                 // wait for data
+    while (Serial.available() && Serial.read()); // empty buffer again
 
     // load and configure the DMP
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu.dmpInitialize();
 
     // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXGyroOffset(90);
-    mpu.setYGyroOffset(6);
-    mpu.setZGyroOffset(74);
-    mpu.setZAccelOffset(442); // 1688 factory default for my test chip
+    mpu.setXGyroOffset(220);
+    mpu.setYGyroOffset(76);
+    mpu.setZGyroOffset(-85);
+    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -239,23 +239,6 @@ void setup() {
 // ================================================================
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
-
-void sendAsJson(double roll, double pitch, double yaw)
-{
-    static long last_time = 0;
-    static int counter = 0;
-    static char json[128], rollstr[32], pitchstr[32], yawstr[32];
-    if (millis() - last_time >= 1000) 
-    {
-        last_time = millis();
-        counter = 0;
-    }
-    dtostrf(roll, 3, 4, rollstr);
-    dtostrf(pitch, 3, 4, pitchstr);
-    dtostrf(yaw, 3, 4, yawstr);
-    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld,\"s\":%d}\n", rollstr, pitchstr, yawstr, millis(), ++counter);
-    Serial.print(json);
-}
 
 void loop() {
     // if programming failed, don't try to do anything
@@ -330,17 +313,12 @@ void loop() {
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            // Serial.print("ypr\t");
-            // Serial.print(ypr[0] * 180/M_PI);
-            // Serial.print("\t");
-            // Serial.print(ypr[1] * 180/M_PI);
-            // Serial.print("\t");
-            // Serial.println(ypr[2] * 180/M_PI);
-            sendAsJson(
-                -ypr[1] * 180/M_PI,
-                -ypr[2] * 180/M_PI,
-                ypr[0] * 180/M_PI
-                );
+            Serial.print("ypr\t");
+            Serial.print(ypr[0] * 180/M_PI);
+            Serial.print("\t");
+            Serial.print(ypr[1] * 180/M_PI);
+            Serial.print("\t");
+            Serial.println(ypr[2] * 180/M_PI);
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
