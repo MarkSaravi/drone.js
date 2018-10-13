@@ -14,13 +14,13 @@ export default class PIDController {
         // this.yawControl = new TurnPIDControl();
     }
 
-    getRootSqure(x: number) {
-        return Math.sqrt(Math.abs(x)) * Math.sign(x);
+    convert(x: number) {
+        return x;
     }
 
     PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
-        const pitchError = this.getRootSqure(errors.pitchError);
-        const rollError = this.getRootSqure(errors.rollError);
+        const pitchError = this.convert(errors.pitchError);
+        const rollError = this.convert(errors.rollError);
         const pitchPower = basePower;
         const rollPower = basePower;
         //const pitchPowers = this.pitchControl.PID(pitchPower, pitchError, errors.time, config);
