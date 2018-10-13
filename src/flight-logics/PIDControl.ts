@@ -46,7 +46,7 @@ export default class PIDControl {
     }
 
     PID(error: number, time: number, config: IFlightConfig): number {        
-        const dt = (time - this.prevTime) / 1000; //convert to milliseconds
+        const dt = (time - this.prevTime); //convert to milliseconds
         const dError = error - this.prevError;
 
         const d = this.D(dError, dt, config);
