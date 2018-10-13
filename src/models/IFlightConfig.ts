@@ -15,6 +15,7 @@ export default interface IFlightConfig {
     iMaxValue: number;
     iMaxAngle: number;
     iMinAngle: number;
+    minTakeOffPower: number,
     gain: number;
     mRpm: number;
     bRpm: number;

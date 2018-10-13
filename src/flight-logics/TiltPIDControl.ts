@@ -17,7 +17,7 @@ export default class TiltPIDControl {
     
     PID(basePower: number, error: number, time: number, config: IFlightConfig): IArPowers {
         const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, config.mRpm, config.bRpm);
-        const torque = this.pidControl.PID(error, time, config) * config.gain;
+        const torque = this.pidControl.PID(error, time, config, basePower) * config.gain;
         const rotorsSpeeds = {front:  baseAangularVelocity - torque, back: baseAangularVelocity + torque };
         // flightLogics.rotorSpeedCacculator({baseAangularVelocity}, torque);
         const front = this.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.front, config.mRpm, config.bRpm));
