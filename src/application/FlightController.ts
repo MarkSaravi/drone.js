@@ -22,6 +22,7 @@ export default class FlightController {
     private imuData: ImuData = null;
     private pitchTilt: number = 0;
     private rollTilt: number = 0;
+    private readonly TILT_INC: number = 0.25;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController(this.config);
@@ -39,22 +40,22 @@ export default class FlightController {
     }
 
     tiltForward() {
-        this.pitchTilt++;
+        this.pitchTilt += this.TILT_INC;
         this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
     }
 
     tiltBackward() {
-        this.pitchTilt--;
+        this.pitchTilt -= this.TILT_INC;
         this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
     }
 
     tiltRight() {
-        this.rollTilt++;
+        this.rollTilt += this.TILT_INC;
         this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
     }
 
     tiltLeft() {
-        this.rollTilt--;
+        this.rollTilt -= this.TILT_INC;
         this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: 0,power: this.targetFlightState.power });
     }
 
@@ -172,30 +173,13 @@ export default class FlightController {
         const fss = `roll:${this.signer((errors.rollError).toFixed(2))}, pitch:${this.signer((errors.pitchError).toFixed(2))}`;
         const pids = `G:${(this.config.gain).toFixed(2)},pG:${(this.config.pGain).toFixed(2)},iG:${(this.config.iGain).toFixed(2)},dG:${(this.config.dGain).toFixed(2)}`
         const bps = `P:${basePower}`;
-        const text = ` ${fss},${pids},${bps},${ps},${pid}`;
+        const tilts = `${this.targetFlightState.roll},${this.targetFlightState.pitch}`;
+        const text = ` ${fss},${pids},${bps},${ps},${pid},${tilts}`;
 
         if (this.dataLog) {
             fileSyatem.appendFileSync(this.dataLog, text + '\n');
         }
         process.stdout.write(`${text}\n`);
-    }
-
-    safeAdd(base: number, inc: number) {
-        return base + inc;
-    }
-
-    calculatePower(angularVelocity: number, angularVelocityDiff: IPowers): IPowers {
-        const w1 = this.safeAdd(angularVelocity, angularVelocityDiff.p1);
-        const w2 = this.safeAdd(angularVelocity, angularVelocityDiff.p2);
-        const w3 = this.safeAdd(angularVelocity, angularVelocityDiff.p3);
-        const w4 = this.safeAdd(angularVelocity, angularVelocityDiff.p4);
-        const res = {
-            p1: flightLogics.angularVelocityToPower(w1, this.config.mRpm, this.config.bRpm),
-            p2: flightLogics.angularVelocityToPower(w2, this.config.mRpm, this.config.bRpm),
-            p3: flightLogics.angularVelocityToPower(w3, this.config.mRpm, this.config.bRpm),
-            p4: flightLogics.angularVelocityToPower(w4, this.config.mRpm, this.config.bRpm)
-        }
-        return res;
     }
 
     calcMotorsPower() {
