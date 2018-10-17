@@ -2,16 +2,17 @@ import IFlightStateError from '../models/IFlightStateError';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
 import TiltPIDControl from './TiltPIDControl';
+import PIDControl from './PIDControl';
 
 export default class PIDController {
     rollControl: TiltPIDControl;
     pitchControl: TiltPIDControl;
-    // yawControl: TurnPIDControl;
+    yawControl: PIDControl;
 
     constructor(private readonly config: IFlightConfig) {
         this.rollControl = new TiltPIDControl();
         this.pitchControl = new TiltPIDControl();
-        // this.yawControl = new TurnPIDControl();
+        this.yawControl = new PIDControl();
     }
 
     convert(x: number) {
@@ -20,6 +21,8 @@ export default class PIDController {
 
     PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
         const yawError = errors.pitchError;
+        const yawPID = this.yawControl.PID(yawError, errors.time, config, basePower);
+        
         const pitchError = this.convert(errors.pitchError);
         const rollError = this.convert(errors.rollError);
         const pitchPower = basePower;

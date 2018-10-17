@@ -19,7 +19,6 @@ export default class TiltPIDControl {
         const baseAangularVelocity = flightLogics.powerToAngularVelocity(basePower, config.mRpm, config.bRpm);
         const torque = this.pidControl.PID(error, time, config, basePower) * config.gain;
         const rotorsSpeeds = {front:  baseAangularVelocity - torque, back: baseAangularVelocity + torque };
-        // flightLogics.rotorSpeedCacculator({baseAangularVelocity}, torque);
         const front = this.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.front, config.mRpm, config.bRpm));
         const back = this.isPositveNumber(flightLogics.angularVelocityToPower(rotorsSpeeds.back, config.mRpm, config.bRpm));
         return {
