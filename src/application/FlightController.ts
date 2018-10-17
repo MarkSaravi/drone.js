@@ -23,6 +23,8 @@ export default class FlightController {
     private pitchTilt: number = 0;
     private rollTilt: number = 0;
     private readonly TILT_INC: number = 0.25;
+    private readonly POWER_START: number = 40;
+    private readonly POWER_MAX: number = 55;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController(this.config);
@@ -119,18 +121,21 @@ export default class FlightController {
     }
 
     incPower() {
-        if (this.targetFlightState.power < 65 && this.targetFlightState.power>39) {
-            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 0.25));
-        } else if (this.targetFlightState.power == 0 ) {
-            this.applyCommand(new Command(0, 0, 0, 25));
-        } else if (this.targetFlightState.power >= 25 && this.targetFlightState.power <= 39) {
-            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power + 1));
+        if (this.targetFlightState.power >= this.POWER_MAX) {
+            return;
         }
+        if (this.targetFlightState.power < this.POWER_MAX && this.targetFlightState.power >= this.POWER_START) {
+            this.applyCommand(new Command(0, this.targetFlightState.roll, this.targetFlightState.pitch, this.targetFlightState.power + 0.25));
+        } else {
+            this.applyCommand(new Command(0, this.targetFlightState.roll, this.targetFlightState.pitch, this.POWER_START));
+        } 
     }
 
     decPower() {
-        if (this.targetFlightState.power > 0) {
-            this.applyCommand(new Command(0, 0, 0, this.targetFlightState.power - 0.25));
+        if (this.targetFlightState.power > this.POWER_START) {
+            this.applyCommand(new Command(0, this.targetFlightState.roll, this.targetFlightState.pitch, this.targetFlightState.power - 0.25));
+        } else {
+            this.applyCommand(new Command(0, this.targetFlightState.roll, this.targetFlightState.pitch, 0));
         }
     }
 
