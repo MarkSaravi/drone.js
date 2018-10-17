@@ -62,6 +62,14 @@ export default class Application extends EventEmitter {
             this.flightController.tiltLeft();
         });
 
+        this.on('turn-right', () => {
+            this.flightController.turnRight();
+        });
+
+        this.on('turn-left', () => {
+            this.flightController.turnLeft();
+        });
+
         this.on('inc-gain', () => {
             this.flightController.incGain();
         });

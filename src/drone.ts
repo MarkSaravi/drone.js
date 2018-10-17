@@ -32,20 +32,31 @@ process.stdin.on('keypress', (str, key) => {
             app.emit('tilt-forward');
             // Up
             break;
+
         case '\u001b[B':
             app.emit('tilt-backward');
             // Down
             break;
+
         case '\u001b[C':
             app.emit('tilt-right');
             // Right
             break;
+
         case '\u001b[D':
             app.emit('tilt-left');
             // Left
             break;
     }
     switch (str) {
+        case '.':
+            app.emit('turn-right');
+            // Right
+            break;
+        case ',':
+            app.emit('turn-left');
+            // Left
+            break;
         case 'q':
         case 'Q':
             app.emit('stopping-application');
@@ -71,10 +82,12 @@ process.stdin.on('keypress', (str, key) => {
             app.emit('dec-i-gain');
             break;
 
-        case '.':
+        case 'l':
+        case 'L':
             app.emit('inc-d-gain');
             break;
-        case ',':
+        case 'k':
+        case 'K':
             app.emit('dec-d-gain');
             break;
             
@@ -82,6 +95,7 @@ process.stdin.on('keypress', (str, key) => {
         case 'A':
             app.emit('inc-power');
             break;
+
         case 'z':
         case 'Z':
             app.emit('dec-power');
@@ -90,18 +104,22 @@ process.stdin.on('keypress', (str, key) => {
         case 'G':
             app.emit('mark-start');
             break;
+
         case 'h':
         case 'H':
             app.emit('mark-end');
             break;
+
         case 'p':
         case 'P':
             app.emit('toggle-p');
             break;
+
         case 'i':
         case 'I':
             app.emit('toggle-i');
             break;
+
         case 'd':
         case 'D':
             app.emit('toggle-d');

@@ -57,7 +57,7 @@ export default class PIDControl {
         this.prevTime = time;
         this.prevError = error;        
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
-        this.showStatus(sum * config.gain, p, i, d, dError, time, dt);
+        // this.showStatus(sum * config.gain, p, i, d, dError, time, dt);
         return sum;
     }
 
