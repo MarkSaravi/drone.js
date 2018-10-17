@@ -1,4 +1,4 @@
-import IFlightConfig from '../models/IFlightConfig';
+import IPIDConfig from '../models/IPIDConfig';
 
 export default class PIDControl {
     integralSum: number = 0;
@@ -8,12 +8,12 @@ export default class PIDControl {
     constructor() {
     }
 
-    P(error: number, config: IFlightConfig): number {
+    P(error: number, config: IPIDConfig): number {
         return error * config.pGain;
     }
 
-    I(error: number, dt: number, config: IFlightConfig, power: number): number {
-        if (Math.abs(error) > config.iMaxAngle || power < config.minTakeOffPower) {
+    I(error: number, dt: number, config: IPIDConfig, power: number): number {
+        if (Math.abs(error) > config.iMaxAngle || power < config.iMinPower) {
             this.integralSum = 0; 
         }
         
@@ -22,7 +22,7 @@ export default class PIDControl {
         return this.integralSum;
     }
 
-    D(dError: number, dt: number, config: IFlightConfig): number {
+    D(dError: number, dt: number, config: IPIDConfig): number {
         return dError / dt * config.dGain * 10;
     }
 
@@ -46,7 +46,7 @@ export default class PIDControl {
         process.stdout.write(pids);
     }
 
-    PID(error: number, time: number, config: IFlightConfig, power: number): number {        
+    PID(error: number, time: number, config: IPIDConfig, power: number): number {        
         const dt = (time - this.prevTime); //convert to milliseconds
         const dError = error - this.prevError;
 

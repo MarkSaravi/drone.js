@@ -1,3 +1,5 @@
+import IPIDConfig from './IPIDConfig';
+
 export default interface IFlightConfig {
     rollPolarity: number;
     pitchPolarity: number;
@@ -19,5 +21,7 @@ export default interface IFlightConfig {
     gain: number;
     mRpm: number;
     bRpm: number;
-    saveData: boolean
+    saveData: boolean;
+    yawPID: IPIDConfig;
+    rollPitchPID: IPIDConfig;
 }

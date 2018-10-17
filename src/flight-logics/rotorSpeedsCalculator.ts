@@ -1,6 +1,6 @@
-import IArmRotorSpeeds from '../models/IArmRotorSpeeds';
+import IArmPowers from '../models/IArmPowers';
 
-export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque: number): IArmRotorSpeeds => {
+export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque: number): IArmPowers => {
     // w3^2 - w1^2 = t
     // w3^2 + w1^2 = 2*wb^2
     // w1^2 + t = 2*wb^2 - w1^2 -> 2*w1^2 = 2*wb^2 - t -> w1 = sqrt(wb^2 - t/2)
@@ -12,7 +12,7 @@ export const calcTilteCompensationSpeeds = (angularVelocityBase: number, torque:
     }
 }
 
-const rotorSpeedCacculator = (angularVelocityBase: number, torque: number): IArmRotorSpeeds => {
+const rotorSpeedCacculator = (angularVelocityBase: number, torque: number): IArmPowers => {
     const { front, back } = calcTilteCompensationSpeeds(angularVelocityBase, torque);
     return {
         front,
