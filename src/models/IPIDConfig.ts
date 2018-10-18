@@ -9,6 +9,7 @@ export default interface IPIDConfig {
     pGainInc: number;
     iGainInc: number;
     dGainInc: number;
+    gainInc: number;
     iMinPower: number;
     iMaxValue: number;
     iMaxAngle: number;

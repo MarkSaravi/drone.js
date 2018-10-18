@@ -88,47 +88,35 @@ export default class FlightController {
     }
 
     incPGain() {
-        this.config.rollPitchPID.pGain = this.config.rollPitchPID.pGain + this.config.rollPitchPID.pGainInc;
+        this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
     }
 
     decPGain() {
-        this.config.rollPitchPID.pGain = this.config.rollPitchPID.pGain - this.config.rollPitchPID.pGainInc;
+        this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
     }
 
     incGain() {
-        this.config.gain = this.config.gain + 1;
+        this.config.rollPitchPID.gain += this.config.rollPitchPID.gainInc;
     }
 
     decGain() {
-        this.config.gain = this.config.gain - 1;
+        this.config.rollPitchPID.gain -= this.config.rollPitchPID.gainInc;
     }
 
     incIGain() {
-        this.config.rollPitchPID.iGain = this.config.rollPitchPID.iGain + this.config.rollPitchPID.iGainInc;
+        this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
     }
 
     decIGain() {
-        this.config.rollPitchPID.iGain = this.config.rollPitchPID.iGain - this.config.rollPitchPID.iGainInc;
+        this.config.rollPitchPID.iGain -= this.config.rollPitchPID.iGainInc;
     }
 
     incDGain() {
-        this.config.rollPitchPID.dGain = this.config.rollPitchPID.dGain + this.config.rollPitchPID.dGainInc;
+        this.config.rollPitchPID.dGain += this.config.rollPitchPID.dGainInc;
     }
 
     decDGain() {
-        this.config.rollPitchPID.dGain = this.config.rollPitchPID.dGain - this.config.rollPitchPID.dGainInc;
-    }
-
-    markStart() {
-        if (this.dataLog) {
-            fileSyatem.appendFileSync(this.dataLog, 'start --------------------------------------------------------------\n');
-        }
-    }
-
-    markEnd() {
-        if (this.dataLog) {
-            fileSyatem.appendFileSync(this.dataLog, 'end ---------------------------------------------------------------\n');
-        }
+        this.config.rollPitchPID.dGain -= this.config.rollPitchPID.dGainInc;
     }
 
     initHeading() {
@@ -194,7 +182,7 @@ export default class FlightController {
         const pid = `{${this.config.rollPitchPID.usePGain?'P':''}${this.config.rollPitchPID.useIGain?'I':''}${this.config.rollPitchPID.useDGain?'D':''}}`
         const ps = `b:${(powers.p2).toFixed(2)}, d:${(powers.p4).toFixed(2)}`;
         const fss = `roll:${this.signer((errors.rollError).toFixed(2))}, pitch:${this.signer((errors.pitchError).toFixed(2))}, yaw:${this.signer((errors.yawError).toFixed(2))}`;
-        const pids = `G:${(this.config.gain).toFixed(2)},pG:${(this.config.rollPitchPID.pGain).toFixed(2)},iG:${(this.config.rollPitchPID.iGain).toFixed(2)},dG:${(this.config.rollPitchPID.dGain).toFixed(2)}`
+        const pids = `G:${(this.config.rollPitchPID.gain).toFixed(2)},pG:${(this.config.rollPitchPID.pGain).toFixed(2)},iG:${(this.config.rollPitchPID.iGain).toFixed(2)},dG:${(this.config.rollPitchPID.dGain).toFixed(2)}`
         const bps = `P:${basePower}`;
         const tilts = `${this.targetFlightState.roll},${this.targetFlightState.pitch}`;
         const text = ` ${fss},${pids},${bps},${ps},${pid},${tilts}`;

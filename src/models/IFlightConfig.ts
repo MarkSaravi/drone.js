@@ -6,7 +6,6 @@ export default interface IFlightConfig {
     pitchPolarity: number;
     yawPolarity: number;
     minTakeOffPower: number,
-    gain: number;
     mRpm: number;
     bRpm: number;
     saveData: boolean;

@@ -109,14 +109,6 @@ export default class Application extends EventEmitter {
             this.flightController.decPower();
         });
 
-        this.on('mark-start', () => {
-            this.flightController.markStart();
-        });
-
-        this.on('mark-end', () => {
-            this.flightController.markEnd();
-        });
-
         this.on('toggle-p', () => {
             this.flightController.toggleP();
         });

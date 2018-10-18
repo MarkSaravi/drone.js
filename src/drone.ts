@@ -100,15 +100,6 @@ process.stdin.on('keypress', (str, key) => {
         case 'Z':
             app.emit('dec-power');
             break;
-        case 'g':
-        case 'G':
-            app.emit('mark-start');
-            break;
-
-        case 'h':
-        case 'H':
-            app.emit('mark-end');
-            break;
 
         case 'p':
         case 'P':
