@@ -20,13 +20,14 @@ export default class PIDController {
     }
 
     PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
-        const yawError = errors.pitchError;
-        const yawPID = this.yawControl.PID(yawError, errors.time, config.yawPID, basePower);
-        
-        const pitchError = this.convert(errors.pitchError);
-        const rollError = this.convert(errors.rollError);
-        const pitchPower = basePower;
-        const rollPower = basePower;
+        const yawError = errors.yawError;
+        const pitchError = errors.pitchError;
+        const rollError = errors.rollError;
+
+        const yawPID = this.yawControl.PID(yawError, errors.time, config.yawPID, basePower) * config.yawPID.gain;        
+        const pitchPower = basePower + yawPID;
+        const rollPower = basePower - yawPID;
+        process.stdout.write(`${yawError.toFixed(3)},${yawPID.toFixed(3)},${rollPower.toFixed(3)},${pitchPower.toFixed(3)}, `);
         const pitchPowers = this.pitchControl.PID(pitchPower, pitchError, errors.time, config.rollPitchPID);
         const rollPowers = this.rollControl.PID(rollPower, rollError, errors.time, config.rollPitchPID);
         
