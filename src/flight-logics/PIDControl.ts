@@ -43,7 +43,7 @@ export default class PIDControl {
         const is = (i).toFixed(2);
         const ds = (d).toFixed(2);
         const pids = `S:${this.fixLen(sums)},P:${this.fixLen(ps)},I:${this.fixLen(is)},D:${this.fixLen(ds)},dE:${this.fixLen(dError.toString())},t:${this.fixLen(t.toString())},dt:${this.fixLen((dt*1000000).toString())},`;
-        process.stdout.write(pids);
+        // process.stdout.write(pids);
     }
 
     PID(error: number, time: number, config: IPIDConfig, power: number): number {        

@@ -25,7 +25,7 @@ export default class FlightController {
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
     private readonly POWER_START: number = 40;
-    private readonly POWER_MAX: number = 55;
+    private readonly POWER_MAX: number = 80;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController(this.config);
@@ -164,7 +164,7 @@ export default class FlightController {
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
         this.imuDataPerSecond++;
         if (Date.now() - this.imuTimerStart >= 1000) {
-            console.log(`IMU Data Per Second: ${this.imuDataPerSecond}`);
+            // console.log(`IMU Data Per Second: ${this.imuDataPerSecond}`);
             this.imuTimerStart = Date.now();
             this.imuDataPerSecond = 0;
         }
@@ -198,7 +198,7 @@ export default class FlightController {
         const basePower = this.targetFlightState.power;
         this.powers = this.pidControl.PID(basePower, stateError, this.config);
         this.escCommand = this.createEscCommand(this.powers);
-        this.showState(this.powers, stateError, basePower);
+        // this.showState(this.powers, stateError, basePower);
         return this.escCommand
     }
 }
