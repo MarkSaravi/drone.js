@@ -7,7 +7,7 @@ import * as flightLogics from '../flight-logics';
 import { PIDController } from '../flight-logics';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
-import fileSyatem from 'fs';
+import { fixNum } from '../common';
 
 
 export default class FlightController {
@@ -174,22 +174,13 @@ export default class FlightController {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
     
-    signer(x: string): string {
-        return x[0] != '-' ? '+' + x : x;
-    }
-
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
-        const pid = `{${this.config.rollPitchPID.usePGain?'P':''}${this.config.rollPitchPID.useIGain?'I':''}${this.config.rollPitchPID.useDGain?'D':''}}`
-        const ps = `b:${(powers.p2).toFixed(2)}, d:${(powers.p4).toFixed(2)}`;
-        const fss = `roll:${this.signer((errors.rollError).toFixed(2))}, pitch:${this.signer((errors.pitchError).toFixed(2))}, yaw:${this.signer((errors.yawError).toFixed(2))}`;
-        const pids = `G:${(this.config.rollPitchPID.gain).toFixed(2)},pG:${(this.config.rollPitchPID.pGain).toFixed(2)},iG:${(this.config.rollPitchPID.iGain).toFixed(2)},dG:${(this.config.rollPitchPID.dGain).toFixed(2)}`
-        const bps = `P:${basePower}`;
-        const tilts = `${this.targetFlightState.roll},${this.targetFlightState.pitch}`;
-        const text = ` ${fss},${pids},${bps},${ps},${pid},${tilts}`;
+        const ps = `a:${fixNum(powers.p1, 5)} b:${fixNum(powers.p2, 5)} c:${fixNum(powers.p3, 5)} d:${fixNum(powers.p4, 5)}`;
+        const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
+        const pids = `gain:${(this.config.rollPitchPID.gain, 5)} pG:${(this.config.rollPitchPID.pGain, 5)} iG:${(this.config.rollPitchPID.iGain, 5)} dG:${(this.config.rollPitchPID.dGain, 5)}`
+        const bps = `power:${basePower}`;
+        const text = ` ${fss} ${pids} ${bps} ${ps}`;
 
-        if (this.dataLog) {
-            fileSyatem.appendFileSync(this.dataLog, text + '\n');
-        }
         process.stdout.write(`${text}\n`);
     }
 
@@ -198,7 +189,7 @@ export default class FlightController {
         const basePower = this.targetFlightState.power;
         this.powers = this.pidControl.PID(basePower, stateError, this.config);
         this.escCommand = this.createEscCommand(this.powers);
-        // this.showState(this.powers, stateError, basePower);
+        this.showState(this.powers, stateError, basePower);
         return this.escCommand
     }
 }

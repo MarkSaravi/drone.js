@@ -10,9 +10,9 @@ export default class PIDController {
     yawControl: PIDControl;
 
     constructor(private readonly config: IFlightConfig) {
-        this.rollControl = new TiltPIDControl();
-        this.pitchControl = new TiltPIDControl();
-        this.yawControl = new PIDControl();
+        this.rollControl = new TiltPIDControl('roll', true);
+        this.pitchControl = new TiltPIDControl('pitch', true);
+        this.yawControl = new PIDControl('yaw');
     }
 
     convert(x: number) {
@@ -27,7 +27,6 @@ export default class PIDController {
         const yawPID = this.yawControl.PID(yawError, errors.time, config.yawPID, basePower) * config.yawPID.gain;        
         const pitchPower = basePower + yawPID;
         const rollPower = basePower - yawPID;
-        // process.stdout.write(`${yawError.toFixed(3)},${yawPID.toFixed(3)},${rollPower.toFixed(3)},${pitchPower.toFixed(3)}, `);
         const pitchPowers = this.pitchControl.PID(pitchPower, pitchError, errors.time, config.rollPitchPID);
         const rollPowers = this.rollControl.PID(rollPower, rollError, errors.time, config.rollPitchPID);
         

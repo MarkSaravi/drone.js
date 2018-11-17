@@ -1,11 +1,14 @@
 import IPIDConfig from '../models/IPIDConfig';
+import { fixNum } from '../common';
 
 export default class PIDControl {
     integralSum: number = 0;
     prevError: number = 0;
     prevTime: number = 0;
 
-    constructor() {
+    constructor(
+        protected readonly name: string,
+        protected readonly displayData: boolean = false) {
     }
 
     P(error: number, config: IPIDConfig): number {
@@ -26,24 +29,11 @@ export default class PIDControl {
         return dError / dt * config.dGain * 10;
     }
 
-    fixLen(x: string): string {
-        let s = x;
-        while (s.length < 8) {
-            s = ' ' + s;
-        }
-        if (s.length > 8) {
-            s = s.substring(0, 8);
-        }
-        return s;
-    }
-
-    showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number) {
-        const sums = (sum).toFixed(2);
-        const ps = (p).toFixed(2);
-        const is = (i).toFixed(2);
-        const ds = (d).toFixed(2);
-        const pids = `S:${this.fixLen(sums)},P:${this.fixLen(ps)},I:${this.fixLen(is)},D:${this.fixLen(ds)},dE:${this.fixLen(dError.toString())},t:${this.fixLen(t.toString())},dt:${this.fixLen((dt*1000000).toString())},`;
-        // process.stdout.write(pids);
+    showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number, config: IPIDConfig) {
+        if (!this.displayData) return;
+        const pidname = `${this.name}(${config.usePGain?'P':'_'}${config.useIGain?'I':'_'}${config.useDGain?'D':'_'})`;
+        const pids = `${pidname} s:${fixNum(sum)} p:${fixNum(p)} i:${fixNum(i)} d:${fixNum(d)} de:${fixNum(dError)}`;
+        process.stdout.write(pids);
     }
 
     PID(error: number, time: number, config: IPIDConfig, power: number): number {        
@@ -57,7 +47,7 @@ export default class PIDControl {
         this.prevTime = time;
         this.prevError = error;        
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
-        // this.showStatus(sum * config.gain, p, i, d, dError, time, dt);
+        this.showStatus(sum * config.gain, p, i, d, dError, time, dt, config);
         return sum;
     }
 

@@ -2,12 +2,14 @@ import IPIDExtConfig from '../models/IPIDExtConfig';
 import PIDControl from './PIDControl';
 import IArPowers from '../models/IArmPowers';
 import * as flightLogics from './index';
+import { basename } from 'path';
 
 export default class TiltPIDControl {
     private pidControl: PIDControl;
 
-    constructor() {
-        this.pidControl = new PIDControl();
+    constructor(
+        name: string, displayData: boolean = false) {
+        this.pidControl = new PIDControl(name, displayData);
     }
 
     isPositveNumber = (x: number): number => {
