@@ -9,7 +9,7 @@ export default class PIDController {
     pitchControl: TiltPIDControl;
     yawControl: PIDControl;
 
-    constructor(private readonly config: IFlightConfig) {
+    constructor() {
         this.rollControl = new TiltPIDControl('roll', true);
         this.pitchControl = new TiltPIDControl('pitch', true);
         this.yawControl = new PIDControl('yaw');

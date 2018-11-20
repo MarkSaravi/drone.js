@@ -15,11 +15,11 @@ export default class PIDControl {
         return error * config.pGain;
     }
 
-    I(error: number, dt: number, config: IPIDConfig, power: number): number {
-        if (Math.abs(error) > config.iMaxAngle || power < config.iMinPower) {
-            this.integralSum = 0; 
-        }
-        
+    I(error: number, dt: number, config: IPIDConfig): number {
+        // if (Math.abs(error) > config.iMaxAngle || power < config.iMinPower) {
+        //     this.integralSum = 0; 
+        // }
+        if (dt==0 || dt > 100) return this.integralSum;
         this.integralSum += error * dt / 1000 * config.iGain;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
@@ -32,7 +32,7 @@ export default class PIDControl {
     showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number, config: IPIDConfig) {
         if (!this.displayData) return;
         const pidname = `${this.name}(${config.usePGain?'P':'_'}${config.useIGain?'I':'_'}${config.useDGain?'D':'_'})`;
-        const pids = `${pidname} s:${fixNum(sum)} p:${fixNum(p)} i:${fixNum(i)} d:${fixNum(d)} de:${fixNum(dError)}`;
+        const pids = `${pidname} s:${fixNum(sum)} p:${fixNum(p)} i:${fixNum(i)} d:${fixNum(d)} de:${fixNum(dError)} dt:${fixNum(dt)}`;
         process.stdout.write(pids);
     }
 
@@ -42,7 +42,7 @@ export default class PIDControl {
 
         const d = this.D(dError, dt, config);
         const p = this.P(error, config);
-        const i = this.I(error, dt, config, power);
+        const i = this.I(error, dt, config);
 
         this.prevTime = time;
         this.prevError = error;        

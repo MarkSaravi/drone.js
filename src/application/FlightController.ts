@@ -18,7 +18,6 @@ export default class FlightController {
     private imuTimerStart: number;
     private escCommand: string;
     private powers: IPowers;
-    private dataLog: string = null;
     private imuData: ImuData = null;
     private pitchTilt: number = 0;
     private rollTilt: number = 0;
@@ -28,7 +27,7 @@ export default class FlightController {
     private readonly POWER_MAX: number = 80;
 
     constructor(private config: IFlightConfig) {
-        this.pidControl = new PIDController(this.config);
+        this.pidControl = new PIDController();
         this.imuDataPerSecond = 0;
         this.imuTimerStart = Date.now();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
@@ -37,9 +36,6 @@ export default class FlightController {
             p1: 0, p2: 0, p3: 0, p4: 0
         };
         this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
-        if (this.config.saveData) {
-            this.dataLog = `/home/pi/drone.js/logs/${Date.now()}.flight.log`;
-        }
     }
 
     tiltForward() {
@@ -177,7 +173,7 @@ export default class FlightController {
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const ps = `a:${fixNum(powers.p1, 5)} b:${fixNum(powers.p2, 5)} c:${fixNum(powers.p3, 5)} d:${fixNum(powers.p4, 5)}`;
         const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
-        const pids = `gain:${(this.config.rollPitchPID.gain, 5)} pG:${(this.config.rollPitchPID.pGain, 5)} iG:${(this.config.rollPitchPID.iGain, 5)} dG:${(this.config.rollPitchPID.dGain, 5)}`
+        const pids = `gain:${fixNum(this.config.rollPitchPID.gain,6)} pG:${fixNum(this.config.rollPitchPID.pGain,6)} iG:${fixNum(this.config.rollPitchPID.iGain,6)} dG:${fixNum(this.config.rollPitchPID.dGain,6)}`
         const bps = `power:${basePower}`;
         const text = ` ${fss} ${pids} ${bps} ${ps}`;
 
