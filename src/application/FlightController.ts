@@ -183,7 +183,11 @@ export default class FlightController {
     calcMotorsPower() {
         let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
         const basePower = this.targetFlightState.power;
-        this.powers = this.pidControl.PID(basePower, stateError, this.config);
+        if (this.targetFlightState.power > 39) {
+            this.powers = this.pidControl.PID(basePower, stateError, this.config);
+        } else {
+            this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
+        }        
         this.escCommand = this.createEscCommand(this.powers);
         this.showState(this.powers, stateError, basePower);
         return this.escCommand
