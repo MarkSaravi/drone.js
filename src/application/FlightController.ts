@@ -23,8 +23,8 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_START: number = 40;
-    private readonly POWER_MAX: number = 80;
+    private readonly POWER_START: number = 75;
+    private readonly POWER_MAX: number = 95;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController();
@@ -36,6 +36,14 @@ export default class FlightController {
             p1: 0, p2: 0, p3: 0, p4: 0
         };
         this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
+    }
+
+    stop(): string {
+        console.log('stop *********************************************************************************************');
+        this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, 0));
+        this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
+        this.escCommand = this.createEscCommand(this.powers);
+        return this.escCommand;
     }
 
     tiltForward() {

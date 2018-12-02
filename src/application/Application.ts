@@ -123,6 +123,8 @@ export default class Application extends EventEmitter {
         });
 
         this.on('stopping-application', () => {
+            const escCommand = this.flightController.stop();
+            this.escDevice.write(escCommand);
             for (let d of this.devices) {
                 d.close();
             }
