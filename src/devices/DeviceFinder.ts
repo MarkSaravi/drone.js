@@ -18,43 +18,44 @@ export default class DeviceFinder extends EventEmitter {
 
     findDevices() {
         let portsInfo = portsConfig.dynamicports;
-        let portCounter: number = -1;
-        let infoCounter: number = 0;
-        let detectedList: PortInfo[] = [];
+        this.emit('devices-ready', portsInfo);
+        // let portCounter: number = -1;
+        // let infoCounter: number = 0;
+        // let detectedList: PortInfo[] = [];
 
-        this.on('port-closed',(info: PortClosedInfo) => {
-            if (info.found) {
-                console.log(`${info.name} is ${info.type}`);
-                detectedList.push({ name: info.name, type: info.type, baudRate: info.baudRate, pattern: ''});
-                portCounter = -1;
-                infoCounter++;
-            }
-            portCounter++;
-            if (portCounter == 10) {
-                portCounter = 0;
-                infoCounter++;
-            }
-            if (infoCounter >= portsInfo.length) {
-                let devices:PortInfo[] =  detectedList;
-                for (let d of portsConfig.staticports) {
-                    devices.push(d);
-                }
-                this.emit('devices-ready', devices);
-            } else {
-                let searchPortName = portsInfo[infoCounter].name + portCounter;
-                if (detectedList.filter(i => i.name == searchPortName).length > 0) {
-                    this.emit('port-closed', false, '', 0, '');
-                } else {
-                    this.findDevice(searchPortName,
-                        portsInfo[infoCounter].baudRate,
-                        portsInfo[infoCounter].type,
-                        portsInfo[infoCounter].pattern
-                    );
-                }
-            }
-        });
+        // this.on('port-closed',(info: PortClosedInfo) => {
+        //     if (info.found) {
+        //         console.log(`${info.name} is ${info.type}`);
+        //         detectedList.push({ name: info.name, type: info.type, baudRate: info.baudRate, pattern: ''});
+        //         portCounter = -1;
+        //         infoCounter++;
+        //     }
+        //     portCounter++;
+        //     if (portCounter == 10) {
+        //         portCounter = 0;
+        //         infoCounter++;
+        //     }
+        //     if (infoCounter >= portsInfo.length) {
+        //         let devices:PortInfo[] =  detectedList;
+        //         for (let d of portsConfig.staticports) {
+        //             devices.push(d);
+        //         }
+        //         this.emit('devices-ready', devices);
+        //     } else {
+        //         let searchPortName = portsInfo[infoCounter].name + portCounter;
+        //         if (detectedList.filter(i => i.name == searchPortName).length > 0) {
+        //             this.emit('port-closed', false, '', 0, '');
+        //         } else {
+        //             this.findDevice(searchPortName,
+        //                 portsInfo[infoCounter].baudRate,
+        //                 portsInfo[infoCounter].type,
+        //                 portsInfo[infoCounter].pattern
+        //             );
+        //         }
+        //     }
+        // });
 
-        this.emit('port-closed', false, '' ,0 , '');
+        // this.emit('port-closed', false, '' ,0 , '');
     }
 
     findDevice(portName: string, baudRate: number, portType: string, pattern: string) {
