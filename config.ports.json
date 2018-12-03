@@ -1,20 +1,26 @@
 {
     "dynamicports": [{
-            "name": "/dev/ttyUSB",
+            "name": "/dev/ttyACM0",
             "baudRate": 115200,
             "type": "imu",
-            "pattern": "pitch"
+            "pattern": "{\"r\":"
         },
         {
-            "name": "/dev/ttyUSB",
+            "name": "/dev/ttyUSB0",
             "baudRate": 115200,
             "type": "esc",
             "pattern": "esc"
+        },
+        {
+          "name": "/dev/ttyACM1",
+          "baudRate":115200,
+          "type": "ble",
+          "pattern":"none"
         }
     ],
     "staticports": [{
-        "name": "/dev/serial0",
-        "baudRate": 9600,
+        "name": "/dev/ttyACM1",
+        "baudRate": 115200,
         "type": "ble",
         "pattern": "none"
     }]

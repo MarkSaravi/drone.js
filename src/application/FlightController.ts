@@ -21,7 +21,7 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_START: number = 75;
+    private readonly POWER_START: number = 65;
     private readonly POWER_MAX: number = 95;
 
     constructor(private config: IFlightConfig) {
