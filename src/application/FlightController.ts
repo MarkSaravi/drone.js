@@ -21,7 +21,7 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_START: number = 65;
+    private readonly POWER_START: number = 55;
     private readonly POWER_MAX: number = 95;
 
     constructor(private config: IFlightConfig) {
@@ -169,6 +169,7 @@ export default class FlightController {
 
     createEscCommand(p: IPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
+        // return `{"a":0,"b":${(p.p2).toFixed(3)},"c":0,"d":${(p.p4).toFixed(3)}}`;
     }
     
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
