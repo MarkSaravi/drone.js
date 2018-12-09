@@ -28,7 +28,10 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
-        const imuData = convertors.JsonToImuData(imuJson, this.config.rollPolarity, this.config.pitchPolarity);
+        const imuData = convertors.JsonToImuData(
+            imuJson, this.config.rollPolarity,
+            this.config.pitchPolarity,
+            this.config.yawPolarity);
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
