@@ -16,6 +16,9 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
+        if (dt > 0.05) {
+            dt = 0.5;
+        } 
         if (Math.abs(error) > config.iMaxAngle) {
             if (error * this.integralSum > 0 ) {
                 this.integralSum = 0;
