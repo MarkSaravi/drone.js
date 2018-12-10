@@ -141,16 +141,11 @@ export default class FlightController {
         this.targetFlightState = convertors.CommandToFlightStatus(command);
     }
 
-    noiseRemover(value: number): number {
-        // return Math.round(value * 10) / 10;
-        return value;
-    }
-
     applyImuData(rawImuData: ImuData) {
         this.imuData = {
-            roll: this.noiseRemover(rawImuData.roll),
-            pitch: this.noiseRemover(rawImuData.pitch),
-            yaw: this.noiseRemover(rawImuData.yaw),
+            roll: rawImuData.roll,
+            pitch: rawImuData.pitch,
+            yaw: rawImuData.yaw,
             time: rawImuData.time
         };
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
@@ -161,10 +156,9 @@ export default class FlightController {
 
     createEscCommand(p: IPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
-        // return `{"a":0,"b":${(p.p2).toFixed(3)},"c":0,"d":${(p.p4).toFixed(3)}}`;
     }
     
-    showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
+    showStatus(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const ps = `a:${fixNum(powers.p1, 5)} b:${fixNum(powers.p2, 5)} c:${fixNum(powers.p3, 5)} d:${fixNum(powers.p4, 5)}`;
         const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
         const pids = `pG:${fixNum(this.config.rollPitchPID.pGain,6)} iG:${fixNum(this.config.rollPitchPID.iGain,6)} dG:${fixNum(this.config.rollPitchPID.dGain,6)}`
@@ -183,7 +177,7 @@ export default class FlightController {
             this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
         }        
         this.escCommand = this.createEscCommand(this.powers);
-        this.showState(this.powers, stateError, basePower);
+        this.showStatus(this.powers, stateError, basePower);
         return this.escCommand
     }
 }

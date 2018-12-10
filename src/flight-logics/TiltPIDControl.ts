@@ -1,8 +1,6 @@
-import IPIDExtConfig from '../models/IPIDExtConfig';
 import PIDControl from './PIDControl';
 import IArPowers from '../models/IArmPowers';
-import * as flightLogics from './index';
-import { basename } from 'path';
+import IPIDConfig from '../models/IPIDConfig';
 
 export default class TiltPIDControl {
     private pidControl: PIDControl;
@@ -12,7 +10,7 @@ export default class TiltPIDControl {
         this.pidControl = new PIDControl(name, displayData);
     }
     
-    PID(basePower: number, error: number, time: number, config: IPIDExtConfig): IArPowers {
+    PID(basePower: number, error: number, time: number, config: IPIDConfig): IArPowers {
         const torque = this.pidControl.PID(error, time, config, basePower);
         const rotorsSpeeds = {front:  basePower - torque, back: basePower + torque };
         return rotorsSpeeds;

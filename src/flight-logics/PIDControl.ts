@@ -16,6 +16,15 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
+        if (Math.abs(error) > config.iMaxAngle) {
+            if (error * this.integralSum > 0 ) {
+                this.integralSum = 0;
+            }
+            return this.integralSum;
+        }
+        if (Math.abs(this.integralSum) > config.iMaxValue) {
+            return this.integralSum;
+        }
         this.integralSum += error * dt * config.iGain;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
@@ -27,12 +36,12 @@ export default class PIDControl {
 
     showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number, config: IPIDConfig) {
         if (!this.displayData) return;
-        const pidname = `${this.name}(${config.usePGain?'P':'_'}${config.useIGain?'I':'_'}${config.useDGain?'D':'_'})`;
+        const pidname = `${this.name}(${config.usePGain ? 'P' : '_'}${config.useIGain ? 'I' : '_'}${config.useDGain ? 'D' : '_'})`;
         const pids = `${pidname} s:${fixNum(sum)} p:${fixNum(p)} i:${fixNum(i)} d:${fixNum(d)} de:${fixNum(dError)} dt:${fixNum(dt)}`;
         process.stdout.write(pids);
     }
 
-    PID(error: number, time: number, config: IPIDConfig, power: number): number {        
+    PID(error: number, time: number, config: IPIDConfig, power: number): number {
         const dt = (time - this.prevTime); //convert to milliseconds
         const dError = error - this.prevError;
 
@@ -41,9 +50,9 @@ export default class PIDControl {
         const i = this.I(error, dt, config);
 
         this.prevTime = time;
-        this.prevError = error;        
+        this.prevError = error;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
-        // this.showStatus(sum * config.gain, p, i, d, dError, time, dt, config);
+        this.showStatus(sum, p, i, d, dError, time, dt, config);
         return sum;
     }
 

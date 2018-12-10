@@ -1,7 +1,8 @@
 {
 	"rollPolarity": 1,
 	"pitchPolarity": 1,
-	"yawPolarity": 1,
+    "yawPolarity": 1,
+    "maxAngle": 30,
     "rollPitchPID": {
         "gain": 0.1,
         "pGain": 70,
@@ -14,9 +15,7 @@
         "iGainInc": 0.1,
         "dGainInc": 10,
         "iMaxValue": 500,
-        "iMaxAngle": 10,
-        "iMinPower": 45,
-        "maxAngle": 45
+        "iMaxAngle": 10
     },
 	"yawPID": {
 		"gain": 0.1,
@@ -30,7 +29,6 @@
         "iGainInc": 0.1,
         "dGainInc": 1,
         "iMaxValue": 500,
-        "iMaxAngle": 10,
-        "iMinPower": 45 
+        "iMaxAngle": 10
     }
 }
