@@ -16,17 +16,14 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        if (Math.abs(error)<=config.iMinAngle) {
-            return this.integralSum;
-        }
-        if (dt==0 || dt > 100) return this.integralSum;
-        this.integralSum += error * dt / 1000 * config.iGain;
+        if (dt > 100) return this.integralSum;
+        this.integralSum += error * dt * config.iGain;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
     }
 
     D(dError: number, dt: number, config: IPIDConfig): number {
-        return dError / dt * config.dGain * 10;
+        return dError / dt * config.dGain;
     }
 
     showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number, config: IPIDConfig) {
