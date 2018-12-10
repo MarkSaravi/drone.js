@@ -16,7 +16,6 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        if (dt > 100) return this.integralSum;
         this.integralSum += error * dt * config.iGain;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
@@ -44,7 +43,7 @@ export default class PIDControl {
         this.prevTime = time;
         this.prevError = error;        
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
-        this.showStatus(sum * config.gain, p, i, d, dError, time, dt, config);
+        // this.showStatus(sum * config.gain, p, i, d, dError, time, dt, config);
         return sum;
     }
 

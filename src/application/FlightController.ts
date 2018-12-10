@@ -95,14 +95,6 @@ export default class FlightController {
         this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
     }
 
-    incGain() {
-        this.config.rollPitchPID.gain += this.config.rollPitchPID.gainInc;
-    }
-
-    decGain() {
-        this.config.rollPitchPID.gain -= this.config.rollPitchPID.gainInc;
-    }
-
     incIGain() {
         this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
     }
@@ -175,7 +167,7 @@ export default class FlightController {
     showState(powers: IPowers, errors: IFlightStateError, basePower: number) {
         const ps = `a:${fixNum(powers.p1, 5)} b:${fixNum(powers.p2, 5)} c:${fixNum(powers.p3, 5)} d:${fixNum(powers.p4, 5)}`;
         const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
-        const pids = `gain:${fixNum(this.config.rollPitchPID.gain,6)} pG:${fixNum(this.config.rollPitchPID.pGain,6)} iG:${fixNum(this.config.rollPitchPID.iGain,6)} dG:${fixNum(this.config.rollPitchPID.dGain,6)}`
+        const pids = `pG:${fixNum(this.config.rollPitchPID.pGain,6)} iG:${fixNum(this.config.rollPitchPID.iGain,6)} dG:${fixNum(this.config.rollPitchPID.dGain,6)}`
         const bps = `power:${basePower}`;
         const text = ` ${fss} ${pids} ${bps} ${ps}`;
 

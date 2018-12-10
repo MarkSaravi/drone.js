@@ -24,7 +24,7 @@ export default class PIDController {
         const pitchError = errors.pitchError;
         const rollError = errors.rollError;
 
-        const yawPID = this.yawControl.PID(yawError, errors.time, config.yawPID, basePower) * config.yawPID.gain;        
+        const yawPID = this.yawControl.PID(yawError, errors.time, config.yawPID, basePower);        
         const pitchPower = basePower + yawPID;
         const rollPower = basePower - yawPID;
         const pitchPowers = this.pitchControl.PID(pitchPower, pitchError, errors.time, config.rollPitchPID);

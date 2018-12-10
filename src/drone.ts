@@ -62,12 +62,6 @@ process.stdin.on('keypress', (str, key) => {
             app.emit('stopping-application');
             break;
 
-        case '=':
-            app.emit('inc-gain');
-            break;
-        case '-':
-            app.emit('dec-gain');
-            break;
         case ']':
             app.emit('inc-p-gain');
             break;
