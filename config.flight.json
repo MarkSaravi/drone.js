@@ -5,16 +5,16 @@
 	"maxAngle": 30,
 	"rollPitchPID": {
 		"pGain": 1,
-		"iGain": 0.02,
-		"dGain": 0.25,
+		"iGain": 2.5,
+		"dGain": 0.2,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
 		"pGainInc": 0.1,
 		"iGainInc": 0.001,
 		"dGainInc": 0.001,
-		"iMaxValue": 10,
-		"iMaxAngle": 5
+		"iMaxValue": 5,
+		"iMaxAngle": 10
 	},
 	"yawPID": {
 		"pGain": 0,
