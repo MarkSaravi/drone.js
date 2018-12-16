@@ -14,7 +14,7 @@ export default function getStateError(target: FlightState, actual: FlightState, 
     let error = {
         rollError: maxAngle(rollError, config.maxAngle),
         pitchError: maxAngle(pitchError, config.maxAngle),
-        yawError,
+        yawError: maxAngle(yawError, config.maxAngle),
         time: actual.time
     };
     return error;

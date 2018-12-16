@@ -135,10 +135,7 @@ export default class Application extends EventEmitter {
             process.exit(0);
         });
 
-        this.on('devices-ready', (configs: PortInfo[]) => {
-            for (let c of configs) {
-                console.log(`${c.type}: ${c.name}, ${c.baudRate}`);
-            }
+        this.on('start-application', (configs: PortInfo[]) => {
             this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => {});
             this.escDevice = this.openDevice('esc', configs, (s) => { }, () => {});
             this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { this.onBleOpen(); });
@@ -149,6 +146,7 @@ export default class Application extends EventEmitter {
         dataEventCallback: (data: string) => void,
         openEventCallback: () => void): SerialDevice {
         let config = configs.filter(d => d.type == type)[0];
+        console.log(`Opening ${type}: ${JSON.stringify(config)}`);
         const device: SerialDevice = new SerialDevice(type, config.name, config.baudRate);
         device.open();
         device.registerOpenEvent(openEventCallback);
