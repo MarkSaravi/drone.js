@@ -3,8 +3,9 @@ import IFlightStateError from '../models/IFlightStateError';
 import IFlightConfig from '../models/IFlightConfig';
 
 const maxAngle = (x: number, max: number) => {
-    if (Math.abs(x) <= max) return x;
-    return max * Math.sign(x);
+    // if (Math.abs(x) <= max) return x;
+    // return max * Math.sign(x);
+    return x;
 }
 
 export default function getStateError(target: FlightState, actual: FlightState, config: IFlightConfig): IFlightStateError {

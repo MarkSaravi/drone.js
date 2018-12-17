@@ -41,16 +41,6 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
 bool isArmed = false;
 
-void sendDeviceType()
-{
-    static long lastIdentifier = millis();
-    if (millis() - lastIdentifier >= 500)
-    {
-        lastIdentifier = millis();
-        Serial.println("{\"dev\":\"esc\"}");
-    }
-}
-
 void initSpeeds()
 {
     for (int i = 0; i < NUM_MOTORS; i++)
@@ -128,7 +118,6 @@ void waitForBatteryState(bool connected)
     long lastMessage = millis();
     while (isBatteryConnected() != connected) //making sure that ESC is not armed already
     {
-        sendDeviceType();
         if (millis() - lastMessage > 2000)
         {
             lastMessage = millis();
@@ -197,7 +186,6 @@ void readCommand()
         if (cmdJson[counter] == '}')
         {
             cmdJson[counter + 1] = NULL;
-            Serial.println(cmdJson);
             err = readJson(cmdJson, &a, &b, &c, &d);
             if (err == NoError)
             {
@@ -223,7 +211,6 @@ void readCommand()
 
 void loop()
 {
-    sendDeviceType();
     if (!isBatteryConnected())
         isArmed = false;
     if (isArmed)

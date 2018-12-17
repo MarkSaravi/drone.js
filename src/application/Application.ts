@@ -38,6 +38,10 @@ export default class Application extends EventEmitter {
         this.escDevice.write(escCommand);
     }
 
+    onEscData(escString: string) {
+        console.log(escString);
+    }
+
     onBleOpen() {
         console.log(`BLE is connected.`);
     }
@@ -137,7 +141,7 @@ export default class Application extends EventEmitter {
 
         this.on('start-application', (configs: PortInfo[]) => {
             this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => {});
-            this.escDevice = this.openDevice('esc', configs, (s) => { }, () => {});
+            this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => {} );
             this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { this.onBleOpen(); });
         });
     }
