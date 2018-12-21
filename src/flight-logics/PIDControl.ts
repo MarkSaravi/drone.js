@@ -17,19 +17,12 @@ export default class PIDControl {
 
     I(error: number, dt: number, config: IPIDConfig): number {
         if (dt > 0.05) {
-            dt = 0.5;
+            dt = 0
         } 
-        if (Math.abs(error) > config.iMaxAngle) {
-            if (error * this.integralSum > 0 ) {
-                this.integralSum = 0;
-            }
-            return this.integralSum;
-        }
-        if (Math.abs(this.integralSum) > config.iMaxValue) {
-            return this.integralSum;
-        }
-        this.integralSum += error * dt * config.iGain;
-        this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ? this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
+        this.integralSum += 
+            Math.abs(this.integralSum) < config.iMaxValue && 
+            Math.abs(error) < config.iMaxAngle ? 
+            error * dt * config.iGain: 0;
         return this.integralSum;
     }
 
