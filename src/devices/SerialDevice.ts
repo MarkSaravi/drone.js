@@ -20,14 +20,14 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         });
     }
 
-    write(data: string): void {
+    write(data: string, writeEndHandler: ()=>void): void {
         this.port.write(data, function(err) {
             if (err) {
               return console.log('Error on write: ', err.message);
             }
-            //console.log('message written');
+            writeEndHandler();
           });
-        //console.log(`Writing: ${data}`);
+        console.log(`Writing: ${data}`);
     }
 
     onData(data: any[]) {

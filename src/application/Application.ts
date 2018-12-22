@@ -35,15 +35,12 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
-        this.escDevice.write(escCommand);
+        this.escDevice.write(escCommand, () =>{
+            console.log('Command sent...');
+        });
     }
 
     onEscData(escString: string) {
-        console.log(escString);
-    }
-
-    onBleOpen() {
-        console.log(`BLE is connected.`);
     }
 
     onBleData(bleJson: string) {
@@ -124,7 +121,9 @@ export default class Application extends EventEmitter {
 
         this.on('stopping-application', () => {
             const escCommand = this.flightController.stop();
-            this.escDevice.write(escCommand);
+            this.escDevice.write(escCommand, () => {
+                console.log('Closing the ports...');
+            });
             for (let d of this.devices) {
                 d.close();
             }
@@ -136,13 +135,14 @@ export default class Application extends EventEmitter {
                     return;
                 }
             }
+            console.log('All ports are closed');
             process.exit(0);
         });
 
         this.on('start-application', (configs: PortInfo[]) => {
-            this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => {});
-            this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => {} );
-            this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { this.onBleOpen(); });
+            this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => { console.log('IMU is connected'); });
+            this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => { console.log('ESC is connected'); });
+            this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { console.log('BLE is connected'); });
         });
     }
 
