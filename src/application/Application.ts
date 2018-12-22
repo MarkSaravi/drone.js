@@ -1,7 +1,7 @@
 ///<reference path="../../node_modules/@types/node/index.d.ts" />
 import { EventEmitter } from 'events';
 const readline = require('readline');
-import { IPortsConfig } from '../models/PortConfig';
+import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const flightConfig: IFlightConfig = require('config.json')('./config.flight.json');
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
@@ -29,19 +29,18 @@ export default class Application extends EventEmitter {
         this.registerConsoleCommands(); 
         this.openDevices();
         this.registerEvents();
-        
     }
 
-    initDevice(name: string, portId: string, baudRate: number, onDataHandler: (data: string)=>void) {
+    initDevice(config: IPortConfig, onDataHandler: (data: string)=>void) {
         const Readline = SerialPort.parsers.Readline;
-        const port = new SerialPort(portId, { baudRate, autoOpen: false });
+        const port = new SerialPort(config.name, { baudRate: config.baudRate, autoOpen: false });
         port.on('open', () => {
             this.deviceCounter++;
-            console.log(`${name} is opened.`);
+            console.log(`${config.type} is opened.`);
             port.flush();
         })
         port.on('close', () => {
-            console.log(`${name} is closed.`);
+            console.log(`${config.type} is closed.`);
             this.deviceCounter--;
             this.emit('exit-application');
         })
@@ -56,53 +55,9 @@ export default class Application extends EventEmitter {
 
     openDevices() {
         console.log('trying to open port...');
-        this.imu = this.initDevice('IMU', '/dev/ttyACM0', 115200, this.onImuData);
-        this.esc = this.initDevice('ESC', '/dev/ttyACM1', 115200, this.onEscData);
-        this.ble = this.initDevice('BLE', '/dev/ttyACM2', 115200, this.onBleData);
-        // const Readline = SerialPort.parsers.Readline
-        // this.imu = new SerialPort('/dev/ttyACM0', { baudRate: 115200, autoOpen: false }, function (status: any) {
-        //     console.log(`Port open status: ${status}`);
-        // });
-        // this.imu.on('open', () => {
-        //     this.deviceCounter++;
-        //     console.log('Port is opened');
-        //     this.imu.flush();
-        // })
-        // this.imu.on('close', () => {
-        //     console.log('Port is closed');
-        //     this.deviceCounter--;
-        //     if (this.deviceCounter == 0) {
-        //         this.emit('exit-application');
-        //     }
-        //     process.exit(0);
-        // })
-        // this.imu.open();
-        // const parser = new Readline()
-        // this.imu.pipe(parser)
-        // parser.on('data', (data: string)=>{
-        //     console.log(`**** ${data} ----`);
-        // });
-        
-        
-
-        // this.imu = new SerialDevice(portsConfig.imu);
-        // this.esc = new SerialDevice(portsConfig.esc);
-        // this.ble = new SerialDevice(portsConfig.ble);
-        // this.imu.open(()=>{}, ()=>{});
-        // this.esc.open(()=>{}, ()=>{});
-        // this.ble.open(()=>{}, ()=>{});
-
-        // process.nextTick(()=>{ 
-        //     this.iimu = new Serial({portId: '/dev/ttyACM0', baudRate: 115200});
-        //     console.log('opening this.imu...');
-        //     this.iimu.open(() => {
-        //         this.emit('imu-data', 'this.imu is open');
-        //         this.iimu.on('data', (data: string) => {
-        //             this.emit('imu-data', data);
-        //         });
-        //       this.iimu.write('Hello from raspi-serial');
-        //     });
-        // });
+        this.imu = this.initDevice(portsConfig.imu, this.onImuData);
+        this.esc = this.initDevice(portsConfig.esc, this.onEscData);
+        this.ble = this.initDevice(portsConfig.ble, this.onBleData);
     }
 
     registerConsoleCommands() { 
