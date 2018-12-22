@@ -1,10 +1,10 @@
 ///<reference path="../../node_modules/@types/serialport/index.d.ts" />
 import ISerialDevice from './ISerialDevice';
-import SerialPort from 'serialport';
+import { Serial } from 'raspi-serial';
 import { EventEmitter } from 'events';
 
 export default class SerialDevice extends EventEmitter implements ISerialDevice {
-    port: SerialPort;
+    serial: Serial;
     buffer:any[]=[];
     isopen: boolean = false;
     deviceName: string;
@@ -14,20 +14,18 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         super();
         this.deviceName = deviceName;
         this.portName = portName;
-        this.port = new SerialPort(portName, {
-            baudRate: baudRate,
-            autoOpen: false
-        });
+        this.serial = new Serial({portId: portName, baudRate});
     }
 
     write(data: string, writeEndHandler: ()=>void): void {
-        this.port.write(data, function(err) {
-            if (err) {
-              return console.log('Error on write: ', err.message);
-            }
-            writeEndHandler();
-          });
-        console.log(`Writing: ${data}`);
+        this.serial.write(data);
+        // this.port.write(data, function(err) {
+        //     if (err) {
+        //       return console.log('Error on write: ', err.message);
+        //     }
+        //     writeEndHandler();
+        //   });
+        // console.log(`Writing: ${data}`);
     }
 
     onData(data: any[]) {
@@ -50,29 +48,32 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
     }
 
     open() {
-        this.port.on('open', () => {
+        this.serial.open();
+
+        this.serial.on('open', () => {
             this.isopen = true;
             this.emit('open');
         });
 
-        this.port.on('close', () => {
+        this.serial.on('close', () => {
             this.isopen = false;
             console.log(`${this.deviceName} on ${this.portName} is closed`);
             this.emit('close');
         });
-        this.port.on('data', (data) => {
+
+        this.serial.on('data', (data) => {
             this.onData(data);
         });
 
-        this.port.open((err) => {
-            if (err) {
-                console.error(`Faile to open ${this.portName}. ${err}`);
-            }
-        });
+        // this.port.open((err) => {
+        //     if (err) {
+        //         console.error(`Faile to open ${this.portName}. ${err}`);
+        //     }
+        // });
     }
 
     close() {
-        this.port.close();
+        this.serial.close();
     }
 
     registerCloseEvent(callback: () => void){
