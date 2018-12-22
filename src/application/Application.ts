@@ -11,7 +11,6 @@ import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 
-
 export default class Application extends EventEmitter {
     imu: any;
     esc: ISerialDevice;
@@ -28,7 +27,7 @@ export default class Application extends EventEmitter {
 
     startApp() {
         console.log('starting the application');
-        
+        this.registerConsoleCommands(); 
         this.openDevices();
         // this.registerEvents();
         
@@ -46,11 +45,17 @@ export default class Application extends EventEmitter {
         })
         this.imu.on('close', () => {
             console.log('Port is closed');
+            process.exit(0);
         })
         this.imu.open();
         const parser = new Readline()
         this.imu.pipe(parser)
-        parser.on('data', console.log)
+        parser.on('data', (data: string)=>{
+            console.log(`**** ${data} ----`);
+        });
+        
+        
+
         // this.imu = new SerialDevice(portsConfig.imu);
         // this.esc = new SerialDevice(portsConfig.esc);
         // this.ble = new SerialDevice(portsConfig.ble);
@@ -72,10 +77,8 @@ export default class Application extends EventEmitter {
     }
 
     registerConsoleCommands() { 
-        const readline = require('readline');
         readline.emitKeypressEvents(process.stdin);    
         process.stdin.setRawMode(true);
-         
         process.stdin.on('keypress', (str, key) => {
             // switch (key.sequence) {
             //     case '\u001b[A':
@@ -154,6 +157,10 @@ export default class Application extends EventEmitter {
                 //     break;
             }
         });
+        setInterval(()=>{
+            process.stdin.resume();
+        },5);
+        process.stdin.pause();
     }
     
     registerEvents() {
