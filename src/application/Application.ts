@@ -6,15 +6,14 @@ const flightConfig: IFlightConfig = require('config.json')('./config.flight.json
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
 import ISerialDevice from '../devices/ISerialDevice';
-// import SerialDevice from '../devices/SerialDevice';
 import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 
 export default class Application extends EventEmitter {
     imu: any;
-    esc: ISerialDevice;
-    ble: ISerialDevice;
+    esc: any;
+    ble: any;
     flightConfig: IFlightConfig;
     deviceCounter: number = 0;
 
@@ -33,31 +32,56 @@ export default class Application extends EventEmitter {
         
     }
 
+    initDevice(name: string, portId: string, baudRate: number, onDataHandler: (data: string)=>void) {
+        const Readline = SerialPort.parsers.Readline;
+        const port = new SerialPort(portId, { baudRate, autoOpen: false });
+        port.on('open', () => {
+            this.deviceCounter++;
+            console.log(`${name} is opened.`);
+            port.flush();
+        })
+        port.on('close', () => {
+            console.log(`${name} is closed.`);
+            this.deviceCounter--;
+            this.emit('exit-application');
+        })
+        port.open();
+        const parser = new Readline()
+        port.pipe(parser)
+        parser.on('data', (str: string)=>{
+            onDataHandler(str);
+        });
+        return port;
+   }
+
     openDevices() {
         console.log('trying to open port...');
-        const Readline = SerialPort.parsers.Readline
-        this.imu = new SerialPort('/dev/ttyACM0', { baudRate: 115200, autoOpen: false }, function (status: any) {
-            console.log(`Port open status: ${status}`);
-        });
-        this.imu.on('open', () => {
-            this.deviceCounter++;
-            console.log('Port is opened');
-            this.imu.flush();
-        })
-        this.imu.on('close', () => {
-            console.log('Port is closed');
-            this.deviceCounter--;
-            if (this.deviceCounter == 0) {
-                this.emit('exit-application');
-            }
-            process.exit(0);
-        })
-        this.imu.open();
-        const parser = new Readline()
-        this.imu.pipe(parser)
-        parser.on('data', (data: string)=>{
-            console.log(`**** ${data} ----`);
-        });
+        this.imu = this.initDevice('IMU', '/dev/ttyACM0', 115200, this.onImuData);
+        this.esc = this.initDevice('ESC', '/dev/ttyACM1', 115200, this.onEscData);
+        this.ble = this.initDevice('BLE', '/dev/ttyACM2', 115200, this.onBleData);
+        // const Readline = SerialPort.parsers.Readline
+        // this.imu = new SerialPort('/dev/ttyACM0', { baudRate: 115200, autoOpen: false }, function (status: any) {
+        //     console.log(`Port open status: ${status}`);
+        // });
+        // this.imu.on('open', () => {
+        //     this.deviceCounter++;
+        //     console.log('Port is opened');
+        //     this.imu.flush();
+        // })
+        // this.imu.on('close', () => {
+        //     console.log('Port is closed');
+        //     this.deviceCounter--;
+        //     if (this.deviceCounter == 0) {
+        //         this.emit('exit-application');
+        //     }
+        //     process.exit(0);
+        // })
+        // this.imu.open();
+        // const parser = new Readline()
+        // this.imu.pipe(parser)
+        // parser.on('data', (data: string)=>{
+        //     console.log(`**** ${data} ----`);
+        // });
         
         
 
@@ -85,27 +109,6 @@ export default class Application extends EventEmitter {
         readline.emitKeypressEvents(process.stdin);    
         process.stdin.setRawMode(true);
         process.stdin.on('keypress', (str, key) => {
-            // switch (key.sequence) {
-            //     case '\u001b[A':
-            //         app.emit('tilt-forward');
-            //         // Up
-            //         break;
-    
-            //     case '\u001b[B':
-            //         app.emit('tilt-backward');
-            //         // Down
-            //         break;
-    
-            //     case '\u001b[C':
-            //         app.emit('tilt-right');
-            //         // Right
-            //         break;
-    
-            //     case '\u001b[D':
-            //         app.emit('tilt-left');
-            //         // Left
-            //         break;
-            // }
             switch (str) {
                 case 'q':
                 case 'Q':
@@ -252,11 +255,12 @@ export default class Application extends EventEmitter {
         this.on('close-devices', () => {
             console.log('Closing devices.');
             this.imu.close();
+            this.esc.close();
+            this.ble.close();
         });
 
         this.on('exit-application', () => {
             if (this.deviceCounter != 0) {
-                console.log('waiting for devices to be closed.');
                 return;
             }
             console.log('exiting application');
@@ -274,13 +278,15 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
-        const imuData = convertors.JsonToImuData(
-            imuJson, this.flightConfig.rollPolarity,
-            this.flightConfig.pitchPolarity,
-            this.flightConfig.yawPolarity);
-        this.flightController.applyImuData(imuData);
+        console.log(JSON.stringify(imuJson));
+        // const imuData = convertors.JsonToImuData(
+        //     imuJson, this.flightConfig.rollPolarity,
+        //     this.flightConfig.pitchPolarity,
+        //     this.flightConfig.yawPolarity);
+        // console.log(JSON.stringify(imuData));
+        // this.flightController.applyImuData(imuData);
 
-        const escCommand = this.flightController.calcMotorsPower();
+        // const escCommand = this.flightController.calcMotorsPower();
         // this.escDevice.write(escCommand, () => {
         //     console.log('Command sent...');
         // });
@@ -291,9 +297,9 @@ export default class Application extends EventEmitter {
 
     onBleData(bleJson: string) {
         // {"x":0,"y":-3,"h":0,"p":42.5}
-        console.log(bleJson);
-        const cmd = convertors.JsonToCommand(bleJson);
-        this.flightController.applyCommand(cmd);
+        // console.log(bleJson);
+        // const cmd = convertors.JsonToCommand(bleJson);
+        // this.flightController.applyCommand(cmd);
     }
 
     // openDevice(type: string, configs: PortInfo[],
