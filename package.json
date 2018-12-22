@@ -15,15 +15,16 @@
         "build-copy": "npm run build && npm run zip && npm run copy",
         "run-drone": "node ./dist/drone.js",
         "unzip-start": "npm run clean && npm run unzip && npm run run-drone",
+        "build-start": "npm run build && npm run run-drone",
         "start": "npm run run-drone",
         "build-test": "npm run build && npm run test",
         "test": "node ./dist/tests/test.js"
     },
     "dependencies": {
         "@types/node": "^10.5.3",
-        "@types/serialport": "^6.0.4",
         "config.json": "0.0.4",
         "gaussian-elimination": "^1.0.2",
+        "raspi": "^5.1.0",
         "raspi-serial": "^5.1.0"
     },
     "devDependencies": {

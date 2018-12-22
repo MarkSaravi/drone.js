@@ -1,5 +1,6 @@
 ///<reference path="../../node_modules/@types/node/index.d.ts" />
 import { EventEmitter } from 'events';
+const readline = require('readline');
 import PortInfo from '../models/PortInfo';
 import ISerialDevice from '../devices/ISerialDevice';
 import SerialDevice from '../devices/SerialDevice';
@@ -20,6 +21,96 @@ export default class Application extends EventEmitter {
         super();
     }
 
+    startApp() {
+        console.log('starting the application');
+        this.registerConsoleCommands();
+        this.registerEvents();
+    }
+
+    registerConsoleCommands() {
+        readline.emitKeypressEvents(process.stdin);
+        process.stdin.setRawMode(true);
+
+        process.stdin.on('keypress', (str, key) => {
+            // switch (key.sequence) {
+            //     case '\u001b[A':
+            //         app.emit('tilt-forward');
+            //         // Up
+            //         break;
+
+            //     case '\u001b[B':
+            //         app.emit('tilt-backward');
+            //         // Down
+            //         break;
+
+            //     case '\u001b[C':
+            //         app.emit('tilt-right');
+            //         // Right
+            //         break;
+
+            //     case '\u001b[D':
+            //         app.emit('tilt-left');
+            //         // Left
+            //         break;
+            // }
+            switch (str) {
+                case 'q':
+                case 'Q':
+                    console.log('exiting application');
+                    this.emit('exit-application');
+                    break;
+
+                // case ']':
+                //     this.emit('inc-p-gain');
+                //     break;
+                // case '[':
+                //     this.emit('dec-p-gain');
+                //     break;
+
+                // case '\'':
+                //     this.emit('inc-i-gain');
+                //     break;
+                // case ';':
+                //     this.emit('dec-i-gain');
+                //     break;
+
+                // case 'l':
+                // case 'L':
+                //     this.emit('inc-d-gain');
+                //     break;
+                // case 'k':
+                // case 'K':
+                //     this.emit('dec-d-gain');
+                //     break;
+
+                // case 'a':
+                // case 'A':
+                //     this.emit('inc-power');
+                //     break;
+
+                // case 'z':
+                // case 'Z':
+                //     this.emit('dec-power');
+                //     break;
+
+                // case 'p':
+                // case 'P':
+                //     this.emit('toggle-p');
+                //     break;
+
+                // case 'i':
+                // case 'I':
+                //     this.emit('toggle-i');
+                //     break;
+
+                // case 'd':
+                // case 'D':
+                //     this.emit('toggle-d');
+                //     break;
+            }
+        });
+    }
+
     start() {
         this.registerEvents();
     }
@@ -35,7 +126,7 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
-        this.escDevice.write(escCommand, () =>{
+        this.escDevice.write(escCommand, () => {
             console.log('Command sent...');
         });
     }
@@ -136,6 +227,11 @@ export default class Application extends EventEmitter {
                 }
             }
             console.log('All ports are closed');
+            process.exit(0);
+        });
+
+        this.on('exit-application', () => {
+            console.log('exiting...');
             process.exit(0);
         });
 

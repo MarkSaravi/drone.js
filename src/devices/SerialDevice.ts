@@ -1,4 +1,3 @@
-///<reference path="../../node_modules/@types/serialport/index.d.ts" />
 import ISerialDevice from './ISerialDevice';
 import { Serial } from 'raspi-serial';
 import { EventEmitter } from 'events';
