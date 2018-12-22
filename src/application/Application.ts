@@ -16,7 +16,7 @@ export default class Application extends EventEmitter {
     esc: ISerialDevice;
     ble: ISerialDevice;
     flightConfig: IFlightConfig;
-    imuCounter: number = 0;
+    deviceCounter: number = 0;
 
     devices: ISerialDevice[] = [];
 
@@ -29,7 +29,7 @@ export default class Application extends EventEmitter {
         console.log('starting the application');
         this.registerConsoleCommands(); 
         this.openDevices();
-        // this.registerEvents();
+        this.registerEvents();
         
     }
 
@@ -40,11 +40,16 @@ export default class Application extends EventEmitter {
             console.log(`Port open status: ${status}`);
         });
         this.imu.on('open', () => {
+            this.deviceCounter++;
             console.log('Port is opened');
             this.imu.flush();
         })
         this.imu.on('close', () => {
             console.log('Port is closed');
+            this.deviceCounter--;
+            if (this.deviceCounter == 0) {
+                this.emit('exit-application');
+            }
             process.exit(0);
         })
         this.imu.open();
@@ -104,9 +109,7 @@ export default class Application extends EventEmitter {
             switch (str) {
                 case 'q':
                 case 'Q':
-                    console.log('exiting application');
-                    this.imu.close();
-                    
+                    this.emit('close-devices');
                     break;
                 // case ']':
                 //     this.emit('inc-p-gain');
@@ -232,30 +235,32 @@ export default class Application extends EventEmitter {
             this.flightController.toggleD();
         });
 
-        this.on('stopping-application', () => {
-            const escCommand = this.flightController.stop();
-            // this.escDevice.write(escCommand, () => {
-            //     console.log('Closing the ports...');
-            // });
-            for (let d of this.devices) {
-                // d.close();
-            }
-        });
-
-        this.on('stop-application', () => {
-            for (let d of this.devices) {
-            }
-            console.log('All ports are closed');
-            process.exit(0);
-        });
+        // this.on('stopping-application', () => {
+        //     const escCommand = this.flightController.stop();
+        //     // this.escDevice.write(escCommand, () => {
+        //     //     console.log('Closing the ports...');
+        //     // });
+        //     for (let d of this.devices) {
+        //         // d.close();
+        //     }
+        // });
 
         this.on('imu-data', data => {
             console.log(`imu data: ${data}`);
         });
 
+        this.on('close-devices', () => {
+            console.log('Closing devices.');
+            this.imu.close();
+        });
+
         this.on('exit-application', () => {
-            this.closeDevices();
-            console.log('exiting...');
+            if (this.deviceCounter != 0) {
+                console.log('waiting for devices to be closed.');
+                return;
+            }
+            console.log('exiting application');
+            process.exit(0);
         });
 
         // this.on('start-application', (configs: PortInfo[]) => {
@@ -263,14 +268,6 @@ export default class Application extends EventEmitter {
         //     this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => { console.log('ESC is connected'); });
         //     this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { console.log('BLE is connected'); });
         // });
-    }
-
-    closeDevices() {
-        // this.imu.close();
-        // this.esc.close();
-        // this.ble.close();
-        // console.log(this.imu);
-        this.imu.close();
     }
 
     writeBLE(s: string): void {
