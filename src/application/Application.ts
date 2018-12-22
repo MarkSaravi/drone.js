@@ -5,7 +5,6 @@ import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const flightConfig: IFlightConfig = require('config.json')('./config.flight.json');
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
-import ISerialDevice from '../devices/ISerialDevice';
 import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
@@ -16,9 +15,7 @@ export default class Application extends EventEmitter {
     ble: any;
     flightConfig: IFlightConfig;
     deviceCounter: number = 0;
-
-    devices: ISerialDevice[] = [];
-
+    
     constructor(private readonly flightController: FlightController) {
         super();
         this.flightConfig = flightConfig;
