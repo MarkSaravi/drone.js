@@ -1,18 +1,17 @@
 {
-    "ports": [{
-            "name": "/dev/ttyACM0",
-            "baudRate": 115200,
-            "type": "imu"
-        },
-        {
-            "name": "/dev/ttyACM1",
-            "baudRate": 115200,
-            "type": "esc"
-        },
-        {
-          "name": "/dev/ttyACM2",
-          "baudRate":115200,
-          "type": "ble"
-        }
-    ]
+	"imu": {
+		"name": "/dev/ttyACM0",
+		"baudRate": 115200,
+		"type": "imu"
+	},
+	"esc": {
+		"name": "/dev/ttyACM1",
+		"baudRate": 115200,
+		"type": "esc"
+	},
+	"ble": {
+		"name": "/dev/ttyACM2",
+		"baudRate": 115200,
+		"type": "ble"
+	}
 }

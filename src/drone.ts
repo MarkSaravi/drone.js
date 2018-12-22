@@ -1,14 +1,14 @@
 ///<reference path="../node_modules/@types/node/index.d.ts" />
 import Application from './application/Application';
-import FlightController from './application/FlightController';
+// import FlightController from './application/FlightController';
 // const readline = require('readline');
 import IFlightConfig from './models/IFlightConfig';
-const config: IFlightConfig = require('config.json')('./config.flight.json');
+// const config: IFlightConfig = require('config.json')('./config.flight.json');
 // const portsConfig = require('config.json')('./config.ports.json');
 
 
-const flightControl = new FlightController(config);
-let app = new Application(flightControl, config);
+// const flightControl = new FlightController(config);
+let app = new Application(null);
 
 // app.on('ble-send', (s) => {
 //     app.writeBLE(s);

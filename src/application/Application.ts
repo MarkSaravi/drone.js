@@ -1,7 +1,10 @@
 ///<reference path="../../node_modules/@types/node/index.d.ts" />
 import { EventEmitter } from 'events';
 const readline = require('readline');
-import PortInfo from '../models/PortInfo';
+import { IPortsConfig } from '../models/PortConfig';
+const flightConfig: IFlightConfig = require('config.json')('./config.flight.json');
+const portsConfig: IPortsConfig = require('config.json')('./config.port.json');
+
 import ISerialDevice from '../devices/ISerialDevice';
 import SerialDevice from '../devices/SerialDevice';
 import FlightController from './FlightController';
@@ -9,16 +12,17 @@ import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 
 export default class Application extends EventEmitter {
-    imuDevice: ISerialDevice;
-    escDevice: ISerialDevice;
-    bleDevice: ISerialDevice;
+    imu: ISerialDevice;
+    esc: ISerialDevice;
+    ble: ISerialDevice;
+    flightConfig: IFlightConfig;
     imuCounter: number = 0;
 
     devices: ISerialDevice[] = [];
 
-    constructor(private readonly flightController: FlightController,
-        private config: IFlightConfig) {
+    constructor(private readonly flightController: FlightController) {
         super();
+        this.flightConfig = flightConfig;
     }
 
     startApp() {
@@ -111,36 +115,6 @@ export default class Application extends EventEmitter {
         });
     }
 
-    start() {
-        this.registerEvents();
-    }
-
-    writeBLE(s: string): void {
-    }
-
-    onImuData(imuJson: string) {
-        const imuData = convertors.JsonToImuData(
-            imuJson, this.config.rollPolarity,
-            this.config.pitchPolarity,
-            this.config.yawPolarity);
-        this.flightController.applyImuData(imuData);
-
-        const escCommand = this.flightController.calcMotorsPower();
-        this.escDevice.write(escCommand, () => {
-            console.log('Command sent...');
-        });
-    }
-
-    onEscData(escString: string) {
-    }
-
-    onBleData(bleJson: string) {
-        // {"x":0,"y":-3,"h":0,"p":42.5}
-        console.log(bleJson);
-        const cmd = convertors.JsonToCommand(bleJson);
-        this.flightController.applyCommand(cmd);
-    }
-
     registerEvents() {
         this.on('tilt-forward', () => {
             this.flightController.tiltForward();
@@ -212,11 +186,11 @@ export default class Application extends EventEmitter {
 
         this.on('stopping-application', () => {
             const escCommand = this.flightController.stop();
-            this.escDevice.write(escCommand, () => {
-                console.log('Closing the ports...');
-            });
+            // this.escDevice.write(escCommand, () => {
+            //     console.log('Closing the ports...');
+            // });
             for (let d of this.devices) {
-                d.close();
+                // d.close();
             }
         });
 
@@ -235,26 +209,61 @@ export default class Application extends EventEmitter {
             process.exit(0);
         });
 
-        this.on('start-application', (configs: PortInfo[]) => {
-            this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => { console.log('IMU is connected'); });
-            this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => { console.log('ESC is connected'); });
-            this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { console.log('BLE is connected'); });
-        });
+        // this.on('start-application', (configs: PortInfo[]) => {
+        //     this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => { console.log('IMU is connected'); });
+        //     this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => { console.log('ESC is connected'); });
+        //     this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { console.log('BLE is connected'); });
+        // });
     }
 
-    openDevice(type: string, configs: PortInfo[],
-        dataEventCallback: (data: string) => void,
-        openEventCallback: () => void): SerialDevice {
-        let config = configs.filter(d => d.type == type)[0];
-        console.log(`Opening ${type}: ${JSON.stringify(config)}`);
-        const device: SerialDevice = new SerialDevice(type, config.name, config.baudRate);
-        device.open();
-        device.registerOpenEvent(openEventCallback);
-        device.registerCloseEvent(() => {
-            this.emit('stop-application');
-        });
-        device.registerDataEvent(dataEventCallback);
-        this.devices.push(device);
-        return device;
+    openDevices() {
+        this.imu = new SerialDevice(portsConfig.imu);
+        this.esc = new SerialDevice(portsConfig.esc);
+        this.ble = new SerialDevice(portsConfig.ble);
+        // this.imuDevice = this.openDevice('imu', configs, (s) => { this.onImuData(s); }, () => { console.log('IMU is connected'); });
+        // this.escDevice = this.openDevice('esc', configs, (s) => { this.onEscData(s); }, () => { console.log('ESC is connected'); });
+        // this.bleDevice = this.openDevice('ble', configs, (s) => { this.onBleData(s); }, () => { console.log('BLE is connected'); });
     }
+
+    writeBLE(s: string): void {
+    }
+
+    onImuData(imuJson: string) {
+        const imuData = convertors.JsonToImuData(
+            imuJson, this.flightConfig.rollPolarity,
+            this.flightConfig.pitchPolarity,
+            this.flightConfig.yawPolarity);
+        this.flightController.applyImuData(imuData);
+
+        const escCommand = this.flightController.calcMotorsPower();
+        // this.escDevice.write(escCommand, () => {
+        //     console.log('Command sent...');
+        // });
+    }
+
+    onEscData(escString: string) {
+    }
+
+    onBleData(bleJson: string) {
+        // {"x":0,"y":-3,"h":0,"p":42.5}
+        console.log(bleJson);
+        const cmd = convertors.JsonToCommand(bleJson);
+        this.flightController.applyCommand(cmd);
+    }
+
+    // openDevice(type: string, configs: PortInfo[],
+    //     dataEventCallback: (data: string) => void,
+    //     openEventCallback: () => void): SerialDevice {
+    //     let config = configs.filter(d => d.type == type)[0];
+    //     console.log(`Opening ${type}: ${JSON.stringify(config)}`);
+    //     const device: SerialDevice = new SerialDevice(type, config.name, config.baudRate);
+    //     // device.open();
+    //     // device.registerOpenEvent(openEventCallback);
+    //     device.registerCloseEvent(() => {
+    //         this.emit('stop-application');
+    //     });
+    //     device.registerDataEvent(dataEventCallback);
+    //     this.devices.push(device);
+    //     return device;
+    // }
 }

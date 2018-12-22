@@ -1,23 +1,22 @@
+import { IPortConfig } from '../models/PortConfig';
 import ISerialDevice from './ISerialDevice';
 import { Serial } from 'raspi-serial';
 import { EventEmitter } from 'events';
 
 export default class SerialDevice extends EventEmitter implements ISerialDevice {
     serial: Serial;
-    buffer:any[]=[];
+    buffer: any[] = [];
     isopen: boolean = false;
-    deviceName: string;
-    portName: string;
 
-    constructor(deviceName: string, portName: string, baudRate: number) {
+    constructor(private readonly config: IPortConfig) {
         super();
-        this.deviceName = deviceName;
-        this.portName = portName;
-        this.serial = new Serial({portId: portName, baudRate});
     }
 
-    write(data: string, writeEndHandler: ()=>void): void {
-        this.serial.write(data);
+    write(data: string, callback: () => void): void {
+        if (this.isopen) {
+            this.serial.write(data);
+        }
+
         // this.port.write(data, function(err) {
         //     if (err) {
         //       return console.log('Error on write: ', err.message);
@@ -46,23 +45,35 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
         return this.isopen;
     }
 
-    open() {
-        this.serial.open();
-
-        this.serial.on('open', () => {
+    open(onData: () => void, onClose: () => void) {
+        this.serial = new Serial({ portId: this.config.name, baudRate: this.config.baudRate });
+        this.serial.open(() => {
             this.isopen = true;
-            this.emit('open');
+            console.log(`${this.config.type} is open.`);
+            // this.serial.on('data', (data) => {
+            //     this.onData(data);
+            // });
+            this.serial.on('close', () => {
+                this.isopen = false;
+                console.log(`${this.config.type} is closed.`);
+            });
         });
 
-        this.serial.on('close', () => {
-            this.isopen = false;
-            console.log(`${this.deviceName} on ${this.portName} is closed`);
-            this.emit('close');
-        });
 
-        this.serial.on('data', (data) => {
-            this.onData(data);
-        });
+        // this.serial.on('open', () => {
+        //     this.isopen = true;
+        //     this.emit('open');
+        // });
+
+        // this.serial.on('close', () => {
+        //     this.isopen = false;
+        //     console.log(`${this.deviceName} on ${this.portName} is closed`);
+        //     this.emit('close');
+        // });
+
+        // this.serial.on('data', (data) => {
+        //     this.onData(data);
+        // });
 
         // this.port.open((err) => {
         //     if (err) {
@@ -73,17 +84,5 @@ export default class SerialDevice extends EventEmitter implements ISerialDevice 
 
     close() {
         this.serial.close();
-    }
-
-    registerCloseEvent(callback: () => void){
-        this.on('close', callback);
-    }
-
-    registerDataEvent(callback: (data: string) => void){
-        this.on('data', callback);
-    }
-
-    registerOpenEvent(callback: () => void){
-        this.on('open', callback);
     }
 }
