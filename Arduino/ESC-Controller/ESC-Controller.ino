@@ -104,6 +104,7 @@ bool waitForArming(int armingTime)
     long start = millis();
     while (millis() - start < armingTime)
     {
+        clearInputBuffer();
         if (!isBatteryConnected())
         {
             Serial.println("{\"info\":\"abort arming\"}");
@@ -118,6 +119,7 @@ void waitForBatteryState(bool connected)
     long lastMessage = millis();
     while (isBatteryConnected() != connected) //making sure that ESC is not armed already
     {
+        clearInputBuffer();
         if (millis() - lastMessage > 2000)
         {
             lastMessage = millis();
@@ -148,15 +150,16 @@ void arm()
         if (waitForArming(10000))
         {
             Serial.println("{\"info\":\"end arming\"}");
-            clearInputBuffer();
             isArmed = true;
         }
     }
+    clearInputBuffer();
 }
 
 bool isBatteryConnected()
 {
     float inputVoltage = analogRead(BATTERY_PIN) * 5.0 / 1023;
+    // Serial.println(inputVoltage);
     return inputVoltage > 3.0;
 }
 
