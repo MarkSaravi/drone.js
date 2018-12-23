@@ -237,7 +237,7 @@ export default class Application extends EventEmitter {
 
         const escCommand = this.flightController.calcMotorsPower();
         if (this.esc.isOpen) {
-            // this.esc.write(escCommand);
+            this.esc.write(escCommand);
         }
     }
 
