@@ -204,10 +204,6 @@ export default class Application extends EventEmitter {
             this.flightController.toggleD();
         });
 
-        this.on('imu-data', data => {
-            console.log(`imu data: ${data}`);
-        });
-
         this.on('close-devices', () => {
             console.log('Closing devices.');
             this.imu.close();
