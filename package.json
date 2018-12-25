@@ -19,10 +19,7 @@
         "start": "npm run run-drone",
         "build-test": "npm run build && npm run test",
         "test": "node ./dist/tests/test.js",
-        "test-device": "npm run clean && npm run unzip && node ./dist/tests/device-test.js",
-        "test-imu": "device=imu && npm run test-device",
-        "test-esc": "device=esc && npm run test-device",
-        "test-ble": "device=ble && npm run test-device"
+        "test-device": "npm run clean && npm run unzip && node ./dist/tests/device-test.js"
     },
     "dependencies": {
         "@types/node": "^10.5.3",

@@ -1,16 +1,16 @@
 {
 	"imu": {
-		"name": "/dev/ttyACM0",
+		"name": "/dev/ttyIMU",
 		"baudRate": 115200,
 		"type": "imu"
 	},
 	"esc": {
-		"name": "/dev/ttyACM1",
+		"name": "/dev/ttyESC",
 		"baudRate": 115200,
 		"type": "esc"
 	},
 	"ble": {
-		"name": "/dev/ttyACM2",
+		"name": "/dev/ttyBLE",
 		"baudRate": 115200,
 		"type": "ble"
 	}

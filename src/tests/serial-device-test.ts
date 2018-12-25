@@ -44,8 +44,18 @@ export default class SerialDeviceReader extends EventEmitter {
     }
 
     openDevices() {
-        console.log('trying to open port...');
-        this.serial = this.initDevice(portsConfig.imu, 'data-serial');
+        console.log(`trying to open port ${process.env["PORT_NAME"]}`);
+        switch (process.env["PORT_NAME"]) {
+            case 'imu':
+                this.serial = this.initDevice(portsConfig.imu, 'data-serial');
+                break;
+            case 'esc':
+                this.serial = this.initDevice(portsConfig.esc, 'data-serial');
+                break;
+            case 'ble':
+                this.serial = this.initDevice(portsConfig.ble, 'data-serial');
+                break;
+        }
     }
 
     registerConsoleCommands() {
