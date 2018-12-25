@@ -1,0 +1,3 @@
+SUBSYSTEM=="tty", ATTRS{devpath}=="1.4",  SYMLINK+="ttyIMU"
+SUBSYSTEM=="tty", ATTRS{devpath}=="1.5",  SYMLINK+="ttyESC"
+SUBSYSTEM=="tty", ATTRS{devpath}=="1.3",  SYMLINK+="ttyBLE"
