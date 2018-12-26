@@ -15,7 +15,6 @@ export default class Application extends EventEmitter {
     ble: any;
     flightConfig: IFlightConfig;
     flightController: FlightController;
-    deviceCounter: number = 0;
 
     constructor() {
         super();
@@ -30,18 +29,16 @@ export default class Application extends EventEmitter {
         this.registerEvents();
     }
 
-    initDevice(config: IPortConfig, event: string) {
+    initDevice(config: IPortConfig, event: string, onClose: () => void) {
         const Readline = SerialPort.parsers.Readline;
         const port = new SerialPort(config.name, { baudRate: config.baudRate, autoOpen: false });
         port.on('open', () => {
-            this.deviceCounter++;
             console.log(`${config.type} is opened.`);
             port.flush();
         })
         port.on('close', () => {
             console.log(`${config.type} is closed.`);
-            this.deviceCounter--;
-            this.emit('exit-application');
+            onClose();
         })
         port.open();
         const parser = new Readline()
@@ -54,9 +51,19 @@ export default class Application extends EventEmitter {
 
     openDevices() {
         console.log('trying to open port...');
-        this.imu = this.initDevice(portsConfig.imu, 'data-imu');
-        this.esc = this.initDevice(portsConfig.esc, 'data-esc');
-        this.ble = this.initDevice(portsConfig.ble, 'data-ble');
+        this.imu = this.initDevice(portsConfig.imu, 'data-imu', 
+            () => { 
+                console.log("turning off the motors.");
+                this.esc.write("{\"a\":0,\"b\":0,\"c\":0,\"d\":0}",()=> {
+                    this.esc.close(); 
+                })
+            });
+        this.esc = this.initDevice(portsConfig.esc, 'data-esc', 
+            () => {
+                console.log("exiting the application");
+                process.exit(0);
+            } );
+        this.ble = this.initDevice(portsConfig.ble, 'data-ble', () => {} );
     }
 
     registerConsoleCommands() {
@@ -66,7 +73,9 @@ export default class Application extends EventEmitter {
             switch (str) {
                 case 'q':
                 case 'Q':
-                    this.emit('close-devices');
+                    console.log('Closing devices.');
+                    this.imu.close();
+                    this.ble.close();
                     break;
                 case ']':
                     this.emit('inc-p-gain');
@@ -203,21 +212,6 @@ export default class Application extends EventEmitter {
         this.on('toggle-d', () => {
             this.flightController.toggleD();
         });
-
-        this.on('close-devices', () => {
-            console.log('Closing devices.');
-            this.imu.close();
-            this.esc.close();
-            this.ble.close();
-        });
-
-        this.on('exit-application', () => {
-            if (this.deviceCounter != 0) {
-                return;
-            }
-            console.log('exiting application');
-            process.exit(0);
-        });
     }
 
     writeBLE(s: string): void {
@@ -232,9 +226,7 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
-        if (this.esc.isOpen) {
-            this.esc.write(escCommand);
-        }
+        this.esc.write(escCommand);
     }
 
     onEscData(escString: string) {
