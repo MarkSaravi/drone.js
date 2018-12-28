@@ -5,6 +5,7 @@ export default class PIDControl {
     integralSum: number = 0;
     prevError: number = 0;
     prevTime: number = 0;
+    iCounter: number = 0;
 
     constructor(
         protected readonly name: string,
@@ -18,11 +19,23 @@ export default class PIDControl {
     I(error: number, dt: number, config: IPIDConfig): number {
         if (dt > 0.05) {
             dt = 0
-        } 
+        }
+        // reset integral sum if it is opposit to tilt direction
+        if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
+            this.iCounter++;
+        } else {
+            this.iCounter = 0;
+        }
+        if (this.iCounter > 10) {
+            this.integralSum = 0;
+            console.log('reset I -------------------------------------------------------------------------');
+        }
+
         this.integralSum += 
-            Math.abs(this.integralSum) < config.iMaxValue && 
-            Math.abs(error) < config.iMaxAngle ? 
-            error * dt * config.iGain: 0;
+            (Math.abs(this.integralSum) > config.iMaxValue && this.integralSum * error > 0) ||
+            Math.abs(error) > config.iMaxAngle ||
+            Math.abs(error) < config.iMinAngle ? 
+            0: error * dt * config.iGain;
         return this.integralSum;
     }
 
