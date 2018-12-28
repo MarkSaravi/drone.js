@@ -4,8 +4,8 @@
 	"yawPolarity": 1,
 	"maxAngle": 30,
 	"rollPitchPID": {
-		"pGain": 0.2,
-		"iGain": 0.225,
+		"pGain": 0.75,
+		"iGain": 0.5,
 		"dGain": 0.1,
 		"usePGain": true,
 		"useIGain": true,
