@@ -21,13 +21,13 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_START: number = 60;
+    private readonly POWER_START: number = 50;
     private readonly POWER_MAX: number = 90;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
-        this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
+        this.targetFlightState = new FlightState(0, 0, NaN, 0, 0);
         this.powers = {
             p1: 0, p2: 0, p3: 0, p4: 0
         };
@@ -149,6 +149,9 @@ export default class FlightController {
             time: rawImuData.time
         };
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
+        if (isNaN(this.targetFlightState.yaw)) {
+            this.targetFlightState = new FlightState(0, 0, this.actualFlightState.yaw, 0, 0);
+        }
         if (Math.abs( this.actualFlightState.roll)>30 || Math.abs(this.actualFlightState.pitch)>30) {
             this.stop();
         }
