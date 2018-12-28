@@ -21,8 +21,8 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_START: number = 45;
-    private readonly POWER_MAX: number = 95;
+    private readonly POWER_START: number = 60;
+    private readonly POWER_MAX: number = 90;
 
     constructor(private config: IFlightConfig) {
         this.pidControl = new PIDController();
