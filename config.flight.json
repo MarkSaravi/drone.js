@@ -14,7 +14,8 @@
 		"iGainInc": 0.001,
 		"dGainInc": 0.001,
 		"iMaxValue": 5,
-		"iMaxAngle": 10
+		"iMaxAngle": 10,
+		"iMinAngle": 0.2
 	},
 	"yawPID": {
 		"pGain": 0,
@@ -27,6 +28,7 @@
 		"iGainInc": 0,
 		"dGainInc": 0,
 		"iMaxValue": 0,
-		"iMaxAngle": 0
+		"iMaxAngle": 0,
+		"iMinAngle": 0
 	}
 }

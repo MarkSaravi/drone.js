@@ -10,4 +10,5 @@ export default interface IPIDConfig {
     dGainInc: number;
     iMaxValue: number;
     iMaxAngle: number;
+    iMinAngle: number;
 } 
