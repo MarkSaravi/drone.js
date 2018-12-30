@@ -10,9 +10,9 @@
 		"d": true
 	},
 	"rollPitchPID": {
-		"pGain": 0.75,
-		"iGain": 0.5,
-		"dGain": 0.1,
+		"pGain": 0.25,
+		"iGain": 0.25,
+		"dGain": 0.113,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
