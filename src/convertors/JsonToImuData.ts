@@ -1,12 +1,16 @@
 import ImuData from '../models/ImuData';
 
-export default function(
+export default function (
     json: string,
-    rollPolarity: number, 
-    pitchPolarity: number, 
+    rollPolarity: number,
+    pitchPolarity: number,
     yawPolarity: number): ImuData {
-    let r = JSON.parse(json);
-    return new ImuData(r.r * rollPolarity, r.p * pitchPolarity, r.y * yawPolarity, r.t);
+    try {
+        let r = JSON.parse(json);
+        return new ImuData(r.r * rollPolarity, r.p * pitchPolarity, r.y * yawPolarity, r.t);
+    } catch (err) {
+        return null;
+    }
 }
 
 

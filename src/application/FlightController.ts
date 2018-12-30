@@ -179,7 +179,12 @@ export default class FlightController {
         } else {
             this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
         }        
-        this.escCommand = this.createEscCommand(this.powers);
+        this.escCommand = this.createEscCommand({
+            p1: this.config.motors.a? this.powers.p1: 0,
+            p2: this.config.motors.b? this.powers.p2: 0,
+            p3: this.config.motors.c? this.powers.p3: 0,
+            p4: this.config.motors.d? this.powers.p4: 0,
+        });
         this.showStatus(this.powers, stateError, basePower);
         return this.escCommand
     }

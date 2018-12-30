@@ -223,6 +223,9 @@ export default class Application extends EventEmitter {
             this.flightConfig.pitchPolarity,
             this.flightConfig.yawPolarity);
         // console.log(JSON.stringify(imuData));
+        if (!imuData) {
+            return;
+        }
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();

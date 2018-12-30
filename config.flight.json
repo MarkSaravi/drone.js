@@ -3,6 +3,12 @@
 	"pitchPolarity": 1,
 	"yawPolarity": 1,
 	"maxAngle": 30,
+	"motors": {
+		"a": true,
+		"b": true,
+		"c": true,
+		"d": true
+	},
 	"rollPitchPID": {
 		"pGain": 0.75,
 		"iGain": 0.5,
