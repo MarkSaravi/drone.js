@@ -162,14 +162,13 @@ export default class FlightController {
     }
     
     showStatus(powers: IPowers, errors: IFlightStateError, basePower: number) {
-        const ps = `a:${fixNum(powers.p1, 4)} b:${fixNum(powers.p2, 4)} c:${fixNum(powers.p3, 4)} d:${fixNum(powers.p4, 4)}`;
+        // const ps = `a:${fixNum(powers.p1, 4)} b:${fixNum(powers.p2, 4)} c:${fixNum(powers.p3, 4)} d:${fixNum(powers.p4, 4)}`;
         const fss = `rpw:${fixNum(errors.rollError, 6)},${fixNum(errors.pitchError, 6)},${fixNum(errors.yawError, 6)}`;
         // const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
         const pids = `pidG:${fixNum(this.config.rollPitchPID.pGain,6)},${fixNum(this.config.rollPitchPID.iGain,6)},${fixNum(this.config.rollPitchPID.dGain,6)}`
         const bps = `pow:${basePower}`;
-        const text = ` ${fss} ${pids} ${bps} ${ps}`;
-
-        process.stdout.write(`${text}\n`);
+        const text = ` ${fss} ${pids} ${bps}`;
+        process.stdout.write(`${text}`);
     }
 
     calcMotorsPower() {

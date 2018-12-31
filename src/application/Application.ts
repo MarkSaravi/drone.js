@@ -8,6 +8,7 @@ const SerialPort = require('serialport');
 import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
+import { fixNum } from '../common';
 
 export default class Application extends EventEmitter {
     imu: any;
@@ -15,6 +16,7 @@ export default class Application extends EventEmitter {
     ble: any;
     flightConfig: IFlightConfig;
     flightController: FlightController;
+    motorsIdle: boolean = false;
 
     constructor() {
         super();
@@ -51,19 +53,37 @@ export default class Application extends EventEmitter {
 
     openDevices() {
         console.log('trying to open port...');
-        this.imu = this.initDevice(portsConfig.imu, 'data-imu', 
-            () => { 
-                console.log("turning off the motors.");
-                this.esc.write("{\"a\":0,\"b\":0,\"c\":0,\"d\":0}",()=> {
-                    this.esc.close(); 
-                })
-            });
-        this.esc = this.initDevice(portsConfig.esc, 'data-esc', 
+        this.imu = this.initDevice(portsConfig.imu, 'data-imu',
+            () => { });
+        this.esc = this.initDevice(portsConfig.esc, 'data-esc',
             () => {
                 console.log("exiting the application");
                 process.exit(0);
-            } );
-        this.ble = this.initDevice(portsConfig.ble, 'data-ble', () => {} );
+            });
+        this.ble = this.initDevice(portsConfig.ble, 'data-ble', () => { });
+    }
+
+    terminateApplication(terminate: boolean) {
+        this.motorsIdle = true;
+        const escCommand = "{\"a\":0,\"b\":0,\"c\":0,\"d\":0}";
+        this.esc.write(escCommand, () => {
+            process.stdout.write(`Stopping all motors: ${escCommand}\n`);
+            if (terminate) {
+                this.esc.close();
+            }
+        });
+        if (terminate) {
+            this.imu.close();
+            this.ble.close();
+        }
+    }
+
+    activateMotors(activate: boolean) {
+        if (activate) {
+            this.motorsIdle = false;
+        } else {
+            this.terminateApplication(false);
+        }
     }
 
     registerConsoleCommands() {
@@ -71,11 +91,20 @@ export default class Application extends EventEmitter {
         process.stdin.setRawMode(true);
         process.stdin.on('keypress', (str, key) => {
             switch (str) {
+                case 's':
+                case 'S':
+                    if (this.motorsIdle) {
+                        console.log('Starting motors.');
+                        this.activateMotors(true);
+                    } else {
+                        console.log('Stopping motors.');
+                        this.activateMotors(false);
+                    }
+                    break;
                 case 'q':
                 case 'Q':
                     console.log('Closing devices.');
-                    this.imu.close();
-                    this.ble.close();
+                    this.terminateApplication(true);
                     break;
                 case ']':
                     this.emit('inc-p-gain');
@@ -218,6 +247,9 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
+        if (this.motorsIdle) {
+            return;
+        }
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
@@ -229,7 +261,10 @@ export default class Application extends EventEmitter {
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();
-        this.esc.write(escCommand);
+        this.esc.write(escCommand, () => {
+            // const ps = `a:${fixNum(escCommand.p1, 4)} b:${fixNum(escCommand.p2, 4)} c:${fixNum(powers.p3, 4)} d:${fixNum(powers.p4, 4)}`;
+            process.stdout.write(`${escCommand}\n`);
+        });
     }
 
     onEscData(escString: string) {
