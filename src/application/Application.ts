@@ -9,6 +9,7 @@ import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 import { fixNum } from '../common';
+import { ImuData } from '../models';
 
 export default class Application extends EventEmitter {
     imu: any;
@@ -246,6 +247,10 @@ export default class Application extends EventEmitter {
     writeBLE(s: string): void {
     }
 
+    applySafeTilt(imuData: ImuData): boolean {
+        return Math.abs(imuData.roll) < 30 && Math.abs(imuData.roll) < 30;
+    }
+
     onImuData(imuJson: string) {
         if (this.motorsIdle) {
             return;
@@ -258,6 +263,12 @@ export default class Application extends EventEmitter {
         if (!imuData) {
             return;
         }
+
+        if (!this.applySafeTilt(imuData)) {
+            this.activateMotors(false);
+            return;
+        }
+
         this.flightController.applyImuData(imuData);
 
         const escCommand = this.flightController.calcMotorsPower();

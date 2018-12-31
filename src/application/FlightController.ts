@@ -34,14 +34,6 @@ export default class FlightController {
         this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
     }
 
-    stop(): string {
-        console.log('stop *********************************************************************************************');
-        this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, 0));
-        this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
-        this.escCommand = this.createEscCommand(this.powers);
-        return this.escCommand;
-    }
-
     tiltForward() {
         this.pitchTilt += this.TILT_INC;
         this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });
@@ -151,9 +143,6 @@ export default class FlightController {
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
         if (isNaN(this.targetFlightState.yaw)) {
             this.targetFlightState = new FlightState(0, 0, this.actualFlightState.yaw, 0, 0);
-        }
-        if (Math.abs( this.actualFlightState.roll)>30 || Math.abs(this.actualFlightState.pitch)>30) {
-            this.stop();
         }
     }
 
