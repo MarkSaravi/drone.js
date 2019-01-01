@@ -14,7 +14,7 @@ export default function (cmdJson: string, target: FlightState): FlightState {
             );
         } else if (cmd.x != undefined) {
             return new FlightState(
-                target.roll,
+                cmd.x / 10,
                 target.pitch,
                 target.yaw,
                 0,
