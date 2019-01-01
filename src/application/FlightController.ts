@@ -108,6 +108,11 @@ export default class FlightController {
             this.heading = this.actualFlightState.yaw;
         }
     }
+    
+    applyIncomingCommand(cmdJson: string) {
+        this.targetFlightState = convertors.JsonToCommand(cmdJson, this.targetFlightState);
+        console.log(JSON.stringify(this.targetFlightState));
+    }
 
     incPower() {
         this.initHeading();

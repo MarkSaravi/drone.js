@@ -288,8 +288,7 @@ export default class Application extends EventEmitter {
 
     onBleData(bleJson: string) {
         // {"x":0,"y":-3,"h":0,"p":42.5}
-        // console.log(bleJson);
-        // const cmd = convertors.JsonToCommand(bleJson);
-        // this.flightController.applyCommand(cmd);
+        console.log(`Command: ${bleJson}`);
+        this.flightController.applyIncomingCommand(bleJson);
     }
 }
