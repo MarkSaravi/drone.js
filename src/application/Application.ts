@@ -75,8 +75,13 @@ export default class Application extends EventEmitter {
         });
         if (terminate) {
             this.imu.close();
-            this.ble.close();
-        }
+            this.ble.write("{\"state\": \"exit\"}",()=>{
+                this.ble.close();
+            });
+            
+        } else {
+            this.ble.write("{\"state\": \"stop\"}");
+        }      
     }
 
     activateMotors(activate: boolean) {
