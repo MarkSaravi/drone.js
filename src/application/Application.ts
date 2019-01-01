@@ -8,8 +8,10 @@ const SerialPort = require('serialport');
 import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
-import { fixNum } from '../common';
 import { ImuData } from '../models';
+
+const BLE_STOP_STATE = "{\"state\": \"stop\"}";
+const BLE_EXIT_STATE = "{\"state\": \"exit\"}";
 
 export default class Application extends EventEmitter {
     imu: any;
@@ -75,12 +77,12 @@ export default class Application extends EventEmitter {
         });
         if (terminate) {
             this.imu.close();
-            this.ble.write("{\"state\": \"exit\"}",()=>{
+            this.ble.write(BLE_EXIT_STATE,()=>{
                 this.ble.close();
             });
             
         } else {
-            this.ble.write("{\"state\": \"stop\"}");
+            this.ble.write(BLE_STOP_STATE);
         }      
     }
 
@@ -283,7 +285,12 @@ export default class Application extends EventEmitter {
         });
     }
 
-    onEscData(escString: string) {
+    onEscData(escJson: string) {
+        console.log(`Command: ${escJson}`);
+        if (escJson.indexOf("{\"info\":\"end arming\"}")==0) {
+            console.log(`Sending stop to remote controller.`);
+            this.ble.write(BLE_STOP_STATE);
+        }
     }
 
     onBleData(bleJson: string) {
