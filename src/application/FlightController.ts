@@ -36,81 +36,121 @@ export default class FlightController {
 
     tiltForward() {
         this.pitchTilt += this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });
+        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
     tiltBackward() {
         this.pitchTilt -= this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });
+        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
     tiltRight() {
         this.rollTilt += this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });
+        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
     tiltLeft() {
         this.rollTilt -= this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });
+        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
     turnRight() {
         this.heading += this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });  
+        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
     turnLeft() {
         this.heading -= this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({x: this.rollTilt, y: this.pitchTilt, heading: this.heading,power: this.targetFlightState.power });
+        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
     toggleP() {
-        this.config.rollPitchPID.usePGain = !this.config.rollPitchPID.usePGain;
-        console.log(`P is ${this.config.rollPitchPID.usePGain ? 'on': 'off'}`);
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.usePGain = !this.config.rollPitchPID.usePGain;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.usePGain = !this.config.yawPID.usePGain;
+        }
     }
 
     toggleI() {
-        this.config.rollPitchPID.useIGain = !this.config.rollPitchPID.useIGain;
-        console.log(`I is ${this.config.rollPitchPID.useIGain ? 'on': 'off'}`);
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.useIGain = !this.config.rollPitchPID.useIGain;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.useIGain = !this.config.yawPID.useIGain;
+        }
     }
 
     toggleD() {
-        this.config.rollPitchPID.useDGain = !this.config.rollPitchPID.useDGain;
-        console.log(`D is ${this.config.rollPitchPID.useDGain ? 'on': 'off'}`);
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.useDGain = !this.config.rollPitchPID.useDGain;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.useDGain = !this.config.yawPID.useDGain;
+        }
     }
 
     incPGain() {
-        // this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
-        this.config.yawPID.pGain += this.config.yawPID.pGainInc;
-        console.log(this.config.yawPID.pGain);
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.pGain += this.config.yawPID.pGainInc;
+        }
     }
 
     decPGain() {
-        this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.pGain -= this.config.yawPID.pGainInc;
+        }
     }
 
     incIGain() {
-        this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.iGain += this.config.yawPID.iGainInc;
+        }
     }
 
     decIGain() {
-        this.config.rollPitchPID.iGain -= this.config.rollPitchPID.iGainInc;
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.iGain -= this.config.rollPitchPID.iGainInc;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.iGain -= this.config.yawPID.iGainInc;
+        }
     }
 
     incDGain() {
-        this.config.rollPitchPID.dGain += this.config.rollPitchPID.dGainInc;
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.dGain += this.config.rollPitchPID.dGainInc;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.dGain += this.config.yawPID.dGainInc;
+        }
     }
 
     decDGain() {
-        this.config.rollPitchPID.dGain -= this.config.rollPitchPID.dGainInc;
+        if (this.config.rollPitchPID.tuneable) {
+            this.config.rollPitchPID.dGain -= this.config.rollPitchPID.dGainInc;
+        }
+        if (this.config.yawPID.tuneable) {
+            this.config.yawPID.dGain -= this.config.yawPID.dGainInc;
+        }
     }
 
     initHeading() {
-        if (this.heading == -1000){
+        if (this.heading == -1000) {
             this.heading = this.actualFlightState.yaw;
         }
     }
-    
+
     applyIncomingCommand(cmdJson: string) {
         this.targetFlightState = convertors.JsonToCommand(cmdJson, this.targetFlightState);
         console.log(JSON.stringify(this.targetFlightState));
@@ -125,7 +165,7 @@ export default class FlightController {
             this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, this.targetFlightState.power + 0.25));
         } else {
             this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, this.POWER_START));
-        } 
+        }
     }
 
     decPower() {
@@ -156,14 +196,14 @@ export default class FlightController {
     createEscCommand(p: IPowers): string {
         return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
     }
-    
+
     showStatus(powers: IPowers, errors: IFlightStateError, basePower: number) {
         // const ps = `a:${fixNum(powers.p1, 4)} b:${fixNum(powers.p2, 4)} c:${fixNum(powers.p3, 4)} d:${fixNum(powers.p4, 4)}`;
-        const fss = `rpw:${fixNum(errors.rollError, 6)},${fixNum(errors.pitchError, 6)},${fixNum(errors.yawError, 6)}`;
+        const fss = `rpy:${fixNum(errors.rollError, 6)},${fixNum(errors.pitchError, 6)},${fixNum(errors.yawError, 6)}`;
         // const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
-        const pids = `pidG:${fixNum(this.config.rollPitchPID.pGain,6)},${fixNum(this.config.rollPitchPID.iGain,6)},${fixNum(this.config.rollPitchPID.dGain,6)}`
+        // const pids = `pidG:${fixNum(this.config.rollPitchPID.pGain,6)},${fixNum(this.config.rollPitchPID.iGain,6)},${fixNum(this.config.rollPitchPID.dGain,6)}`
         const bps = `pow:${basePower}`;
-        const text = ` ${fss} ${pids} ${bps}`;
+        const text = ` ${fss} ${bps}`;
         process.stdout.write(`${text}`);
     }
 
@@ -174,12 +214,12 @@ export default class FlightController {
             this.powers = this.pidControl.PID(basePower, stateError, this.config);
         } else {
             this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
-        }        
+        }
         this.escCommand = this.createEscCommand({
-            p1: this.config.motors.a? this.powers.p1: 0,
-            p2: this.config.motors.b? this.powers.p2: 0,
-            p3: this.config.motors.c? this.powers.p3: 0,
-            p4: this.config.motors.d? this.powers.p4: 0,
+            p1: this.config.motors.a ? this.powers.p1 : 0,
+            p2: this.config.motors.b ? this.powers.p2 : 0,
+            p3: this.config.motors.c ? this.powers.p3 : 0,
+            p4: this.config.motors.d ? this.powers.p4 : 0,
         });
         this.showStatus(this.powers, stateError, basePower);
         return this.escCommand

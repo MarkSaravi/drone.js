@@ -11,4 +11,6 @@ export default interface IPIDConfig {
     iMaxValue: number;
     iMaxAngle: number;
     iMinAngle: number;
+    pMaxAngle: number;
+    tuneable: boolean;
 } 
