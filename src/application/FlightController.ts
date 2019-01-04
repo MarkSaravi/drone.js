@@ -80,7 +80,9 @@ export default class FlightController {
     }
 
     incPGain() {
-        this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
+        // this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
+        this.config.yawPID.pGain += this.config.yawPID.pGainInc;
+        console.log(this.config.yawPID.pGain);
     }
 
     decPGain() {

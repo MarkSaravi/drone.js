@@ -12,7 +12,7 @@ export default class PIDController {
     constructor() {
         this.rollControl = new TiltPIDControl('roll', true);
         this.pitchControl = new TiltPIDControl('pitch', true);
-        this.yawControl = new PIDControl('yaw');
+        this.yawControl = new PIDControl('yaw', true);
     }
 
     convert(x: number) {
@@ -20,7 +20,8 @@ export default class PIDController {
     }
 
     PID(basePower: number, errors: IFlightStateError, config: IFlightConfig): IPowers {
-        const yawError = errors.yawError;
+        const yawError = Math.abs(errors.yawError) < 5 ?
+         errors.yawError : 5 * Math.sign(errors.yawError);
         const pitchError = errors.pitchError;
         const rollError = errors.rollError;
 

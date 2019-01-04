@@ -45,7 +45,7 @@ export default class PIDControl {
 
     showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number, config: IPIDConfig) {
         if (!this.displayData) return;
-        if (this.name == 'pitch') return;
+        if (this.name == 'pitch' || this.name == 'role') return;
         const pidname = `(${config.usePGain ? 'P' : '_'}${config.useIGain ? 'I' : '_'}${config.useDGain ? 'D' : '_'})`;
         // const pidname = `${this.name}(${config.usePGain ? 'P' : '_'}${config.useIGain ? 'I' : '_'}${config.useDGain ? 'D' : '_'})`;
         const pids = `${pidname} s:${fixNum(sum)} p:${fixNum(p)} i:${fixNum(i)} d:${fixNum(d)} de:${fixNum(dError)} dt:${fixNum(dt)}`;
