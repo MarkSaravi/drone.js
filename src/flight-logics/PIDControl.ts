@@ -23,7 +23,7 @@ export default class PIDControl {
             dt = 0
         }
         // reset integral sum if it is opposit to tilt direction
-        if (this.integralSum * error < 0 && Math.abs(error) > 3) {
+        if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
             this.iCounter++;
         } else {
             this.iCounter = 0;
