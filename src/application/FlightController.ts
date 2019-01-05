@@ -202,8 +202,8 @@ export default class FlightController {
             const rollPIDResult = this.pidRoll.PID(errors.rollError, errors.time, this.config.rollPitchPID);
             const pitchPIDResult = this.pidPitch.PID(errors.pitchError, errors.time, this.config.rollPitchPID);
             const yawPIDResult = this.pidYaw.PID(errors.yawError, errors.time, this.config.yawPID);
-            const pitchPower = this.calcPairPower(basePower - yawPIDResult.sum, pitchPIDResult);
             const rollPower = this.calcPairPower(basePower + yawPIDResult.sum, rollPIDResult);
+            const pitchPower = this.calcPairPower(basePower - yawPIDResult.sum, pitchPIDResult);
             const powers = {
                 a: this.config.motors.a ? pitchPower.front : 0,
                 b: this.config.motors.b ? rollPower.front : 0,

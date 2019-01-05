@@ -10,7 +10,7 @@ import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 import { ImuData, IPowers } from '../models';
-import { print, println } from '../utilities';
+import { print, println, printPowerValues } from '../utilities';
 
 const BLE_STOP_STATE = "{\"state\": \"stop\"}";
 const BLE_EXIT_STATE = "{\"state\": \"exit\"}";
@@ -286,10 +286,7 @@ export default class Application extends EventEmitter {
         const powers = this.flightController.calcMotorsPower();
         const escCommand = this.createEscCommand(powers);
         this.esc.write(escCommand, () => {
-            print(`a:${numeral(powers.a).format('00.0')} `);
-            print(`b:${numeral(powers.b).format('00.0')} `);
-            print(`c:${numeral(powers.c).format('00.0')} `);
-            println(`d:${numeral(powers.d).format('00.0')}`);
+            printPowerValues(powers);
         });
     }
 
