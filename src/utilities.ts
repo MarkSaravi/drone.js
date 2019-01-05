@@ -41,7 +41,12 @@ export function printLabelValue(label: string, value: string, color: string) {
     }
 }
 
-export const printPIDConfig = (config: IPIDConfig) => {
+export const printPIDConfig = (name: string, config: IPIDConfig) => {
+    colorStdout.black(`${name}(`);
+    colorStdout.red(`${config.usePGain ? 'P' : '_'}`);
+    colorStdout.red(`${config.useIGain ? 'I' : '_'}`);
+    colorStdout.red(`${config.useDGain ? 'D' : '_'}`);
+    colorStdout.black('):');
     printLabelValue('pG:',`${numeral(config.pGain).format('0.000')} `, 'green');
     printLabelValue('iG:',`${numeral(config.iGain).format('0.000')} `, 'green');
     printLabelValue('dG:',`${numeral(config.dGain).format('0.000')} `, 'green');
@@ -75,10 +80,10 @@ export default function showStatus(
     printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.0')} `, 'green');
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.0')} `, 'green');
     if (config.debug == 'roll' || config.debug == 'pitch') {
-        printPIDConfig(config.rollPitchPID);
+        printPIDConfig(config.debug, config.rollPitchPID);
     }
     if (config.debug == 'yaw') {
-        printPIDConfig(config.yawPID);
+        printPIDConfig(config.debug, config.yawPID);
     }
     if (rollPID && config.debug == 'roll') {
         printPIDValues(rollPID);

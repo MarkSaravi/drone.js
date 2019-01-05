@@ -19,6 +19,7 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
+    private readonly POWER_INC: number = 1;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("roll");
     private readonly pidYaw: PIDControl = new PIDControl("roll");
@@ -156,7 +157,7 @@ export default class FlightController {
         }
         var newPower = 0;
         if (this.targetFlightState.power >= this.config.minPower) {
-            newPower = this.targetFlightState.power + 0.25;
+            newPower = this.targetFlightState.power + this.POWER_INC;
         } else {
             newPower = this.config.minPower;
         }
@@ -166,7 +167,7 @@ export default class FlightController {
     decPower() {
         var newPower = 0;
         if (this.targetFlightState.power > this.config.minPower) {
-            newPower=this.targetFlightState.power - 0.25;
+            newPower=this.targetFlightState.power - this.POWER_INC;
         }
         this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, newPower));
     }
