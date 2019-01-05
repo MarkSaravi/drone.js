@@ -30,7 +30,6 @@ export default class PIDControl {
         }
         if (this.iCounter > 10) {
             this.integralSum = 0;
-            console.log('resetting I -------------------------------------------------------------------------');
         }
 
         this.integralSum += 

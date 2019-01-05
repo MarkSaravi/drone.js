@@ -6,17 +6,14 @@ import IFlightStateError from '../models/IFlightStateError';
 import * as convertors from '../convertors';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
-import IPIDConfig from '../models/IPIDConfig';
 import { IPIDValue } from '../models/IPIDValue';
 import PIDControl from '../flight-logics/PIDControl';
-import showStatus from './showStatus';
+import showStatus from './utilities';
 
 
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
-    private escCommand: string;
-    private powers: IPowers;
     private imuData: ImuData = null;
     private pitchTilt: number = 0;
     private rollTilt: number = 0;
@@ -29,10 +26,6 @@ export default class FlightController {
     constructor(private config: IFlightConfig) {
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, NaN, 0, 0);
-        this.powers = {
-            a: 0, b: 0, c: 0, d: 0
-        };
-        this.escCommand = this.createEscCommand({ a: 0, b: 0, c: 0, d: 0 });
     }
 
     tiltForward() {
@@ -154,7 +147,6 @@ export default class FlightController {
 
     applyIncomingCommand(cmdJson: string) {
         this.targetFlightState = convertors.JsonToCommand(cmdJson, this.targetFlightState);
-        console.log(JSON.stringify(this.targetFlightState));
     }
 
     incPower() {
@@ -196,22 +188,6 @@ export default class FlightController {
         }
     }
 
-    createEscCommand(p: IPowers): string {
-        return `{"a":${(p.a).toFixed(3)},"b":${(p.b).toFixed(3)},"c":${(p.c).toFixed(3)},"d":${(p.d).toFixed(3)}}`;
-    }
-
-    // showStatus(powers: IPowers, errors: IFlightStateError, basePower: number) {
-    //     const pidConfig: IPIDConfig = this.config.pidLog == 'roll-pitch' ?
-    //         this.config.rollPitchPID : this.config.yawPID;
-    //     const pidName = this.config.pidLog == 'roll-pitch'? 'Roll-Pitch' : 'Yaw';
-    //     const pidstate = `${pidName}: (${pidConfig.usePGain ? 'P' : '_'}${pidConfig.useIGain ? 'I' : '_'}${pidConfig.useDGain ? 'D' : '_'})`;
-    //     const pidGains = `pidG:${fixNum(pidConfig.pGain,6)},${fixNum(pidConfig.iGain,6)},${fixNum(pidConfig.dGain,6)}`
-    //     const fss = `rpy:${fixNum(errors.rollError, 6)},${fixNum(errors.pitchError, 6)},${fixNum(errors.yawError, 6)}`;
-    //     const bps = `pow:${basePower}`;
-    //     const text = `${pidstate} ${pidGains} ${fss} ${bps}`;
-    //     process.stdout.write(`${text}`);
-    // }
-
     calcPairPower(power: number, pid: IPIDValue): {front: number; back: number} {
         return {
             front: power - pid.sum,
@@ -219,7 +195,7 @@ export default class FlightController {
         }
     }
 
-    calcMotorsPower() {
+    calcMotorsPower(): IPowers {
         let errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
         const basePower = this.targetFlightState.power;
         if (basePower >= this.config.minPower) {
@@ -235,15 +211,10 @@ export default class FlightController {
                 d: this.config.motors.d ? rollPower.back : 0
             };
             showStatus(basePower, this.config, errors, rollPIDResult, pitchPIDResult, yawPIDResult, powers );
-            return this.createEscCommand({
-                a: powers.a,
-                b: powers.b,
-                c: powers.c,
-                d: powers.d,
-            });
+            return powers;
         } else {
             showStatus(basePower, this.config, errors, null, null, null, null);
-            return this.createEscCommand ({ a: 0, b: 0, c: 0, d: 0 });
+            return { a: 0, b: 0, c: 0, d: 0 };
         }
     }
 }

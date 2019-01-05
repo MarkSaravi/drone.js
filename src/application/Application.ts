@@ -1,4 +1,5 @@
 ///<reference path="../../node_modules/@types/node/index.d.ts" />
+const numeral = require('numeral');
 import { EventEmitter } from 'events';
 const readline = require('readline');
 import { IPortsConfig, IPortConfig } from '../models/PortConfig';
@@ -8,7 +9,8 @@ const SerialPort = require('serialport');
 import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
-import { ImuData } from '../models';
+import { ImuData, IPowers } from '../models';
+import { print, println } from './utilities';
 
 const BLE_STOP_STATE = "{\"state\": \"stop\"}";
 const BLE_EXIT_STATE = "{\"state\": \"exit\"}";
@@ -28,7 +30,7 @@ export default class Application extends EventEmitter {
     }
 
     startApp() {
-        console.log('starting the application');
+        println('starting the application');
         this.registerConsoleCommands();
         this.openDevices();
         this.registerEvents();
@@ -38,11 +40,11 @@ export default class Application extends EventEmitter {
         const Readline = SerialPort.parsers.Readline;
         const port = new SerialPort(config.name, { baudRate: config.baudRate, autoOpen: false });
         port.on('open', () => {
-            console.log(`${config.type} is opened.`);
+            println(`${config.type} is opened.`);
             port.flush();
         })
         port.on('close', () => {
-            console.log(`${config.type} is closed.`);
+            println(`${config.type} is closed.`);
             onClose();
         })
         port.open();
@@ -55,22 +57,26 @@ export default class Application extends EventEmitter {
     }
 
     openDevices() {
-        console.log('trying to open port...');
+        println('trying to open port...');
         this.imu = this.initDevice(portsConfig.imu, 'data-imu',
             () => { });
         this.esc = this.initDevice(portsConfig.esc, 'data-esc',
             () => {
-                console.log("exiting the application");
+                println("exiting the application");
                 process.exit(0);
             });
         this.ble = this.initDevice(portsConfig.ble, 'data-ble', () => { });
     }
 
+    createEscCommand(p: IPowers): string {
+        return `{"a":${numeral(p.a).format('0.000')},"b":${numeral(p.b).format('0.000')},"c":${numeral(p.c).format('0.000')},"d":${numeral(p.d).format('0.000')}}`
+    }
+
     terminateApplication(terminate: boolean) {
         this.motorsIdle = true;
-        const escCommand = "{\"a\":0,\"b\":0,\"c\":0,\"d\":0}";
+        const escCommand = this.createEscCommand({a:0, b:0, c: 0, d: 0});
         this.esc.write(escCommand, () => {
-            process.stdout.write(`Stopping all motors: ${escCommand}\n`);
+            println(`Stopping all motors: ${escCommand}`);
             if (terminate) {
                 this.esc.close();
             }
@@ -102,16 +108,16 @@ export default class Application extends EventEmitter {
                 case 's':
                 case 'S':
                     if (this.motorsIdle) {
-                        console.log('Starting motors.');
+                        println('Starting motors.');
                         this.activateMotors(true);
                     } else {
-                        console.log('Stopping motors.');
+                        println('Stopping motors.');
                         this.activateMotors(false);
                     }
                     break;
                 case 'q':
                 case 'Q':
-                    console.log('Closing devices.');
+                    println('Closing devices.');
                     this.terminateApplication(true);
                     break;
                 case ']':
@@ -266,7 +272,6 @@ export default class Application extends EventEmitter {
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
             this.flightConfig.yawPolarity);
-        // console.log(JSON.stringify(imuData));
         if (!imuData) {
             return;
         }
@@ -278,23 +283,24 @@ export default class Application extends EventEmitter {
 
         this.flightController.applyImuData(imuData);
 
-        const escCommand = this.flightController.calcMotorsPower();
+        const powers = this.flightController.calcMotorsPower();
+        const escCommand = this.createEscCommand(powers);
         this.esc.write(escCommand, () => {
-            process.stdout.write(`${escCommand}\n`);
+            print(`a:${numeral(powers.a).format('00.0')},`);
+            print(`b:${numeral(powers.b).format('00.0')},`);
+            print(`c:${numeral(powers.c).format('00.0')},`);
+            println(`d:${numeral(powers.d).format('00.0')}`);
         });
     }
 
     onEscData(escJson: string) {
-        console.log(`Command: ${escJson}`);
         if (escJson.indexOf("{\"info\":\"end arming\"}")==0) {
-            console.log(`Sending stop to remote controller.`);
             this.ble.write(BLE_STOP_STATE);
         }
     }
 
     onBleData(bleJson: string) {
         // {"x":0,"y":-3,"h":0,"p":42.5}
-        console.log(`Command: ${bleJson}`);
         this.flightController.applyIncomingCommand(bleJson);
     }
 }

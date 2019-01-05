@@ -4,6 +4,7 @@ const readline = require('readline');
 import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
+import { println } from '../application/utilities';
 
 export default class SerialDeviceReader extends EventEmitter {
     serial: any;
@@ -14,7 +15,7 @@ export default class SerialDeviceReader extends EventEmitter {
     }
 
     startApp() {
-        console.log('starting the application');
+        println('starting the application');
         this.registerConsoleCommands();
         this.openDevices();
         this.registerEvents();
@@ -25,11 +26,11 @@ export default class SerialDeviceReader extends EventEmitter {
         const port = new SerialPort(config.name, { baudRate: config.baudRate, autoOpen: false });
         port.on('open', () => {
             this.deviceCounter++;
-            console.log(`${config.type} is opened.`);
+            println(`${config.type} is opened.`);
             port.flush();
         })
         port.on('close', () => {
-            console.log(`${config.type} is closed.`);
+            println(`${config.type} is closed.`);
             this.deviceCounter--;
             this.emit('exit-application');
         })
@@ -37,14 +38,14 @@ export default class SerialDeviceReader extends EventEmitter {
         const parser = new Readline()
         port.pipe(parser)
         parser.on('data', (str: string) => {
-            console.log(str);
+            println(str);
             this.emit(event, str);
         });
         return port;
     }
 
     openDevices() {
-        console.log(`trying to open port ${process.env["PORT_NAME"]}`);
+        println(`trying to open port ${process.env["PORT_NAME"]}`);
         switch (process.env["PORT_NAME"]) {
             case 'imu':
                 this.serial = this.initDevice(portsConfig.imu, 'data-serial');
@@ -81,7 +82,7 @@ export default class SerialDeviceReader extends EventEmitter {
         });
 
         this.on('close-devices', () => {
-            console.log('Closing devices.');
+            println('Closing devices.');
             this.serial.close();
         });
 
@@ -89,12 +90,12 @@ export default class SerialDeviceReader extends EventEmitter {
             if (this.deviceCounter != 0) {
                 return;
             }
-            console.log('exiting application');
+            println('exiting application');
             process.exit(0);
         });
     }
 
     onSerialData(data: string) {
-        console.log(data)
+        println(data)
     }
 }
