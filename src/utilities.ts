@@ -27,4 +27,14 @@ export default function showStatus(
     print(`rpPID:${numeral(config.rollPitchPID.pGain).format('0.000')},${numeral(config.rollPitchPID.iGain).format('0.000')},${numeral(config.rollPitchPID.dGain).format('0.000')},`);
     print(`yPID:${numeral(config.yawPID.pGain).format('0.000')},${numeral(config.yawPID.iGain).format('0.000')},${numeral(config.yawPID.dGain).format('0.000')},`);
     print(`rpy:${numeral(errors.rollError).format('+00.0')},${numeral(errors.pitchError).format('+00.0')},${numeral(errors.yawError).format('+00.0')},`);
+    if (rollPID) {
+        print(`rPID:${numeral(rollPID.sum).format('+00.0')},${numeral(rollPID.p).format('+00.0')},${numeral(rollPID.i).format('+00.0')},,${numeral(rollPID.d).format('+00.0')},`);
+    }
+    if (pitchPID) {
+        print(`pPID:${numeral(pitchPID.sum).format('+00.0')},${numeral(pitchPID.p).format('+00.0')},${numeral(pitchPID.i).format('+00.0')},,${numeral(pitchPID.d).format('+00.0')},`);
+    }
+    if (yawPID) {
+        print(`yPID:${numeral(yawPID.sum).format('+00.0')},${numeral(yawPID.p).format('+00.0')},${numeral(yawPID.i).format('+00.0')},,${numeral(yawPID.d).format('+00.0')},`);
+    }
+
 }
