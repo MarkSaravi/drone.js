@@ -10,7 +10,7 @@ import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 import { ImuData, IPowers } from '../models';
-import { print, println } from './utilities';
+import { print, println } from '../utilities';
 
 const BLE_STOP_STATE = "{\"state\": \"stop\"}";
 const BLE_EXIT_STATE = "{\"state\": \"exit\"}";

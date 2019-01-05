@@ -1,7 +1,7 @@
-import IFlightStateError from '../models/IFlightStateError';
-import { IPIDValue } from '../models/IPIDValue';
-import IFlightConfig from '../models/IFlightConfig';
-import IPowers from '../models/IPowers';
+import IFlightStateError from './models/IFlightStateError';
+import { IPIDValue } from './models/IPIDValue';
+import IFlightConfig from './models/IFlightConfig';
+import IPowers from './models/IPowers';
 const numeral = require('numeral');
 
 export function print(msg: string) {

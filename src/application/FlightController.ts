@@ -8,7 +8,7 @@ import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
 import { IPIDValue } from '../models/IPIDValue';
 import PIDControl from '../flight-logics/PIDControl';
-import showStatus from './utilities';
+import showStatus from '../utilities';
 
 
 export default class FlightController {

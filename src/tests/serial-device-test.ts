@@ -4,7 +4,7 @@ const readline = require('readline');
 import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
-import { println } from '../application/utilities';
+import { println } from '../utilities';
 
 export default class SerialDeviceReader extends EventEmitter {
     serial: any;
