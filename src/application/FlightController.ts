@@ -1,19 +1,20 @@
 import FlightState from '../models/FlightState';
 import Command from '../models/Command';
 import ImuData from '../models/ImuData';
+import getStateError from '../flight-logics/getStateErrors';
 import IFlightStateError from '../models/IFlightStateError';
 import * as convertors from '../convertors';
-import * as flightLogics from '../flight-logics';
-import { PIDController } from '../flight-logics';
 import IPowers from '../models/IPowers';
 import IFlightConfig from '../models/IFlightConfig';
-import { fixNum } from '../common';
+import IPIDConfig from '../models/IPIDConfig';
+import { IPIDValue } from '../models/IPIDValue';
+import PIDControl from '../flight-logics/PIDControl';
+import showStatus from './showStatus';
 
 
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
-    private readonly pidControl: PIDController;
     private escCommand: string;
     private powers: IPowers;
     private imuData: ImuData = null;
@@ -21,17 +22,17 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_START: number = 50;
-    private readonly POWER_MAX: number = 90;
+    private readonly pidRoll: PIDControl = new PIDControl("roll");
+    private readonly pidPitch: PIDControl = new PIDControl("roll");
+    private readonly pidYaw: PIDControl = new PIDControl("roll");
 
     constructor(private config: IFlightConfig) {
-        this.pidControl = new PIDController();
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, NaN, 0, 0);
         this.powers = {
-            p1: 0, p2: 0, p3: 0, p4: 0
+            a: 0, b: 0, c: 0, d: 0
         };
-        this.escCommand = this.createEscCommand({ p1: 0, p2: 0, p3: 0, p4: 0 });
+        this.escCommand = this.createEscCommand({ a: 0, b: 0, c: 0, d: 0 });
     }
 
     tiltForward() {
@@ -158,22 +159,24 @@ export default class FlightController {
 
     incPower() {
         this.initHeading();
-        if (this.targetFlightState.power >= this.POWER_MAX) {
+        if (this.targetFlightState.power >= this.config.maxPower) {
             return;
         }
-        if (this.targetFlightState.power < this.POWER_MAX && this.targetFlightState.power >= this.POWER_START) {
-            this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, this.targetFlightState.power + 0.25));
+        var newPower = 0;
+        if (this.targetFlightState.power >= this.config.minPower) {
+            newPower = this.targetFlightState.power + 0.25;
         } else {
-            this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, this.POWER_START));
+            newPower = this.config.minPower;
         }
+        this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, newPower));
     }
 
     decPower() {
-        if (this.targetFlightState.power > this.POWER_START) {
-            this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, this.targetFlightState.power - 0.25));
-        } else {
-            this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, 0));
+        var newPower = 0;
+        if (this.targetFlightState.power > this.config.minPower) {
+            newPower=this.targetFlightState.power - 0.25;
         }
+        this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, newPower));
     }
 
     applyCommand(command: Command) {
@@ -194,34 +197,53 @@ export default class FlightController {
     }
 
     createEscCommand(p: IPowers): string {
-        return `{"a":${(p.p1).toFixed(3)},"b":${(p.p2).toFixed(3)},"c":${(p.p3).toFixed(3)},"d":${(p.p4).toFixed(3)}}`;
+        return `{"a":${(p.a).toFixed(3)},"b":${(p.b).toFixed(3)},"c":${(p.c).toFixed(3)},"d":${(p.d).toFixed(3)}}`;
     }
 
-    showStatus(powers: IPowers, errors: IFlightStateError, basePower: number) {
-        // const ps = `a:${fixNum(powers.p1, 4)} b:${fixNum(powers.p2, 4)} c:${fixNum(powers.p3, 4)} d:${fixNum(powers.p4, 4)}`;
-        const fss = `rpy:${fixNum(errors.rollError, 6)},${fixNum(errors.pitchError, 6)},${fixNum(errors.yawError, 6)}`;
-        // const fss = `roll:${fixNum(errors.rollError, 6)} pitch:${fixNum(errors.pitchError, 6)} yaw:${fixNum(errors.yawError, 6)}`;
-        // const pids = `pidG:${fixNum(this.config.rollPitchPID.pGain,6)},${fixNum(this.config.rollPitchPID.iGain,6)},${fixNum(this.config.rollPitchPID.dGain,6)}`
-        const bps = `pow:${basePower}`;
-        const text = ` ${fss} ${bps}`;
-        process.stdout.write(`${text}`);
+    // showStatus(powers: IPowers, errors: IFlightStateError, basePower: number) {
+    //     const pidConfig: IPIDConfig = this.config.pidLog == 'roll-pitch' ?
+    //         this.config.rollPitchPID : this.config.yawPID;
+    //     const pidName = this.config.pidLog == 'roll-pitch'? 'Roll-Pitch' : 'Yaw';
+    //     const pidstate = `${pidName}: (${pidConfig.usePGain ? 'P' : '_'}${pidConfig.useIGain ? 'I' : '_'}${pidConfig.useDGain ? 'D' : '_'})`;
+    //     const pidGains = `pidG:${fixNum(pidConfig.pGain,6)},${fixNum(pidConfig.iGain,6)},${fixNum(pidConfig.dGain,6)}`
+    //     const fss = `rpy:${fixNum(errors.rollError, 6)},${fixNum(errors.pitchError, 6)},${fixNum(errors.yawError, 6)}`;
+    //     const bps = `pow:${basePower}`;
+    //     const text = `${pidstate} ${pidGains} ${fss} ${bps}`;
+    //     process.stdout.write(`${text}`);
+    // }
+
+    calcPairPower(power: number, pid: IPIDValue): {front: number; back: number} {
+        return {
+            front: power - pid.sum,
+            back: power + pid.sum
+        }
     }
 
     calcMotorsPower() {
-        let stateError: IFlightStateError = flightLogics.getStateError(this.targetFlightState, this.actualFlightState, this.config);
+        let errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
         const basePower = this.targetFlightState.power;
-        if (this.targetFlightState.power > 39) {
-            this.powers = this.pidControl.PID(basePower, stateError, this.config);
+        if (basePower >= this.config.minPower) {
+            const rollPIDResult = this.pidRoll.PID(errors.rollError, errors.time, this.config.rollPitchPID);
+            const pitchPIDResult = this.pidPitch.PID(errors.pitchError, errors.time, this.config.rollPitchPID);
+            const yawPIDResult = this.pidYaw.PID(errors.yawError, errors.time, this.config.yawPID);
+            const pitchPower = this.calcPairPower(basePower - yawPIDResult.sum, pitchPIDResult);
+            const rollPower = this.calcPairPower(basePower + yawPIDResult.sum, rollPIDResult);
+            const powers = {
+                a: this.config.motors.a ? pitchPower.front : 0,
+                b: this.config.motors.b ? rollPower.front : 0,
+                c: this.config.motors.c ? pitchPower.back : 0,
+                d: this.config.motors.d ? rollPower.back : 0
+            };
+            showStatus(basePower, this.config, errors, rollPIDResult, pitchPIDResult, yawPIDResult, powers );
+            return this.createEscCommand({
+                a: powers.a,
+                b: powers.b,
+                c: powers.c,
+                d: powers.d,
+            });
         } else {
-            this.powers = { p1: 0, p2: 0, p3: 0, p4: 0 }
+            showStatus(basePower, this.config, errors, null, null, null, null);
+            return this.createEscCommand ({ a: 0, b: 0, c: 0, d: 0 });
         }
-        this.escCommand = this.createEscCommand({
-            p1: this.config.motors.a ? this.powers.p1 : 0,
-            p2: this.config.motors.b ? this.powers.p2 : 0,
-            p3: this.config.motors.c ? this.powers.p3 : 0,
-            p4: this.config.motors.d ? this.powers.p4 : 0,
-        });
-        this.showStatus(this.powers, stateError, basePower);
-        return this.escCommand
     }
 }

@@ -1,5 +1,5 @@
 import IPIDConfig from '../models/IPIDConfig';
-import { fixNum } from '../common';
+import { IPIDValue } from '../models/IPIDValue';
 
 export default class PIDControl {
     integralSum: number = 0;
@@ -13,7 +13,9 @@ export default class PIDControl {
     }
 
     P(error: number, config: IPIDConfig): number {
-        return error * config.pGain;
+        const err = Math.abs(error) < config.pMaxAngle ?
+            error: Math.sign(error) * config.pMaxAngle;
+        return err * config.pGain;
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
@@ -28,7 +30,7 @@ export default class PIDControl {
         }
         if (this.iCounter > 10) {
             this.integralSum = 0;
-            console.log('reset I -------------------------------------------------------------------------');
+            console.log('resetting I -------------------------------------------------------------------------');
         }
 
         this.integralSum += 
@@ -43,17 +45,7 @@ export default class PIDControl {
         return dError / dt * config.dGain;
     }
 
-    showStatus(sum: number, p: number, i: number, d: number, dError: number, t: number, dt: number, config: IPIDConfig) {
-        if (!this.displayData) return;
-        if (this.name == 'pitch' || this.name == 'roll') return;
-        const pidname = `(${config.usePGain ? 'P' : '_'}${config.useIGain ? 'I' : '_'}${config.useDGain ? 'D' : '_'})`;
-        // const pidname = `${this.name}(${config.usePGain ? 'P' : '_'}${config.useIGain ? 'I' : '_'}${config.useDGain ? 'D' : '_'})`;
-        const pidGains = `pidG:${fixNum(config.pGain,6)},${fixNum(config.iGain,6)},${fixNum(config.dGain,6)}`
-        const pids = `${pidname} ${pidGains} s:${fixNum(sum)} p:${fixNum(p)} i:${fixNum(i)} d:${fixNum(d)} de:${fixNum(dError)} dt:${fixNum(dt)}`;
-        process.stdout.write(pids);
-    }
-
-    PID(error: number, time: number, config: IPIDConfig, power: number): number {
+    PID(error: number, time: number, config: IPIDConfig): IPIDValue {
         const dt = (time - this.prevTime); //convert to milliseconds
         const dError = error - this.prevError;
 
@@ -64,8 +56,9 @@ export default class PIDControl {
         this.prevTime = time;
         this.prevError = error;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
-        this.showStatus(sum, p, i, d, dError, time, dt, config);
-        return sum;
+        return {
+            sum, p,i,d
+        };
     }
 
 }

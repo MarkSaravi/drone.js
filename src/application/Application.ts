@@ -280,7 +280,6 @@ export default class Application extends EventEmitter {
 
         const escCommand = this.flightController.calcMotorsPower();
         this.esc.write(escCommand, () => {
-            // const ps = `a:${fixNum(escCommand.p1, 4)} b:${fixNum(escCommand.p2, 4)} c:${fixNum(powers.p3, 4)} d:${fixNum(powers.p4, 4)}`;
             process.stdout.write(`${escCommand}\n`);
         });
     }
