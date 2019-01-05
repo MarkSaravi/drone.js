@@ -34,12 +34,12 @@
 		"useIGain": true,
 		"useDGain": true,
 		"pGainInc": 0.025,
-		"iGainInc": 0,
-		"dGainInc": 0,
+		"iGainInc": 0.01,
+		"dGainInc": 0.01,
 		"iMaxValue": 10,
 		"iMaxAngle": 10,
 		"iMinAngle": 0.5,
                 "pMaxAngle": 5
 	},
-        "debug": "roll-pitch"
+        "debug": "roll"
 }
