@@ -59,7 +59,7 @@ export default class FlightController {
     }
 
     toggleP() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.usePGain = !this.config.rollPitchPID.usePGain;
         }
         if (this.config.debug == 'yaw') {
@@ -68,7 +68,7 @@ export default class FlightController {
     }
 
     toggleI() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.useIGain = !this.config.rollPitchPID.useIGain;
         }
         if (this.config.debug == 'yaw') {
@@ -77,7 +77,7 @@ export default class FlightController {
     }
 
     toggleD() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.useDGain = !this.config.rollPitchPID.useDGain;
         }
         if (this.config.debug == 'yaw') {
@@ -86,7 +86,7 @@ export default class FlightController {
     }
 
     incPGain() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
         }
         if (this.config.debug == 'yaw') {
@@ -95,7 +95,7 @@ export default class FlightController {
     }
 
     decPGain() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
         }
         if (this.config.debug == 'yaw') {
@@ -104,7 +104,7 @@ export default class FlightController {
     }
 
     incIGain() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
         }
         if (this.config.debug == 'yaw') {
@@ -113,7 +113,7 @@ export default class FlightController {
     }
 
     decIGain() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.iGain -= this.config.rollPitchPID.iGainInc;
         }
         if (this.config.debug == 'yaw') {
@@ -122,7 +122,7 @@ export default class FlightController {
     }
 
     incDGain() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.dGain += this.config.rollPitchPID.dGainInc;
         }
         if (this.config.debug == 'yaw') {
@@ -131,7 +131,7 @@ export default class FlightController {
     }
 
     decDGain() {
-        if (this.config.debug == 'roll-pitch') {
+        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
             this.config.rollPitchPID.dGain -= this.config.rollPitchPID.dGainInc;
         }
         if (this.config.debug == 'yaw') {
@@ -210,10 +210,10 @@ export default class FlightController {
                 c: this.config.motors.c ? pitchPower.back : 0,
                 d: this.config.motors.d ? rollPower.back : 0
             };
-            showStatus(basePower, this.config, errors, rollPIDResult, pitchPIDResult, yawPIDResult, powers );
+            showStatus(basePower, this.config, errors, rollPIDResult, pitchPIDResult, yawPIDResult);
             return powers;
         } else {
-            showStatus(basePower, this.config, errors, null, null, null, null);
+            showStatus(basePower, this.config, errors, null, null, null);
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }

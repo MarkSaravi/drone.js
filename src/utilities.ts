@@ -2,6 +2,7 @@ import IFlightStateError from './models/IFlightStateError';
 import { IPIDValue } from './models/IPIDValue';
 import IFlightConfig from './models/IFlightConfig';
 import IPowers from './models/IPowers';
+import IPIDConfig from './models/IPIDConfig';
 const numeral = require('numeral');
 
 export function print(msg: string) {
@@ -12,29 +13,38 @@ export function println(msg: string) {
     print(`${msg}\n`);
 }
 
+const pidConfigToString = (config: IPIDConfig): string => 
+     `pG:${numeral(config.pGain).format('0.000')} iG${numeral(config.iGain).format('0.000')} dG${numeral(config.dGain).format('0.000')}   `;
+
+const pidValuesToString = (pid: IPIDValue): string =>
+    `sum:${numeral(pid.sum).format('+000.0')} p:${numeral(pid.p).format('+000.0')} i:${numeral(pid.i).format('+000.0')} d:${numeral(pid.d).format('+000.0')}   `;
+
 export default function showStatus(
     power: number,
     config: IFlightConfig,
     errors: IFlightStateError,
     rollPID: IPIDValue,
     pitchPID: IPIDValue,
-    yawPID: IPIDValue,
-    powers: IPowers
+    yawPID: IPIDValue
 
     ) 
 {
-    print(`power:${numeral(power).format('0.00')},`);
-    print(`rpPID:${numeral(config.rollPitchPID.pGain).format('0.000')},${numeral(config.rollPitchPID.iGain).format('0.000')},${numeral(config.rollPitchPID.dGain).format('0.000')},`);
-    print(`yPID:${numeral(config.yawPID.pGain).format('0.000')},${numeral(config.yawPID.iGain).format('0.000')},${numeral(config.yawPID.dGain).format('0.000')},`);
-    print(`rpy:${numeral(errors.rollError).format('+00.0')},${numeral(errors.pitchError).format('+00.0')},${numeral(errors.yawError).format('+00.0')},`);
-    if (rollPID) {
-        print(`rPID:${numeral(rollPID.sum).format('+00.0')},${numeral(rollPID.p).format('+00.0')},${numeral(rollPID.i).format('+00.0')},,${numeral(rollPID.d).format('+00.0')},`);
+    print(`power:${numeral(power).format('0.00')}   `);
+    print(`   roll:${numeral(errors.rollError).format('+00.0')} pitch:${numeral(errors.pitchError).format('+00.0')} yaw:${numeral(errors.yawError).format('+000.0')}   `);
+    if (config.debug == 'roll' || config.debug == 'pitch') {
+        print(pidConfigToString(config.rollPitchPID));
     }
-    if (pitchPID) {
-        print(`pPID:${numeral(pitchPID.sum).format('+00.0')},${numeral(pitchPID.p).format('+00.0')},${numeral(pitchPID.i).format('+00.0')},,${numeral(pitchPID.d).format('+00.0')},`);
+    if (config.debug == 'yaw') {
+        print(pidConfigToString(config.yawPID));
     }
-    if (yawPID) {
-        print(`yPID:${numeral(yawPID.sum).format('+00.0')},${numeral(yawPID.p).format('+00.0')},${numeral(yawPID.i).format('+00.0')},,${numeral(yawPID.d).format('+00.0')},`);
+    if (rollPID && config.debug == 'roll') {
+        print(pidValuesToString(rollPID));
+    }
+    if (pitchPID && config.debug == 'pitch') {
+        print(pidValuesToString(pitchPID));
+    }
+    if (yawPID && config.debug == 'yaw') {
+        print(pidValuesToString(yawPID));
     }
 
 }
