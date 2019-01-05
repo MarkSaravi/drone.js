@@ -167,7 +167,7 @@ export default class FlightController {
     decPower() {
         var newPower = 0;
         if (this.targetFlightState.power > this.config.minPower) {
-            newPower=this.targetFlightState.power - this.POWER_INC;
+            newPower = this.targetFlightState.power - this.POWER_INC;
         }
         this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, newPower));
     }
@@ -189,7 +189,7 @@ export default class FlightController {
         }
     }
 
-    calcPairPower(power: number, pid: IPIDValue): {front: number; back: number} {
+    calcPairPower(power: number, pid: IPIDValue): { front: number; back: number } {
         return {
             front: power - pid.sum,
             back: power + pid.sum
@@ -198,11 +198,15 @@ export default class FlightController {
 
     calcMotorsPower(): IPowers {
         let errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
+        const rollError = this.config.motors.b && this.config.motors.d ? errors.rollError : 0;
+        const pitchError = this.config.motors.a && this.config.motors.c ? errors.pitchError : 0;
+        const yawError = this.config.motors.a && this.config.motors.b &&
+            this.config.motors.c && this.config.motors.d ? errors.yawError : 0;
         const basePower = this.targetFlightState.power;
         if (basePower >= this.config.minPower) {
-            const rollPIDResult = this.pidRoll.PID(errors.rollError, errors.time, this.config.rollPitchPID);
-            const pitchPIDResult = this.pidPitch.PID(errors.pitchError, errors.time, this.config.rollPitchPID);
-            const yawPIDResult = this.pidYaw.PID(errors.yawError, errors.time, this.config.yawPID);
+            const rollPIDResult = this.pidRoll.PID(rollError, errors.time, this.config.rollPitchPID);
+            const pitchPIDResult = this.pidPitch.PID(pitchError, errors.time, this.config.rollPitchPID);
+            const yawPIDResult = this.pidYaw.PID(yawError, errors.time, this.config.yawPID);
             const rollPower = this.calcPairPower(basePower + yawPIDResult.sum, rollPIDResult);
             const pitchPower = this.calcPairPower(basePower - yawPIDResult.sum, pitchPIDResult);
             const powers = {
@@ -214,7 +218,12 @@ export default class FlightController {
             showStatus(basePower, this.config, errors, rollPIDResult, pitchPIDResult, yawPIDResult);
             return powers;
         } else {
-            showStatus(basePower, this.config, errors, null, null, null);
+            showStatus(basePower, this.config, {
+                rollError,
+                pitchError,
+                yawError,
+                time: errors.time
+            }, null, null, null);
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }
