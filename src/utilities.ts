@@ -55,10 +55,10 @@ export const printPIDValues = (pid: IPIDValue) => {
 }
 
 export const printPowerValues = (p: IPowers) => {
-    printLabelValue('a:',`${numeral(p.a).format('+00.0')} `, 'yellow');
-    printLabelValue('b:',`${numeral(p.b).format('+00.0')} `, 'yellow');
-    printLabelValue('c:',`${numeral(p.c).format('+00.0')} `, 'yellow');
-    printLabelValue('d:',`${numeral(p.d).format('+00.0')}\n`, 'yellow');
+    printLabelValue('a:',`${numeral(p.a).format('00.0')} `, 'yellow');
+    printLabelValue('b:',`${numeral(p.b).format('00.0')} `, 'yellow');
+    printLabelValue('c:',`${numeral(p.c).format('00.0')} `, 'yellow');
+    printLabelValue('d:',`${numeral(p.d).format('00.0')}\n`, 'yellow');
 }
 
 export default function showStatus(
