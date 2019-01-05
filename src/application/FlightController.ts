@@ -198,10 +198,9 @@ export default class FlightController {
 
     calcMotorsPower(): IPowers {
         let errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
-        const rollError = this.config.motors.b && this.config.motors.d ? errors.rollError : 0;
-        const pitchError = this.config.motors.a && this.config.motors.c ? errors.pitchError : 0;
-        const yawError = this.config.motors.a && this.config.motors.b &&
-            this.config.motors.c && this.config.motors.d ? errors.yawError : 0;
+        const rollError = !this.config.suppress.roll ? errors.rollError : 0;
+        const pitchError = !this.config.suppress.pitch ? errors.pitchError : 0;
+        const yawError = !this.config.suppress.yaw ? errors.yawError : 0;
         const basePower = this.targetFlightState.power;
         if (basePower >= this.config.minPower) {
             const rollPIDResult = this.pidRoll.PID(rollError, errors.time, this.config.rollPitchPID);

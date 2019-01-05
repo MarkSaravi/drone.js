@@ -6,9 +6,15 @@ export interface Motors {
     d: boolean;
 }
 
+export interface Suppress {
+    roll: boolean;
+    pitch: boolean;
+    yaw: boolean;
+}
 export default interface IFlightConfig {
     rollPolarity: number;
     motors: Motors;
+    suppress: Suppress;
     pitchPolarity: number;
     yawPolarity: number;
     maxAngle: number;

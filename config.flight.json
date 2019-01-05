@@ -11,6 +11,11 @@
 		"c": true,
 		"d": true
 	},
+	"suppress": {
+		"roll": false,
+		"pitch": false,
+		"yaw": false
+	},
 	"rollPitchPID": {
 		"pGain": 0.5,
 		"iGain": 0.223,
