@@ -3,6 +3,8 @@
 	"pitchPolarity": 1,
 	"yawPolarity": -1,
 	"maxAngle": 30,
+	"minPower": 60,
+	"maxPower": 80,
 	"motors": {
 		"a": false,
 		"b": true,
@@ -40,5 +42,6 @@
 		"iMinAngle": 0.5,
 		"pMaxAngle": 5,
 		"tuneable": false
-	}
+	},
+	"pidLog": "pitch"
 }

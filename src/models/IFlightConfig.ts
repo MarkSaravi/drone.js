@@ -12,6 +12,9 @@ export default interface IFlightConfig {
     pitchPolarity: number;
     yawPolarity: number;
     maxAngle: number;
+    minPower: number;
+    maxPower: number;
     yawPID: IPIDConfig;
     rollPitchPID: IPIDConfig;
+    pidLog: string;
 }
