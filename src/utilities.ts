@@ -4,9 +4,11 @@ import IFlightConfig from './models/IFlightConfig';
 import IPowers from './models/IPowers';
 import IPIDConfig from './models/IPIDConfig';
 const numeral = require('numeral');
+const colorStdout = require('color-stdout');
 
 export function print(msg: string) {
     process.stdout.write(msg);
+    colorStdout.green(msg);
 }
 
 export function println(msg: string) {
@@ -29,6 +31,7 @@ export default function showStatus(
 
     ) 
 {
+    // print(`power:${numeral(power).format('0.00')}   `);
     print(`power:${numeral(power).format('0.00')}   `);
     print(`   roll:${numeral(errors.rollError).format('+00.0')} pitch:${numeral(errors.pitchError).format('+00.0')} yaw:${numeral(errors.yawError).format('+000.0')}   `);
     if (config.debug == 'roll' || config.debug == 'pitch') {
