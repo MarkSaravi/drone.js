@@ -24,8 +24,7 @@
 		"iMaxValue": 50,
 		"iMaxAngle": 15,
 		"iMinAngle": 0,
-                "pMaxAngle": 5,
-                "tuneable": true
+                "pMaxAngle": 5
 	},
 	"yawPID": {
 		"pGain": 1,
@@ -40,8 +39,7 @@
 		"iMaxValue": 10,
 		"iMaxAngle": 10,
 		"iMinAngle": 0.5,
-                "pMaxAngle": 5,
-                "tuneable": false
+                "pMaxAngle": 5
 	},
-        "pidLog": "roll-pitch"
+        "debug": "roll-pitch"
 }

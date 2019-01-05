@@ -16,5 +16,5 @@ export default interface IFlightConfig {
     maxPower: number;
     yawPID: IPIDConfig;
     rollPitchPID: IPIDConfig;
-    pidLog: string;
+    debug: string;
 }

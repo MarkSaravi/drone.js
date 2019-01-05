@@ -59,82 +59,82 @@ export default class FlightController {
     }
 
     toggleP() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.usePGain = !this.config.rollPitchPID.usePGain;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.usePGain = !this.config.yawPID.usePGain;
         }
     }
 
     toggleI() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.useIGain = !this.config.rollPitchPID.useIGain;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.useIGain = !this.config.yawPID.useIGain;
         }
     }
 
     toggleD() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.useDGain = !this.config.rollPitchPID.useDGain;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.useDGain = !this.config.yawPID.useDGain;
         }
     }
 
     incPGain() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.pGain += this.config.yawPID.pGainInc;
         }
     }
 
     decPGain() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.pGain -= this.config.yawPID.pGainInc;
         }
     }
 
     incIGain() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.iGain += this.config.yawPID.iGainInc;
         }
     }
 
     decIGain() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.iGain -= this.config.rollPitchPID.iGainInc;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.iGain -= this.config.yawPID.iGainInc;
         }
     }
 
     incDGain() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.dGain += this.config.rollPitchPID.dGainInc;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.dGain += this.config.yawPID.dGainInc;
         }
     }
 
     decDGain() {
-        if (this.config.rollPitchPID.tuneable) {
+        if (this.config.debug == 'roll-pitch') {
             this.config.rollPitchPID.dGain -= this.config.rollPitchPID.dGainInc;
         }
-        if (this.config.yawPID.tuneable) {
+        if (this.config.debug == 'yaw') {
             this.config.yawPID.dGain -= this.config.yawPID.dGainInc;
         }
     }
