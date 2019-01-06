@@ -214,15 +214,15 @@ export default class FlightController {
                 c: this.config.motors.c ? pitchPower.back : 0,
                 d: this.config.motors.d ? rollPower.back : 0
             };
-            showStatus(basePower, this.config, errors, rollPIDResult, pitchPIDResult, yawPIDResult);
-            return powers;
-        } else {
             showStatus(basePower, this.config, {
                 rollError,
                 pitchError,
                 yawError,
                 time: errors.time
-            }, null, null, null);
+            }, rollPIDResult, pitchPIDResult, yawPIDResult);
+            return powers;
+        } else {
+            showStatus(basePower, this.config, errors, null, null, null);
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }
