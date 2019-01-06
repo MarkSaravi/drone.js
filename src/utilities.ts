@@ -76,9 +76,9 @@ export default function showStatus(
 
 ) {
     printLabelValue('power:',`${numeral(power).format('0.00')} `, 'green');
-    printLabelValue('roll:', `${numeral(errors.rollError).format('+00.0')} `, 'green');
-    printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.0')} `, 'green');
-    printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.0')} `, 'green');
+    printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
+    printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
+    printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
     if (config.debug == 'roll' || config.debug == 'pitch') {
         printPIDConfig(config.debug, config.rollPitchPID);
     }
