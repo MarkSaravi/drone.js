@@ -19,24 +19,14 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        if (dt > 0.05) {
-            dt = 0
-        }
-        // reset integral sum if it is opposit to tilt direction
-        if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
-            this.iCounter++;
-        } else {
-            this.iCounter = 0;
-        }
-        if (this.iCounter > 10) {
+        if (Math.abs(this.integralSum) >= config.iMaxValue && this.integralSum * error <0) {
             this.integralSum = 0;
         }
-
-        this.integralSum += 
-            (Math.abs(this.integralSum) > config.iMaxValue && this.integralSum * error > 0) ||
-            Math.abs(error) > config.iMaxAngle ||
-            Math.abs(error) < config.iMinAngle ? 
-            0: error * dt * config.iGain;
+        this.integralSum += Math.abs(this.integralSum) < config.iMaxValue ?
+            error * dt * config.iGain : 0;
+        if (Math.abs(this.integralSum) > 1.5 * config.iMaxValue) {
+            this.integralSum = 0;
+        }
         return this.integralSum;
     }
 
