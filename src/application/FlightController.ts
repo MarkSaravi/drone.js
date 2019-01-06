@@ -23,6 +23,7 @@ export default class FlightController {
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("roll");
     private readonly pidYaw: PIDControl = new PIDControl("roll");
+    private prevTime: number = 0;
 
     constructor(private config: IFlightConfig) {
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
@@ -202,6 +203,8 @@ export default class FlightController {
         const pitchError = !this.config.suppress.pitch ? errors.pitchError : 0;
         const yawError = !this.config.suppress.yaw ? errors.yawError : 0;
         const basePower = this.targetFlightState.power;
+        const dt = errors.time - this.prevTime;
+        this.prevTime = errors.time;
         if (basePower >= this.config.minPower) {
             const rollPIDResult = this.pidRoll.PID(rollError, errors.time, this.config.rollPitchPID);
             const pitchPIDResult = this.pidPitch.PID(pitchError, errors.time, this.config.rollPitchPID);
@@ -218,7 +221,7 @@ export default class FlightController {
                 rollError,
                 pitchError,
                 yawError,
-                time: errors.time
+                time: dt
             }, rollPIDResult, pitchPIDResult, yawPIDResult);
             return powers;
         } else {

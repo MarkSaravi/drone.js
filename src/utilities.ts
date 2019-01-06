@@ -52,11 +52,12 @@ export const printPIDConfig = (name: string, config: IPIDConfig) => {
     printLabelValue('dG:',`${numeral(config.dGain).format('0.000')} `, 'green');
 }
 
-export const printPIDValues = (pid: IPIDValue) => {
+export const printPIDValues = (pid: IPIDValue, dt: number) => {
     printLabelValue('sum:',`${numeral(pid.sum).format('+000.000')} `, 'green');
     printLabelValue('p:',`${numeral(pid.p).format('+000.000')} `, 'green');
     printLabelValue('i:',`${numeral(pid.i).format('+000.000')} `, 'green');
     printLabelValue('d:',`${numeral(pid.d).format('+000.000')} `, 'green');
+    printLabelValue('t:',`${numeral(dt * 1000).format('000')} `, 'green');
 }
 
 export const printPowerValues = (p: IPowers) => {
@@ -86,12 +87,12 @@ export default function showStatus(
         printPIDConfig(config.debug, config.yawPID);
     }
     if (rollPID && config.debug == 'roll') {
-        printPIDValues(rollPID);
+        printPIDValues(rollPID, errors.time);
     }
     if (pitchPID && config.debug == 'pitch') {
-        printPIDValues(pitchPID);
+        printPIDValues(pitchPID, errors.time);
     }
     if (yawPID && config.debug == 'yaw') {
-        printPIDValues(yawPID);
+        printPIDValues(yawPID, errors.time);
     }
 }
