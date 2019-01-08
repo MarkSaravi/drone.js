@@ -69,6 +69,8 @@ export const printPowerValues = (p: IPowers) => {
 
 export default function showStatus(
     power: number,
+    rollPower: number,
+    pitchPower: number,
     config: IFlightConfig,
     errors: IFlightStateError,
     rollPID: IPIDValue,
@@ -93,6 +95,8 @@ export default function showStatus(
         printPIDValues(pitchPID, errors.time);
     }
     if (yawPID && config.debug == 'yaw') {
+        printLabelValue('rollPower:',`${numeral(rollPower).format('0.000')} `, 'green');
+        printLabelValue('pitchPower:',`${numeral(pitchPower).format('0.000')} `, 'green');
         printPIDValues(yawPID, errors.time);
     }
 }
