@@ -209,15 +209,17 @@ export default class FlightController {
             const rollPIDResult = this.pidRoll.PID(rollError, errors.time, this.config.rollPitchPID);
             const pitchPIDResult = this.pidPitch.PID(pitchError, errors.time, this.config.rollPitchPID);
             const yawPIDResult = this.pidYaw.PID(yawError, errors.time, this.config.yawPID);
-            const rollPower = this.calcPairPower(basePower + yawPIDResult.sum, rollPIDResult);
-            const pitchPower = this.calcPairPower(basePower - yawPIDResult.sum, pitchPIDResult);
+            const rollBasePower = basePower + yawPIDResult.sum;
+            const pitchBasePower = basePower - yawPIDResult.sum;
+            const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
+            const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
             const powers = {
                 a: this.config.motors.a ? pitchPower.front : 0,
                 b: this.config.motors.b ? rollPower.front : 0,
                 c: this.config.motors.c ? pitchPower.back : 0,
                 d: this.config.motors.d ? rollPower.back : 0
             };
-            showStatus(basePower, this.config, {
+            showStatus(basePower, rollBasePower, pitchBasePower, this.config, {
                 rollError,
                 pitchError,
                 yawError,
@@ -225,7 +227,7 @@ export default class FlightController {
             }, rollPIDResult, pitchPIDResult, yawPIDResult);
             return powers;
         } else {
-            showStatus(basePower, this.config, errors, null, null, null);
+            showStatus(basePower, basePower, basePower, this.config, errors, null, null, null);
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }

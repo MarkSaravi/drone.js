@@ -18,7 +18,7 @@
         "build-start": "npm run build && npm run run-drone",
         "start": "npm run run-drone",
         "build-test": "npm run build && npm run test",
-        "test": "node ./dist/tests/test.js",
+        "test": "npm run build && node ./dist/tests/test.js",
         "device-unzip-test": "npm run clean && npm run unzip && node ./dist/tests/device-test.js",
         "device-test": "node ./dist/tests/device-test.js"
     },
