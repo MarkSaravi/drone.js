@@ -1,20 +1,20 @@
 {
 	"rollPolarity": 1,
 	"pitchPolarity": 1,
-	"yawPolarity": -1,
+	"yawPolarity": 1,
 	"maxAngle": 30,
         "minPower": 40,
         "maxPower": 50,
 	"motors": {
 		"a": true,
-		"b": false,
+		"b": true,
 		"c": true,
-		"d": false
+		"d": true
 	},
 	"suppress": {
-		"roll": true,
+		"roll": false,
 		"pitch": false,
-		"yaw": true
+		"yaw": false
 	},
 	"rollPitchPID": {
 		"pGain": 0.15,
@@ -32,19 +32,19 @@
                 "pMaxAngle": 10
 	},
 	"yawPID": {
-		"pGain": 1,
-		"iGain": 0,
-		"dGain": 0,
+		"pGain": 0.2,
+		"iGain": 0.05,
+		"dGain": 0.2,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
-		"pGainInc": 0.025,
+		"pGainInc": 0.01,
 		"iGainInc": 0.01,
 		"dGainInc": 0.01,
-		"iMaxValue": 10,
-		"iMaxAngle": 10,
-		"iMinAngle": 0.5,
+		"iMaxValue": 2,
+		"iMaxAngle": 5,
+		"iMinAngle": 0,
                 "pMaxAngle": 5
 	},
-        "debug": "pitch"
+        "debug": "yaw"
 }
