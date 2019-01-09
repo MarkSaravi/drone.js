@@ -60,7 +60,8 @@ export const printPIDValues = (pid: IPIDValue, dt: number) => {
     printLabelValue('t:',`${numeral(dt * 1000).format('000')} `, 'green');
 }
 
-export const printPowerValues = (p: IPowers) => {
+export const printPowerValues = (cmd: string) => {
+    const p = JSON.parse(cmd);
     printLabelValue('a:',`${numeral(p.a).format('00.0')} `, 'yellow');
     printLabelValue('b:',`${numeral(p.b).format('00.0')} `, 'yellow');
     printLabelValue('c:',`${numeral(p.c).format('00.0')} `, 'yellow');

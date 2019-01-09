@@ -12,8 +12,9 @@ import * as convertors from '../convertors';
 import { ImuData, IPowers } from '../models';
 import { println, printPowerValues } from '../utilities';
 
-const BLE_STOP_STATE = "{\"state\": \"stop\"}";
-const BLE_EXIT_STATE = "{\"state\": \"exit\"}";
+const BLE_STOP_STATE = '{"state": "stop"}';
+const BLE_EXIT_STATE = '{"state": "exit"}';
+const ESC_STOP_COMMAND = '{"a":0.000,"b":0.000,"c":0.000,"d":0.000}';
 
 export default class Application extends EventEmitter {
     imu: any;
@@ -22,6 +23,7 @@ export default class Application extends EventEmitter {
     flightConfig: IFlightConfig;
     flightController: FlightController;
     motorsIdle: boolean = false;
+    terminated: boolean = false;
 
     constructor() {
         super();
@@ -59,45 +61,27 @@ export default class Application extends EventEmitter {
     openDevices() {
         println('trying to open port...');
         this.imu = this.initDevice(portsConfig.imu, 'data-imu',
-            () => { });
+            () => { 
+                this.ble.close();
+            });
         this.esc = this.initDevice(portsConfig.esc, 'data-esc',
+            () => {
+                this.imu.close();
+            });
+        this.ble = this.initDevice(portsConfig.ble, 'data-ble',
             () => {
                 println("exiting the application");
                 process.exit(0);
             });
-        this.ble = this.initDevice(portsConfig.ble, 'data-ble', () => { });
     }
 
     createEscCommand(p: IPowers): string {
         return `{"a":${numeral(p.a).format('0.000')},"b":${numeral(p.b).format('0.000')},"c":${numeral(p.c).format('0.000')},"d":${numeral(p.d).format('0.000')}}`
     }
 
-    terminateApplication(terminate: boolean) {
-        this.motorsIdle = true;
-        const escCommand = this.createEscCommand({ a: 0, b: 0, c: 0, d: 0 });
-        this.esc.write(escCommand, () => {
-            println(`Stopping all motors: ${escCommand}`);
-            if (terminate) {
-                this.esc.close();
-            }
-        });
-        if (terminate) {
-            this.imu.close();
-            this.ble.write(BLE_EXIT_STATE, () => {
-                this.ble.close();
-            });
-
-        } else {
-            this.ble.write(BLE_STOP_STATE);
-        }
-    }
 
     activateMotors(activate: boolean) {
-        if (activate) {
-            this.motorsIdle = false;
-        } else {
-            this.terminateApplication(false);
-        }
+        this.motorsIdle = !activate;
     }
 
     registerConsoleCommands() {
@@ -117,8 +101,8 @@ export default class Application extends EventEmitter {
                     break;
                 case 'q':
                 case 'Q':
-                    println('Closing devices.');
-                    this.terminateApplication(true);
+                    this.motorsIdle = true;
+                    this.terminated = true;
                     break;
                 case ']':
                     this.emit('inc-p-gain');
@@ -265,21 +249,19 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
-        if (this.motorsIdle) {
-            return;
-        }
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
             this.flightConfig.yawPolarity);
-            
+
         if (!imuData) {
             return;
         }
 
         if (Math.abs(imuData.roll) > this.flightConfig.maxAngle ||
             Math.abs(imuData.pitch) > this.flightConfig.maxAngle) {
-                this.terminateApplication(true);
+            this.motorsIdle = true;
+            this.terminated = true;
         }
 
         if (!this.applySafeTilt(imuData)) {
@@ -288,11 +270,16 @@ export default class Application extends EventEmitter {
         }
 
         this.flightController.applyImuData(imuData);
-
         const powers = this.flightController.calcMotorsPower();
-        const escCommand = this.createEscCommand(powers);
+        const escCommand = !this.motorsIdle ?
+            this.createEscCommand(powers) : ESC_STOP_COMMAND;
         this.esc.write(escCommand, () => {
-            printPowerValues(powers);
+            printPowerValues(escCommand);
+            if (this.terminated && escCommand == ESC_STOP_COMMAND) {
+                this.esc.close();
+                this.imu.close();
+                this.ble.close();
+            }
         });
     }
 
