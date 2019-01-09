@@ -10,7 +10,7 @@ import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
 import { ImuData, IPowers } from '../models';
-import { print, println, printPowerValues } from '../utilities';
+import { println, printPowerValues } from '../utilities';
 
 const BLE_STOP_STATE = "{\"state\": \"stop\"}";
 const BLE_EXIT_STATE = "{\"state\": \"exit\"}";
@@ -74,7 +74,7 @@ export default class Application extends EventEmitter {
 
     terminateApplication(terminate: boolean) {
         this.motorsIdle = true;
-        const escCommand = this.createEscCommand({a:0, b:0, c: 0, d: 0});
+        const escCommand = this.createEscCommand({ a: 0, b: 0, c: 0, d: 0 });
         this.esc.write(escCommand, () => {
             println(`Stopping all motors: ${escCommand}`);
             if (terminate) {
@@ -83,13 +83,13 @@ export default class Application extends EventEmitter {
         });
         if (terminate) {
             this.imu.close();
-            this.ble.write(BLE_EXIT_STATE,()=>{
+            this.ble.write(BLE_EXIT_STATE, () => {
                 this.ble.close();
             });
-            
+
         } else {
             this.ble.write(BLE_STOP_STATE);
-        }      
+        }
     }
 
     activateMotors(activate: boolean) {
@@ -272,8 +272,14 @@ export default class Application extends EventEmitter {
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
             this.flightConfig.yawPolarity);
+            
         if (!imuData) {
             return;
+        }
+
+        if (Math.abs(imuData.roll) > this.flightConfig.maxAngle ||
+            Math.abs(imuData.pitch) > this.flightConfig.maxAngle) {
+                this.terminateApplication(true);
         }
 
         if (!this.applySafeTilt(imuData)) {
@@ -291,7 +297,7 @@ export default class Application extends EventEmitter {
     }
 
     onEscData(escJson: string) {
-        if (escJson.indexOf("{\"info\":\"end arming\"}")==0) {
+        if (escJson.indexOf("{\"info\":\"end arming\"}") == 0) {
             this.ble.write(BLE_STOP_STATE);
         }
     }

@@ -19,7 +19,7 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_INC: number = 1;
+    private readonly POWER_INC: number = 0.5;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("roll");
     private readonly pidYaw: PIDControl = new PIDControl("roll");

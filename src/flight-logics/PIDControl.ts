@@ -14,13 +14,19 @@ export default class PIDControl {
 
     P(error: number, config: IPIDConfig): number {
         const err = Math.abs(error) < config.pMaxAngle ?
-            error: Math.sign(error) * config.pMaxAngle;
+            error : Math.sign(error) * config.pMaxAngle;
         return err * config.pGain;
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        if (Math.abs(this.integralSum) >= config.iMaxValue && this.integralSum * error <0) {
-            this.integralSum = 0;
+        if (this.integralSum * error < 0) {
+            this.iCounter++;
+            if (Math.abs(this.integralSum) >= config.iMaxValue || this.iCounter > 20) {
+                this.integralSum = 0;
+                this.iCounter = 0;
+            }
+        } else {
+            this.iCounter = 0;
         }
         this.integralSum += Math.abs(this.integralSum) < config.iMaxValue ?
             error * dt * config.iGain : 0;
@@ -46,7 +52,7 @@ export default class PIDControl {
         this.prevError = error;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
         return {
-            sum, p,i,d
+            sum, p, i, d
         };
     }
 
