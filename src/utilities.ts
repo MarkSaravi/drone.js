@@ -79,7 +79,9 @@ export default function showStatus(
     yawPID: IPIDValue
 
 ) {
-    printLabelValue('power:',`${numeral(power).format('0.00')} `, 'green');
+    printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
+    printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
+    printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
     printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
     printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
@@ -96,8 +98,6 @@ export default function showStatus(
         printPIDValues(pitchPID, errors.time);
     }
     if (yawPID && config.debug == 'yaw') {
-        printLabelValue('rollPower:',`${numeral(rollPower).format('0.000')} `, 'green');
-        printLabelValue('pitchPower:',`${numeral(pitchPower).format('0.000')} `, 'green');
         printPIDValues(yawPID, errors.time);
     }
 }
