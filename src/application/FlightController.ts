@@ -19,7 +19,7 @@ export default class FlightController {
     private rollTilt: number = 0;
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
-    private readonly POWER_INC: number = 0.5;
+    private readonly POWER_INC: number = 0.25;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("roll");
     private readonly pidYaw: PIDControl = new PIDControl("roll");
@@ -206,9 +206,9 @@ export default class FlightController {
         const dt = errors.time - this.prevTime;
         this.prevTime = errors.time;
         if (basePower >= this.config.minPower) {
-            const rollPIDResult = this.pidRoll.PID(rollError, errors.time, this.config.rollPitchPID);
-            const pitchPIDResult = this.pidPitch.PID(pitchError, errors.time, this.config.rollPitchPID);
-            const yawPIDResult = this.pidYaw.PID(yawError, errors.time, this.config.yawPID);
+            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, errors.time, this.config.rollPitchPID);
+            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, errors.time, this.config.rollPitchPID);
+            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, errors.time, this.config.yawPID);
             const rollBasePower = basePower + yawPIDResult.sum;
             const pitchBasePower = basePower - yawPIDResult.sum;
             const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);

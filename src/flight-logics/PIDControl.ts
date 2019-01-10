@@ -3,9 +3,8 @@ import { IPIDValue } from '../models/IPIDValue';
 
 export default class PIDControl {
     integralSum: number = 0;
-    prevError: number = 0;
+    prevAngle: number = 0;
     prevTime: number = 0;
-    iCounter: number = 0;
 
     constructor(
         protected readonly name: string,
@@ -19,40 +18,30 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        if (this.integralSum * error < 0) {
-            this.iCounter++;
-            if (Math.abs(this.integralSum) >= config.iMaxValue || this.iCounter > 20) {
-                this.integralSum = 0;
-                this.iCounter = 0;
-            }
-        } else {
-            this.iCounter = 0;
-        }
-        this.integralSum += Math.abs(this.integralSum) < config.iMaxValue ?
-            error * dt * config.iGain : 0;
-        if (Math.abs(this.integralSum) > 1.5 * config.iMaxValue) {
-            this.integralSum = 0;
-        }
+        this.integralSum += error * dt * config.iGain;
+        this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
+            this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
     }
 
-    D(dError: number, dt: number, config: IPIDConfig): number {
-        return dError / dt * config.dGain;
+    D(dAngle: number, dt: number, config: IPIDConfig): number {
+        return dAngle / dt * config.dGain;
     }
 
-    PID(error: number, time: number, config: IPIDConfig): IPIDValue {
+    PID(error: number, angle: number, time: number, config: IPIDConfig): IPIDValue {
         const dt = (time - this.prevTime); //convert to milliseconds
-        const dError = error - this.prevError;
+        const dAngle = this.prevAngle - angle;
 
-        const d = this.D(dError, dt, config);
+        const d = this.D(dAngle, dt, config);
         const p = this.P(error, config);
         const i = this.I(error, dt, config);
 
         this.prevTime = time;
-        this.prevError = error;
+        this.prevAngle = angle;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
         return {
-            sum, p, i, d
+            sum: Math.abs(sum) <= config.maxOutput ? sum : config.maxOutput * Math.sign(sum),
+            p, i, d
         };
     }
 

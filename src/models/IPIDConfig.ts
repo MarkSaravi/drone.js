@@ -12,4 +12,5 @@ export default interface IPIDConfig {
     iMaxAngle: number;
     iMinAngle: number;
     pMaxAngle: number;
+    maxOutput: number;
 } 
