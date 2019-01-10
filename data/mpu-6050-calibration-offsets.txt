@@ -1,0 +1,25 @@
+Sensor readings with offsets:	3	-5	16380	-1	1	0
+Your offsets:	-2850	-787	1079	1	-22	63
+
+Data is printed as: acelX acelY acelZ giroX giroY giroZ
+Check that your sensor readings are close to 0 0 16384 0 0 0
+------------------------------------------------------------------------
+Sensor readings with offsets:	3	-4	16387	2	0	0
+Your offsets:	-2849	-787	1079	1	-23	64
+
+Data is printed as: acelX acelY acelZ giroX giroY giroZ
+Check that your sensor readings are close to 0 0 16384 0 0 0
+_________________________________________________________________________
+Sensor readings with offsets:	0	-1	16387	0	-1	-2
+Your offsets:	-2849	-787	1079	0	-23	63
+_________________________________________________________________________
+Sensor readings with offsets:	0	-2	16382	-1	-1	2
+Your offsets:	-2850	-787	1079	0	-23	64
+-------------------------------------------------------------------------
+Sensor readings with offsets:	6	-2	16388	0	-1	1
+Your offsets:	-2850	-787	1078	0	-23	64
+-------------------------------------------------------------------------
+Sensor readings with offsets:	3	-1	16388	2	1	2
+Your offsets:	-2850	-787	1078	0	-22	64
+=========================================================
+offsets: acelX: -2850, acelY: -787, acelZ: 1079,  giroX: 0, giroY: -23, giroZ: 64
