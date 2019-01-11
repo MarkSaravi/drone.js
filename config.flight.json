@@ -17,19 +17,19 @@
 		"yaw": false
 	},
 	"rollPitchPID": {
-		"pGain": 0.45,
-		"iGain": 0,
-		"dGain": 0.044,
+		"pGain": 0.46,
+		"iGain": 1.5,
+		"dGain": 0.062,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
 		"pGainInc": 0.01,
-		"iGainInc": 0.1,
+		"iGainInc": 0.01,
 		"dGainInc": 0.001,
-		"iMaxValue": 5,
-		"iMaxAngle": 3,
+		"iMaxValue": 3.5,
+		"iMaxAngle": 2.5,
 		"iMinAngle": 0,
-                "pMaxAngle": 10,
+                "pMaxAngle": 3.5,
                 "maxOutput": 10
 	},
 	"yawPID": {

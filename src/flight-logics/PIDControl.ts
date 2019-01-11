@@ -1,5 +1,6 @@
 import IPIDConfig from '../models/IPIDConfig';
 import { IPIDValue } from '../models/IPIDValue';
+const colorStdout = require('color-stdout');
 
 export default class PIDControl {
     integralSum: number = 0;
@@ -19,6 +20,10 @@ export default class PIDControl {
 
     I(error: number, dt: number, config: IPIDConfig): number {
         this.integralSum += error * dt * config.iGain;
+        if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
+            this.integralSum = 0;
+            colorStdout.red('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        }
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
@@ -29,6 +34,9 @@ export default class PIDControl {
     }
 
     PID(error: number, angle: number, time: number, config: IPIDConfig): IPIDValue {
+        if (Math.abs(error) > config.pMaxAngle) {
+            colorStdout.cyan('============================================================');
+        }
         const dt = (time - this.prevTime); //convert to milliseconds
         const dAngle = this.prevAngle - angle;
 
