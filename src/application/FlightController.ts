@@ -17,6 +17,7 @@ export default class FlightController {
     private imuData: ImuData = null;
     private pitchTilt: number = 0;
     private rollTilt: number = 0;
+    private command: Command = new Command(0, 0, 0, 0);
     private heading: number = -1000;
     private readonly TILT_INC: number = 0.25;
     private readonly POWER_INC: number = 0.25;
@@ -148,7 +149,18 @@ export default class FlightController {
     }
 
     applyIncomingCommand(cmdJson: string) {
-        this.targetFlightState = convertors.JsonToCommand(cmdJson, this.targetFlightState);
+        try{
+            const cmd = JSON.parse(cmdJson);
+            // console.log(JSON.stringify(cmd));
+            const x = cmd.x != undefined ? cmd.x : this.command.x;
+            const y = cmd.y != undefined ? cmd.y : this.command.y;
+            const heading = cmd.heading != undefined ? cmd.heading : this.command.heading;
+            const power = cmd.p != undefined ? cmd.p : this.command.power;
+            this.command = new Command(heading, x, y, power);
+            this.targetFlightState = convertors.JsonToCommand(this.command, this.targetFlightState);
+            // console.log(JSON.stringify(this.targetFlightState));
+        } catch(err){
+        }
     }
 
     incPower() {

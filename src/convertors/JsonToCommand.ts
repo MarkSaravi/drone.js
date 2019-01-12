@@ -1,46 +1,16 @@
-import Command from '../models/Command';
+import xyToRollPitch from '../flight-logics/xyToRollPitch';
 import FlightState from '../models/FlightState';
+import { Command } from '../models';
 
-export default function (cmdJson: string, target: FlightState): FlightState {
-    const RATIO = 20;
-    try {
-        let cmd = JSON.parse(cmdJson);
-        if (cmd.p != undefined) {
-            return new FlightState(
-                target.roll,
-                target.pitch,
-                target.yaw,
-                0,
-                cmd.p
-            );
-        } else if (cmd.x != undefined) {
-            return new FlightState(
-                cmd.x / RATIO,
-                target.pitch,
-                target.yaw,
-                0,
-                target.power
-            );
-        } else if (cmd.y != undefined) {
-            return new FlightState(
-                target.roll,
-                cmd.y / RATIO,
-                target.yaw,
-                0,
-                target.power
-            );
-        } else if (cmd.h != undefined) {
-            return new FlightState(
-                target.roll,
-                target.pitch,
-                target.yaw,
-                0,
-                target.power
-            );
-        } else {
-            return target;
-        }
-    } catch (err) {
-        return target;
-    }
+export default function (cmd: Command, target: FlightState): FlightState {
+    const RATIO = 10;
+    const tilt = xyToRollPitch(cmd.x, cmd.y);
+    // console.log(JSON.stringify(tilt));
+    return new FlightState(
+        tilt.roll / RATIO,
+        tilt.pitch / RATIO,
+        target.yaw,
+        0,
+        cmd.power
+    );
 }
