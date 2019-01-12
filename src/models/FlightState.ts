@@ -1,3 +1,8 @@
+export interface ITilt {
+    roll: number;
+    pitch: number;
+}
+
 export default class FlightState {
     constructor(
         readonly roll: number,
