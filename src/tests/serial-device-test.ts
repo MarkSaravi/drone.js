@@ -38,7 +38,6 @@ export default class SerialDeviceReader extends EventEmitter {
         const parser = new Readline()
         port.pipe(parser)
         parser.on('data', (str: string) => {
-            println(str);
             this.emit(event, str);
         });
         return port;
