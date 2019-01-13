@@ -245,20 +245,22 @@ void setup() {
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
-void sendAsJson(double roll, double pitch, double yaw)
+void sendAsJson(double roll, double pitch, double yaw, double accX, double accY, double accZ)
 {
     static long last_time = 0;
-    static int counter = 0;
-    static char json[128], rollstr[32], pitchstr[32], yawstr[32];
+    static char json[256], rollstr[32], pitchstr[32], yawstr[32];
+    static char xs[32], ys[32], zs[32];
     if (millis() - last_time >= 1000) 
     {
         last_time = millis();
-        counter = 0;
     }
     dtostrf(roll, 3, 4, rollstr);
     dtostrf(pitch, 3, 4, pitchstr);
     dtostrf(yaw, 3, 4, yawstr);
-    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld,\"s\":%d}\n", rollstr, pitchstr, yawstr, millis(), ++counter);
+    dtostrf(accX, 3, 4, xs);
+    dtostrf(accY, 3, 4, ys);
+    dtostrf(accZ, 3, 4, zs);
+    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"ax\":%s,\"ay\":%s,\"az\":%s,\"t\":%ld}\n", rollstr, pitchstr, yawstr, xs, ys, zs, millis());
     Serial.print(json);
 }
 
@@ -335,6 +337,9 @@ void loop() {
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            mpu.dmpGetAccel(&aa, fifoBuffer);
+            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+            mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
             // Serial.print("ypr\t");
             // Serial.print(ypr[0] * 180/M_PI);
             // Serial.print("\t");
@@ -344,7 +349,10 @@ void loop() {
             sendAsJson(
                 -ypr[1] * 180/M_PI,
                 -ypr[2] * 180/M_PI,
-                ypr[0] * 180/M_PI
+                ypr[0] * 180/M_PI,
+                aaWorld.x,
+                aaWorld.y,
+                aaWorld.z
                 );
         #endif
 
