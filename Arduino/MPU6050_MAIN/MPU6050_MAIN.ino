@@ -245,23 +245,32 @@ void setup() {
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
-void sendAsJson(double roll, double pitch, double yaw, double accX, double accY, double accZ)
+void sendAsJson(
+    double roll, double pitch, double yaw,
+    double accrX, double accrY, double accrZ,
+    double accwX, double accwY, double accwZ)
 {
-    static long last_time = 0;
+    // static long last_time = 0;
     static char json[256], rollstr[32], pitchstr[32], yawstr[32];
-    static char xs[32], ys[32], zs[32];
-    if (millis() - last_time >= 1000) 
-    {
-        last_time = millis();
-    }
-    dtostrf(roll, 3, 4, rollstr);
-    dtostrf(pitch, 3, 4, pitchstr);
-    dtostrf(yaw, 3, 4, yawstr);
-    dtostrf(accX, 3, 4, xs);
-    dtostrf(accY, 3, 4, ys);
-    dtostrf(accZ, 3, 4, zs);
-    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"ax\":%s,\"ay\":%s,\"az\":%s,\"t\":%ld}\n", rollstr, pitchstr, yawstr, xs, ys, zs, millis());
-    Serial.print(json);
+    static char xrs[32], yrs[32], zrs[32];
+    static char xws[32], yws[32], zws[32];
+    // if (millis() - last_time >= 1000) 
+    // {
+    //     last_time = millis();
+    //     Serial.println("accrX, accrY, accrZ, accwX, accwY, accwZ, time");
+    // }
+    dtostrf(roll, 3, 3, rollstr);
+    dtostrf(pitch, 3, 3, pitchstr);
+    dtostrf(yaw, 3, 3, yawstr);
+    dtostrf(accrX, 0, 3, xrs);
+    dtostrf(accrY, 0, 3, yrs);
+    dtostrf(accrZ, 0, 3, zrs);
+    dtostrf(accwX, 0, 3, xws);
+    dtostrf(accwY, 0, 3, yws);
+    dtostrf(accwZ, 0, 3, zws);
+    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"arx\":%s,\"ary\":%s,\"arz\":%s,\"awx\":%s,\"awy\":%s,\"awz\":%s,\"t\":%ld}", rollstr, pitchstr, yawstr, xrs, yrs, zrs, xws, yws, zws, millis());
+    // sprintf(json, "%s, %s, %s, %s, %s, %s, %ld", xrs, yrs, zrs, xs, ys, zs, millis());
+    Serial.println(json);
 }
 
 void loop() {
@@ -350,6 +359,9 @@ void loop() {
                 -ypr[1] * 180/M_PI,
                 -ypr[2] * 180/M_PI,
                 ypr[0] * 180/M_PI,
+                aaReal.x,
+                aaReal.y,
+                aaReal.z,
                 aaWorld.x,
                 aaWorld.y,
                 aaWorld.z
