@@ -5,6 +5,10 @@ import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
 import { println } from '../utilities';
+import DistanceCalculator from '../flight-logics/distance-calculator';
+
+const distanceCalculator = new DistanceCalculator();
+let prevTime: number = NaN;
 
 export default class SerialDeviceReader extends EventEmitter {
     serial: any;
@@ -94,7 +98,27 @@ export default class SerialDeviceReader extends EventEmitter {
         });
     }
 
-    onSerialData(data: string) {
-        println(data)
+    onSerialData(jsonString: string) {
+        // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
+        const data = JSON.parse(jsonString);
+        if (isNaN(prevTime)) {
+            prevTime = data.t;
+        }
+        const res = distanceCalculator.calc(
+            {
+                x: data.arx,
+                y: data.ary,
+                z: data.arz,
+            },
+            {
+                x: data.awx,
+                y: data.awy,
+                z: data.awz,
+            },
+            data.t - prevTime
+        );
+        prevTime = data.t;
+        // println(jsonString)
+        println(JSON.stringify({real: res.realDist, world: res.worldDist}));
     }
 }
