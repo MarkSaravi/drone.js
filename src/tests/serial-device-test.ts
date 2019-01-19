@@ -6,9 +6,10 @@ const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
 import { println } from '../utilities';
 import DistanceCalculator from '../flight-logics/distance-calculator';
+const numeral = require('numeral');
+const colorStdout = require('color-stdout');
 
 const distanceCalculator = new DistanceCalculator();
-let prevTime: number = NaN;
 
 export default class SerialDeviceReader extends EventEmitter {
     serial: any;
@@ -98,27 +99,60 @@ export default class SerialDeviceReader extends EventEmitter {
         });
     }
 
-    onSerialData(jsonString: string) {
-        // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
-        const data = JSON.parse(jsonString);
-        if (isNaN(prevTime)) {
-            prevTime = data.t;
+    trim(value: string, len: number = 10) {
+        while (value.length < len) {
+            value = ' ' + value;
         }
-        const res = distanceCalculator.calc(
-            {
-                x: data.arx,
-                y: data.ary,
-                z: data.arz,
-            },
-            {
-                x: data.awx,
-                y: data.awy,
-                z: data.awz,
-            },
-            data.t - prevTime
-        );
-        prevTime = data.t;
-        // println(jsonString)
-        println(JSON.stringify({real: res.realDist, world: res.worldDist}));
+        return value;
+    }
+
+    prevTime: number = 0;
+    prevAccX: number = 0;
+    prevRawAccX: number = 0;
+    prevAccY: number = 0;
+    prevVelX: number = 0;
+    prevVelY: number = 0;
+
+    onSerialData(jsonString: string) {
+        const noiseReducer = (v: number, pv: number) => {
+            const noiseFactor = 0.45;
+            return noiseFactor * v + (1 - noiseFactor) * pv;
+        }
+
+        // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
+        try {
+            const data = JSON.parse(jsonString);
+            const dt = 0.015;
+            const noiseFilter = 0.45;
+            const roundFactor = 100;
+
+            const rawAccX = noiseFilter * Math.round(data.awx / roundFactor) * roundFactor + (1-noiseFilter) * this.prevAccX;
+            const accX = rawAccX - this.prevAccX;
+            const accY = data.awy - this.prevAccY;
+
+
+            const velX = accX * dt + this.prevVelX;
+            const velY = accY * dt + this.prevVelY;
+
+            this.prevAccX = rawAccX;
+            this.prevAccY = accY;
+            this.prevVelX = velX;
+            this.prevVelY = velY;
+
+            colorStdout.blue(`${this.trim(numeral(data.awx).format('0'))},`);
+            colorStdout.green(`${this.trim(numeral(accX).format('0'))},`);
+            colorStdout.yellow(`${this.trim(numeral(velX).format('0'))}, `);
+            colorStdout.blue(`${this.trim(numeral(data.awy).format('0'))},`);
+            colorStdout.green(`${this.trim(numeral(accY).format('0'))},`);
+            colorStdout.yellow(`${this.trim(numeral(velY).format('0'))}\n`);
+
+            // colorStdout.green(`${this.trim(numeral(data.arx).format('0'))},`);
+            // colorStdout.yellow(`${this.trim(numeral(data.ary).format('0'))}, `);
+            // colorStdout.blue(`${this.trim(numeral(data.arz).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(data.awx).format('0'))},`);
+            // colorStdout.yellow(`${this.trim(numeral(data.awy).format('0'))},`);
+            // colorStdout.blue(`${this.trim(numeral(data.awz).format('0'))}\n`);
+        } catch (err) {
+        }
     }
 }

@@ -66,7 +66,7 @@ export default class DistanceCalculator {
     }
 
     private distance(dist: IDistance): number {
-        return Math.sqrt(dist.x * dist.x + dist.y * dist.y);
+        return Math.sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
     }
 
     calc(
