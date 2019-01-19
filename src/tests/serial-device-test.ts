@@ -121,39 +121,29 @@ export default class SerialDeviceReader extends EventEmitter {
         // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
         try {
             const data = JSON.parse(jsonString);
-            const dt = 0.015;
-            const noiseFilter = 0.45;
-            const roundFactor = 100;
+            // const dt = 0.015;
+            // const noiseFilter = 0.45;
+            // const roundFactor = 100;
 
-            const moveX = movement.getVelocityX(data.awx, 0.015);
-            const rawAccX = noiseFilter * Math.round(data.awx / roundFactor) * roundFactor + (1-noiseFilter) * this.prevAccX;
-            const accX = rawAccX - this.prevAccX;
-            const accY = data.awy - this.prevAccY;
+            const movex = movement.getVelocityX(data.awx, 0.015);
+            const movey = movement.getVelocityY(data.awy, 0.015);
+            // const rawAccX = noiseFilter * Math.round(data.awx / roundFactor) * roundFactor + (1-noiseFilter) * this.prevAccX;
+            // const accX = rawAccX - this.prevAccX;
+            // const accY = data.awy - this.prevAccY;
 
 
-            const velX = accX * dt + this.prevVelX;
-            const velY = accY * dt + this.prevVelY;
+            // const velX = accX * dt + this.prevVelX;
+            // const velY = accY * dt + this.prevVelY;
 
-            this.prevAccX = rawAccX;
-            this.prevAccY = accY;
-            this.prevVelX = velX;
-            this.prevVelY = velY;
+            // this.prevAccX = rawAccX;
+            // this.prevAccY = accY;
+            // this.prevVelX = velX;
+            // this.prevVelY = velY;
 
-            colorStdout.blue(`${this.trim(numeral(data.awx).format('0'))},`);
-            colorStdout.green(`${this.trim(numeral(rawAccX).format('0'))},`);
-            colorStdout.yellow(`${this.trim(numeral(velX).format('0'))}, `);
-            colorStdout.green(`${this.trim(numeral(moveX.currAcc).format('0'))},`);
-            colorStdout.yellow(`${this.trim(numeral(moveX.currVelocity).format('0'))}, `);
-            colorStdout.blue(`${this.trim(numeral(data.awy).format('0'))},`);
-            colorStdout.green(`${this.trim(numeral(accY).format('0'))},`);
-            colorStdout.yellow(`${this.trim(numeral(velY).format('0'))}\n`);
-
-            // colorStdout.green(`${this.trim(numeral(data.arx).format('0'))},`);
-            // colorStdout.yellow(`${this.trim(numeral(data.ary).format('0'))}, `);
-            // colorStdout.blue(`${this.trim(numeral(data.arz).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(data.awx).format('0'))},`);
-            // colorStdout.yellow(`${this.trim(numeral(data.awy).format('0'))},`);
-            // colorStdout.blue(`${this.trim(numeral(data.awz).format('0'))}\n`);
+            colorStdout.green(`${this.trim(numeral(movex.currAcc).format('0'))},`);
+            colorStdout.yellow(`${this.trim(numeral(movex.currVelocity).format('0'))}, `);
+            colorStdout.green(`${this.trim(numeral(movey.currAcc).format('0'))},`);
+            colorStdout.yellow(`${this.trim(numeral(movey.currVelocity).format('0'))}\n`);
         } catch (err) {
         }
     }
