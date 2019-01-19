@@ -113,32 +113,11 @@ export default class SerialDeviceReader extends EventEmitter {
     prevVelY: number = 0;
 
     onSerialData(jsonString: string) {
-        const noiseReducer = (v: number, pv: number) => {
-            const noiseFactor = 0.45;
-            return noiseFactor * v + (1 - noiseFactor) * pv;
-        }
-
         // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
         try {
             const data = JSON.parse(jsonString);
-            // const dt = 0.015;
-            // const noiseFilter = 0.45;
-            // const roundFactor = 100;
-
             const movex = movement.getVelocityX(data.awx, 0.015);
             const movey = movement.getVelocityY(data.awy, 0.015);
-            // const rawAccX = noiseFilter * Math.round(data.awx / roundFactor) * roundFactor + (1-noiseFilter) * this.prevAccX;
-            // const accX = rawAccX - this.prevAccX;
-            // const accY = data.awy - this.prevAccY;
-
-
-            // const velX = accX * dt + this.prevVelX;
-            // const velY = accY * dt + this.prevVelY;
-
-            // this.prevAccX = rawAccX;
-            // this.prevAccY = accY;
-            // this.prevVelX = velX;
-            // this.prevVelY = velY;
 
             colorStdout.green(`${this.trim(numeral(movex.currAcc).format('0'))},`);
             colorStdout.yellow(`${this.trim(numeral(movex.currVelocity).format('0'))}, `);
