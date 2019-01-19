@@ -5,11 +5,11 @@ import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
 import { println } from '../utilities';
-import DistanceCalculator from '../flight-logics/distance-calculator';
+import MovementDetector from '../flight-logics/movement-detector';
 const numeral = require('numeral');
 const colorStdout = require('color-stdout');
 
-const distanceCalculator = new DistanceCalculator();
+const movement = new MovementDetector();
 
 export default class SerialDeviceReader extends EventEmitter {
     serial: any;
@@ -108,7 +108,6 @@ export default class SerialDeviceReader extends EventEmitter {
 
     prevTime: number = 0;
     prevAccX: number = 0;
-    prevRawAccX: number = 0;
     prevAccY: number = 0;
     prevVelX: number = 0;
     prevVelY: number = 0;
@@ -126,6 +125,7 @@ export default class SerialDeviceReader extends EventEmitter {
             const noiseFilter = 0.45;
             const roundFactor = 100;
 
+            const moveX = movement.getVelocityX(data.awx, 0.015);
             const rawAccX = noiseFilter * Math.round(data.awx / roundFactor) * roundFactor + (1-noiseFilter) * this.prevAccX;
             const accX = rawAccX - this.prevAccX;
             const accY = data.awy - this.prevAccY;
@@ -140,8 +140,10 @@ export default class SerialDeviceReader extends EventEmitter {
             this.prevVelY = velY;
 
             colorStdout.blue(`${this.trim(numeral(data.awx).format('0'))},`);
-            colorStdout.green(`${this.trim(numeral(accX).format('0'))},`);
+            colorStdout.green(`${this.trim(numeral(rawAccX).format('0'))},`);
             colorStdout.yellow(`${this.trim(numeral(velX).format('0'))}, `);
+            colorStdout.green(`${this.trim(numeral(moveX.currAcc).format('0'))},`);
+            colorStdout.yellow(`${this.trim(numeral(moveX.currVelocity).format('0'))}, `);
             colorStdout.blue(`${this.trim(numeral(data.awy).format('0'))},`);
             colorStdout.green(`${this.trim(numeral(accY).format('0'))},`);
             colorStdout.yellow(`${this.trim(numeral(velY).format('0'))}\n`);
