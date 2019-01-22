@@ -30,7 +30,8 @@
 		"iMaxAngle": 10,
 		"iMinAngle": 0,
                 "pMaxAngle": 5,
-                "maxOutput": 10
+		"maxOutput": 10,
+		"dMaxValue": 2
 	},
 	"yawPID": {
 		"pGain": 0.2,
@@ -46,7 +47,8 @@
 		"iMaxAngle": 5,
 		"iMinAngle": 0,
                 "pMaxAngle": 5,
-                "maxOutput": 50
+		"maxOutput": 50,
+		"dMaxValue": 50
 	},
         "debug": "roll"
 }

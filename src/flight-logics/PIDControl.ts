@@ -30,7 +30,8 @@ export default class PIDControl {
     }
 
     D(dAngle: number, dt: number, config: IPIDConfig): number {
-        return dAngle / dt * config.dGain;
+        const d = dAngle / dt * config.dGain;
+        return Math.abs(d) < config.dMaxValue ? d : config.dMaxValue * Math.sign(d);
     }
 
     PID(error: number, angle: number, time: number, config: IPIDConfig): IPIDValue {

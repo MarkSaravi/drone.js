@@ -106,23 +106,29 @@ export default class SerialDeviceReader extends EventEmitter {
         return value;
     }
 
-    prevTime: number = 0;
-    prevAccX: number = 0;
-    prevAccY: number = 0;
-    prevVelX: number = 0;
-    prevVelY: number = 0;
+
+    maxX: number = 0;
+    maxY: number = 0;
+    maxZ: number = 0;
 
     onSerialData(jsonString: string) {
         // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
         try {
             const data = JSON.parse(jsonString);
-            const movex = movement.getVelocityX(data.awx, 0.015);
-            const movey = movement.getVelocityY(data.awy, 0.015);
 
-            colorStdout.green(`${this.trim(numeral(movex.currAcc).format('0'))},`);
-            colorStdout.yellow(`${this.trim(numeral(movex.currVelocity).format('0'))}, `);
-            colorStdout.green(`${this.trim(numeral(movey.currAcc).format('0'))},`);
-            colorStdout.yellow(`${this.trim(numeral(movey.currVelocity).format('0'))}\n`);
+            const velocities = movement.getVelocity(data.awx, data.awy, data.awz, 0.015);
+            // colorStdout.green(`${this.trim(numeral(data.arx).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(data.ary).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(data.arz).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(data.awx).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(data.awy).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(data.awz).format('0'))}\n`);
+
+            // colorStdout.green(`${this.trim(numeral(velocities.velocityX).format('0'))},`);
+            // colorStdout.green(`${this.trim(numeral(velocities.distX).format('0'))},`);
+            // colorStdout.yellow(`${this.trim(numeral(velocities.velocityY).format('0'))}, `);
+            // colorStdout.yellow(`${this.trim(numeral(velocities.distY).format('0'))}\n`);
+            colorStdout.green(`${JSON.stringify(data)}\n`);
         } catch (err) {
         }
     }
