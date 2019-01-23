@@ -5,11 +5,7 @@ import { IPortsConfig, IPortConfig } from '../models/PortConfig';
 const portsConfig: IPortsConfig = require('config.json')('./config.ports.json');
 const SerialPort = require('serialport');
 import { println } from '../utilities';
-import MovementDetector from '../flight-logics/movement-detector';
-const numeral = require('numeral');
 const colorStdout = require('color-stdout');
-
-const movement = new MovementDetector();
 
 export default class SerialDeviceReader extends EventEmitter {
     serial: any;
@@ -115,19 +111,6 @@ export default class SerialDeviceReader extends EventEmitter {
         // {"r":-1.615,"p":-2.014,"y":-92.374,"arx":7.000,"ary":0.000,"arz":111.000,"awx":3.000,"awy":4.000,"awz":111.000,"t":9883798}
         try {
             const data = JSON.parse(jsonString);
-
-            const velocities = movement.getVelocity(data.awx, data.awy, data.awz, 0.015);
-            // colorStdout.green(`${this.trim(numeral(data.arx).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(data.ary).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(data.arz).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(data.awx).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(data.awy).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(data.awz).format('0'))}\n`);
-
-            // colorStdout.green(`${this.trim(numeral(velocities.velocityX).format('0'))},`);
-            // colorStdout.green(`${this.trim(numeral(velocities.distX).format('0'))},`);
-            // colorStdout.yellow(`${this.trim(numeral(velocities.velocityY).format('0'))}, `);
-            // colorStdout.yellow(`${this.trim(numeral(velocities.distY).format('0'))}\n`);
             colorStdout.green(`${JSON.stringify(data)}\n`);
         } catch (err) {
         }
