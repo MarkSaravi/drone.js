@@ -245,31 +245,13 @@ void setup() {
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
-void sendAsJson(
-    double roll, double pitch, double yaw,
-    double accrX, double accrY, double accrZ,
-    double accwX, double accwY, double accwZ)
+void sendAsJson(double roll, double pitch, double yaw)
 {
-    // static long last_time = 0;
-    static char json[256], rollstr[32], pitchstr[32], yawstr[32];
-    static char xrs[32], yrs[32], zrs[32];
-    static char xws[32], yws[32], zws[32];
-    // if (millis() - last_time >= 1000) 
-    // {
-    //     last_time = millis();
-    //     Serial.println("accrX, accrY, accrZ, accwX, accwY, accwZ, time");
-    // }
-    dtostrf(roll, 3, 3, rollstr);
-    dtostrf(pitch, 3, 3, pitchstr);
-    dtostrf(yaw, 3, 3, yawstr);
-    dtostrf(accrX, 0, 3, xrs);
-    dtostrf(accrY, 0, 3, yrs);
-    dtostrf(accrZ, 0, 3, zrs);
-    dtostrf(accwX, 0, 3, xws);
-    dtostrf(accwY, 0, 3, yws);
-    dtostrf(accwZ, 0, 3, zws);
-    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"arx\":%s,\"ary\":%s,\"arz\":%s,\"awx\":%s,\"awy\":%s,\"awz\":%s,\"t\":%ld}", rollstr, pitchstr, yawstr, xrs, yrs, zrs, xws, yws, zws, millis());
-    // sprintf(json, "%s, %s, %s, %s, %s, %s, %ld", xrs, yrs, zrs, xs, ys, zs, millis());
+    static char json[128], rollstr[16], pitchstr[16], yawstr[16];
+    dtostrf(roll, 8, 3, rollstr);
+    dtostrf(pitch, 8, 3, pitchstr);
+    dtostrf(yaw, 8, 3, yawstr);
+    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%ld}", rollstr, pitchstr, yawstr, millis());
     Serial.println(json);
 }
 
@@ -346,26 +328,10 @@ void loop() {
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            mpu.dmpGetAccel(&aa, fifoBuffer);
-            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-            mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-            // Serial.print("ypr\t");
-            // Serial.print(ypr[0] * 180/M_PI);
-            // Serial.print("\t");
-            // Serial.print(ypr[1] * 180/M_PI);
-            // Serial.print("\t");
-            // Serial.println(ypr[2] * 180/M_PI);
             sendAsJson(
                 -ypr[1] * 180/M_PI,
                 -ypr[2] * 180/M_PI,
-                ypr[0] * 180/M_PI,
-                aaReal.x,
-                aaReal.y,
-                aaReal.z,
-                aaWorld.x,
-                aaWorld.y,
-                aaWorld.z
-                );
+                ypr[0] * 180/M_PI);
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
