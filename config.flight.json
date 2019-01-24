@@ -4,7 +4,11 @@
 	"yawPolarity": 1,
 	"maxAngle": 20,
         "minPower": 40,
-        "maxPower": 50,
+	"maxPower": 50,
+	"rpm": {
+		"M": 184,
+		"Y0": -2140
+	},
 	"motors": {
 		"a": true,
 		"b": true,
