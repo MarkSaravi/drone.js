@@ -9,6 +9,8 @@ import IFlightConfig from '../models/IFlightConfig';
 import { IPIDValue } from '../models/IPIDValue';
 import PIDControl from '../flight-logics/PIDControl';
 import showStatus from '../utilities';
+import IArmPower from '../models/IArmPower';
+import { SumArmPower } from '../flight-logics/front-back-power';
 
 
 export default class FlightController {
@@ -151,14 +153,12 @@ export default class FlightController {
     applyIncomingCommand(cmdJson: string) {
         try{
             const cmd = JSON.parse(cmdJson);
-            // console.log(JSON.stringify(cmd));
             const x = cmd.x != undefined ? cmd.x : this.command.x;
             const y = cmd.y != undefined ? cmd.y : this.command.y;
             const heading = cmd.heading != undefined ? cmd.heading : this.command.heading;
             const power = cmd.p != undefined ? cmd.p : this.command.power;
             this.command = new Command(heading, x, y, power);
             this.targetFlightState = convertors.JsonToCommand(this.command, this.targetFlightState);
-            // console.log(JSON.stringify(this.targetFlightState));
         } catch(err){
         }
     }
@@ -202,11 +202,8 @@ export default class FlightController {
         }
     }
 
-    calcPairPower(power: number, pid: IPIDValue): { front: number; back: number } {
-        return {
-            front: power - pid.sum,
-            back: power + pid.sum
-        }
+    calcPairPower(power: number, pid: IPIDValue): IArmPower {
+        return SumArmPower(power, pid);
     }
 
     calcMotorsPower(): IPowers {
@@ -221,8 +218,8 @@ export default class FlightController {
             const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, errors.time, this.config.rollPitchPID);
             const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, errors.time, this.config.rollPitchPID);
             const yawPIDResult = this.pidYaw.PID(yawError, -yawError, errors.time, this.config.yawPID);
-            const rollBasePower = basePower + yawPIDResult.sum;
-            const pitchBasePower = basePower - yawPIDResult.sum;
+            const rollBasePower = basePower + 0; // yawPIDResult.sum;
+            const pitchBasePower = basePower - 0; //yawPIDResult.sum;
             const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
             const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
             const powers = {

@@ -1,4 +1,5 @@
 import IRPMConfig from "../models/IRPMConfig";
+import IArmPower from "../models/IArmPower";
 
 export const PowerToRpm = (power: number, config: IRPMConfig): number => {
     return power * config.M + config.Y0;
@@ -23,7 +24,7 @@ export const quadratic = (base: number, inc: number): number => {
     return 0;
 }
 
-export const PairPowerChange = (power: number, pid: number, config: IRPMConfig): { front: number; back: number } => {
+export const PairPowerChange = (power: number, pid: number, config: IRPMConfig): IArmPower => {
     const rpm = PowerToRpm(power, config);
 
     return {
