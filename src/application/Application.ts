@@ -24,6 +24,7 @@ export default class Application extends EventEmitter {
     flightController: FlightController;
     motorsIdle: boolean = false;
     terminated: boolean = false;
+    imuIgnoreCounter: number = 0;
 
     constructor() {
         super();
@@ -249,6 +250,13 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
+        if (this.imuIgnoreCounter < 200) {
+            if (this.imuIgnoreCounter == 0) {
+                console.log('Initialising IMU...');
+            }
+            this.imuIgnoreCounter++;
+            return;
+        }
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
