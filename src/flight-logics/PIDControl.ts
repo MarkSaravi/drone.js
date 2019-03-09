@@ -22,7 +22,7 @@ export default class PIDControl {
         this.integralSum += error * dt * config.iGain;
         if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
             this.integralSum = 0;
-            // colorStdout.red('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+            console.log(`${this.name} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^`);
         }
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
@@ -35,9 +35,6 @@ export default class PIDControl {
     }
 
     PID(error: number, angle: number, time: number, config: IPIDConfig): IPIDValue {
-        // if (Math.abs(error) > config.pMaxAngle) {
-        //     colorStdout.cyan('============================================================');
-        // }
         const dt = (time - this.prevTime); //convert to milliseconds
         const dAngle = this.prevAngle - angle;
 
@@ -48,6 +45,9 @@ export default class PIDControl {
         this.prevTime = time;
         this.prevAngle = angle;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
+        if (Math.abs(sum)>config.maxOutput) {
+            console.log(`${this.name}, ${sum} ,${config.maxOutput} ############################################################`);
+        }
         return {
             sum: Math.abs(sum) <= config.maxOutput ? sum : config.maxOutput * Math.sign(sum),
             p, i, d

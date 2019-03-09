@@ -24,8 +24,8 @@ export default class FlightController {
     private readonly TILT_INC: number = 0.25;
     private readonly POWER_INC: number = 0.25;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
-    private readonly pidPitch: PIDControl = new PIDControl("roll");
-    private readonly pidYaw: PIDControl = new PIDControl("roll");
+    private readonly pidPitch: PIDControl = new PIDControl("pitch");
+    private readonly pidYaw: PIDControl = new PIDControl("yaw");
     private prevTime: number = 0;
 
     constructor(private config: IFlightConfig) {
