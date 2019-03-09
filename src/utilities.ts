@@ -18,7 +18,7 @@ export function printLabelValue(label: string, value: string, color: string) {
     print(label);
     switch (color) {
         case 'red':
-            colorStdout.green(value);
+            colorStdout.red(value);
             break;
         case 'green':
             colorStdout.green(value);
@@ -82,7 +82,20 @@ export default function showStatus(
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
-    printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
+    if (Math.abs(errors.rollError) < config.rollPitchPID.iMaxAngle) {
+        printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
+    } else if (Math.abs(errors.rollError) < config.rollPitchPID.iMaxAngle * 2)  {
+        printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'yellow');
+    } else {
+        printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'red');
+    }
+    if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle) {
+        printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
+    } else if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle * 2) {
+        printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'yellow');
+    } else {
+        printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'red');
+    }
     printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
     if (config.debug == 'roll' || config.debug == 'pitch') {

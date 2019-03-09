@@ -23,7 +23,7 @@
 	"rollPitchPID": {
 		"pGain": 0.25,
 		"iGain": 0.5,
-		"dGain": 0.09,
+		"dGain": 0.1,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
@@ -31,7 +31,7 @@
 		"iGainInc": 0.01,
 		"dGainInc": 0.00025,
 		"iMaxValue": 5,
-		"iMaxAngle": 3,
+		"iMaxAngle": 1.5,
 		"iMinAngle": 0,
 		"pMaxAngle": 10,
 		"maxOutput": 5,

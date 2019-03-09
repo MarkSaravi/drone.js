@@ -22,7 +22,12 @@ export default class PIDControl {
         this.integralSum += error * dt * config.iGain;
         if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
             this.integralSum = 0;
-            console.log(`${this.name} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^`);
+            if (error > 0) {
+                console.log(`${this.name} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
+            } else {
+                console.log(`${this.name} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`);
+            }
+            
         }
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
@@ -46,7 +51,7 @@ export default class PIDControl {
         this.prevAngle = angle;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
         if (Math.abs(sum)>config.maxOutput) {
-            console.log(`${this.name}, ${sum} ,${config.maxOutput} ############################################################`);
+            console.log(`${this.name}, ${sum} ,${config.maxOutput} @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`);
         }
         return {
             sum: Math.abs(sum) <= config.maxOutput ? sum : config.maxOutput * Math.sign(sum),
