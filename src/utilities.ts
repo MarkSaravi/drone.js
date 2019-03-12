@@ -82,16 +82,16 @@ export default function showStatus(
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
-    if (Math.abs(errors.rollError) < config.rollPitchPID.iMaxAngle) {
+    if (Math.abs(errors.rollError) < config.rollPitchPID.iMinAngle) {
         printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
-    } else if (Math.abs(errors.rollError) < config.rollPitchPID.iMaxAngle * 2)  {
+    } else if (Math.abs(errors.rollError) < config.rollPitchPID.iMinAngle * 1.5)  {
         printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'yellow');
     } else {
         printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'red');
     }
-    if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle) {
+    if (Math.abs(errors.pitchError) < config.rollPitchPID.iMinAngle) {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
-    } else if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle * 2) {
+    } else if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle * 1.5) {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'yellow');
     } else {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'red');

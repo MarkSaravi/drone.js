@@ -18,16 +18,11 @@ export default class PIDControl {
         return err * config.pGain;
     }
 
-    I(error: number, dt: number, config: IPIDConfig): number {
+    I(error: number, p: number, d: number, dt: number, config: IPIDConfig): number {
         this.integralSum += error * dt * config.iGain;
-        if (this.integralSum * error < 0 && Math.abs(error) > config.iMaxAngle) {
+        if (p * this.integralSum <0 && Math.abs(error) >= config.iMaxAngle) {
             this.integralSum = 0;
-            if (error > 0) {
-                console.log(`${this.name} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
-            } else {
-                console.log(`${this.name} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`);
-            }
-            
+            console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`');
         }
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
@@ -45,7 +40,7 @@ export default class PIDControl {
 
         const d = this.D(dAngle, dt, config);
         const p = this.P(error, config);
-        const i = this.I(error, dt, config);
+        const i = this.I(error, p, d, dt, config);
 
         this.prevTime = time;
         this.prevAngle = angle;
