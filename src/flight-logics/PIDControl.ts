@@ -21,8 +21,11 @@ export default class PIDControl {
     I(error: number, p: number, d: number, dt: number, config: IPIDConfig): number {
         this.integralSum += error * dt * config.iGain;
         if (p * this.integralSum <0 && Math.abs(error) >= config.iMaxAngle) {
+            if (this.integralSum>=0)
+                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`');
+            else
+                console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`');
             this.integralSum = 0;
-            console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`');
         }
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
