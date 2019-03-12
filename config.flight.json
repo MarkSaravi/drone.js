@@ -21,9 +21,9 @@
 		"yaw": true
 	},
 	"rollPitchPID": {
-		"pGain": 0.1,
-		"iGain": 0.5,
-		"dGain": 0.06,
+		"pGain": 0.12,
+		"iGain": 0.125,
+		"dGain": 0.05,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
