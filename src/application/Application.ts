@@ -152,6 +152,11 @@ export default class Application extends EventEmitter {
                 case 'D':
                     this.emit('toggle-d');
                     break;
+
+                case 'y':
+                case 'Y':
+                    this.emit('reset-yaw');
+                    break            
             }
         });
         setInterval(() => {
@@ -239,6 +244,10 @@ export default class Application extends EventEmitter {
 
         this.on('toggle-d', () => {
             this.flightController.toggleD();
+        });
+
+        this.on('reset-yaw', () => {
+            this.flightController.resetYaw();
         });
     }
 

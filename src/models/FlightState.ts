@@ -5,10 +5,10 @@ export interface ITilt {
 
 export default class FlightState {
     constructor(
-        readonly roll: number,
-        readonly pitch: number,
-        readonly yaw: number,
-        readonly time: number,
+        public roll: number,
+        public pitch: number,
+        public yaw: number,
+        public time: number,
         public power: number,
     ){
     }

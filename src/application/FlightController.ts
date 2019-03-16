@@ -144,9 +144,14 @@ export default class FlightController {
         }
     }
 
+    resetYaw() {
+        this.heading = this.actualFlightState.yaw;
+        this.targetFlightState.yaw = this.actualFlightState.yaw;
+    }
+
     initHeading() {
         if (this.heading == -1000) {
-            this.heading = this.actualFlightState.yaw;
+            this.resetYaw();
         }
     }
 
