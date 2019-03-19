@@ -3,18 +3,22 @@
 // August 17, 2014
 // Public Domain
 #include <Wire.h>
+
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
+const float alpha = 0.45;
+
 int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
-double xg, yg, zg, roll, pitch, xds, yds, zds;
+double xg, yg, zg, xds, yds, zds;
 double fXg = 0;
 double fYg = 0;
 double fZg = 0;
-const float alpha = 0.45;
-double yaw = 0;
-long prevtime;
-long currtime;
-long displaytime;
-long millitime;
+
+double roll = 0, pitch = 0, yaw = 0;
+long prevMicroTime;
+long currMicroTime;
+long prevMilliTime;
+long currMilliTime;
+
 void setup()
 {
     Wire.begin();
@@ -23,9 +27,10 @@ void setup()
     Wire.write(0);    // set to zero (wakes up the MPU-6050)
     Wire.endTransmission(true);
     Serial.begin(9600);
-    prevtime = micros();
-    displaytime = millis();
+    prevMicroTime = micros();
+    prevMilliTime = millis();
 }
+
 void loop()
 {
     Wire.beginTransmission(MPU_addr);
@@ -61,12 +66,12 @@ void loop()
     xds = GyX / 14.375;
     yds = GyY / 14.375;
     zds = GyZ / 14.375;
-    currtime = micros();
-    yaw += zds * (currtime-prevtime)/1000 * -0.001;
-    prevtime = currtime;
-    millitime=millis();
-    if (millitime-displaytime>=100){
-        displaytime=millitime;
+    currMicroTime = micros();
+    yaw += zds * (currMicroTime-prevMicroTime)/1000 * -0.001;
+    prevMicroTime = currMicroTime;
+    currMilliTime=millis();
+    if (currMilliTime-prevMilliTime>=100){
+        prevMilliTime=currMilliTime;
         Serial.print("roll = ");
         Serial.print(roll);
         Serial.print(" | pitch = ");
