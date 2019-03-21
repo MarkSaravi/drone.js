@@ -6,6 +6,7 @@
 
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
 const float alpha = 0.45;
+const float const1 = 0.00390625;
 
 int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 double xg, yg, zg, xds, yds, zds;
@@ -26,7 +27,7 @@ void setup()
     Wire.write(0x6B); // PWR_MGMT_1 register
     Wire.write(0);    // set to zero (wakes up the MPU-6050)
     Wire.endTransmission(true);
-    Serial.begin(9600);
+    Serial.begin(115200);
     prevMicroTime = micros();
     prevMilliTime = millis();
 }
@@ -51,9 +52,9 @@ void loop()
                                           //   Serial.print(" | GyX = "); Serial.print(GyX);
                                           //   Serial.print(" | GyY = "); Serial.print(GyY);
                                           //   Serial.print(" | GyZ = "); Serial.println(GyZ);
-    xg = AcX * 0.0039;
-    yg = AcY * 0.0039;
-    zg = AcZ * 0.0039;
+    xg = AcX * const1;
+    yg = AcY * const1;
+    zg = AcZ * const1;
     fXg = xg * alpha + (fXg * (1.0 - alpha));
     fYg = yg * alpha + (fYg * (1.0 - alpha));
     fZg = zg * alpha + (fZg * (1.0 - alpha));
