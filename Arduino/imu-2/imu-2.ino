@@ -661,8 +661,9 @@ typedef union accel_t_gyro_union {
     } value;
 };
 
+const float alpha = 0.45;
 const float const1 = 0.00390625;
-double xg, yg, zg, roll, pitch;
+double xg, yg, zg, roll, pitch, fXg = 0, fYg = 0, fZg = 0;
 
 void setup()
 {
@@ -744,6 +745,12 @@ void loop()
     xg = accel_t_gyro.value.x_accel * const1;
     yg = accel_t_gyro.value.y_accel * const1;
     zg = accel_t_gyro.value.z_accel * const1;
+    fXg = xg * alpha + (fXg * (1.0 - alpha));
+    fYg = yg * alpha + (fYg * (1.0 - alpha));
+    fZg = zg * alpha + (fZg * (1.0 - alpha));
+    xg = fXg;
+    yg = fYg;
+    zg = fZg;
 
     roll = atan2(yg, zg) * 180 / PI;
     pitch = atan2(-xg, sqrt(yg * yg + zg * zg)) * 180 / PI;
