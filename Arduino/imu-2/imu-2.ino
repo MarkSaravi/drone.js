@@ -663,7 +663,7 @@ typedef union accel_t_gyro_union {
 
 const float alpha = 0.45;
 const float const1 = 0.00390625;
-double xg, yg, zg, roll, pitch, fXg = 0, fYg = 0, fZg = 0, yaw = 0;
+double xg, yg, zg, zds, roll, pitch, fXg = 0, fYg = 0, fZg = 0, yaw = 0;
 long prevMillis = 0, currMillis = 0, prevMicro = 0, currMicro = 0;
 
 void setup()
@@ -753,8 +753,10 @@ void loop()
     yg = fYg;
     zg = fZg;
 
+    zds = accel_t_gyro.value.z_gyro / 14.375;
     roll = atan2(yg, zg) * 180 / PI;
     pitch = atan2(-xg, sqrt(yg * yg + zg * zg)) * 180 / PI;
+    // yaw += zds * (currMicro-prevMicro)/1000 * -0.001;
 
     // Serial.print(F("accel x,y,z: "));
     // Serial.print(accel_t_gyro.value.x_accel, DEC);
@@ -802,7 +804,9 @@ void loop()
         Serial.print(" roll: ");
         Serial.print(roll);
         Serial.print(", pitch: ");
-        Serial.println(pitch);
+        Serial.print(pitch);
+        Serial.print(", yaw: ");
+        Serial.println(yaw);
     }
 }
 
