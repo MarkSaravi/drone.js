@@ -663,14 +663,15 @@ typedef union accel_t_gyro_union {
 
 const float alpha = 0.45;
 const float const1 = 0.00390625;
-double xg, yg, zg, roll, pitch, fXg = 0, fYg = 0, fZg = 0;
+double xg, yg, zg, roll, pitch, fXg = 0, fYg = 0, fZg = 0, yaw = 0;
+long prevMillis = 0, currMillis = 0, prevMicro = 0, currMicro = 0;
 
 void setup()
 {
     int error;
     uint8_t c;
 
-    Serial.begin(9600);
+    Serial.begin(115200);
     Serial.println(F("InvenSense MPU-6050"));
     Serial.println(F("June 2012"));
 
@@ -770,10 +771,6 @@ void loop()
     // Serial.print(F(", "));
     // Serial.print(zg);
     // Serial.println(F(""));
-    Serial.print(" roll: ");
-    Serial.print(roll);
-    Serial.print(", pitch: ");
-    Serial.println(pitch);
 
     // The temperature sensor is -40 to +85 degrees Celsius.
     // It is a signed integer.
@@ -798,7 +795,15 @@ void loop()
     // Serial.print(F(", "));
     // Serial.println(F(""));
 
-    delay(100);
+    currMillis = millis();
+    currMicro = micros();
+    if (currMillis - prevMillis > 100) {
+        prevMillis = currMillis;
+        Serial.print(" roll: ");
+        Serial.print(roll);
+        Serial.print(", pitch: ");
+        Serial.println(pitch);
+    }
 }
 
 // --------------------------------------------------------
