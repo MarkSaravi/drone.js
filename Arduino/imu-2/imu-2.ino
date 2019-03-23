@@ -671,9 +671,13 @@ typedef union accel_t_gyro_union {
 };
 
 int error;
-const float alpha = 0.45;
+const float LOW_PASS_FILTER_FACTOR = 0.45;
 const float ACCEL_RESOLUTION = 0.00390625;
-const float SENSITIVITY_SCALE_FACTOR = 131;
+const float SENSITIVITY_SCALE_FACTOR = 14.375;
+const int16_t MIN_GYRO_VALUE = 300;
+const int NUM_DATA = 40;
+const int DATA_INTERVAL = 1000 / NUM_DATA;
+
 double rawAccleX, rawAccleY, rawAccleZ, rawGyroX, rawGyroY, rawGyroZ, roll, pitch, yaw = 0;
 double dRoll, dPitch, dYaw;
 long prevMillis, currMillis, prevMicro, currMicro;
@@ -726,7 +730,7 @@ void setup()
 
 double lowPassFilter(double raw, double filtered)
 {
-    return raw * alpha + filtered * (1.0 - alpha);
+    return raw * LOW_PASS_FILTER_FACTOR + filtered * (1.0 - LOW_PASS_FILTER_FACTOR);
 }
 
 double rawAccel(int16_t data) 
@@ -736,12 +740,12 @@ double rawAccel(int16_t data)
 
 double rawGyro(int16_t data) 
 {
-    return data / SENSITIVITY_SCALE_FACTOR;
+    return (double)data / SENSITIVITY_SCALE_FACTOR;
 }
 
 double deltaGyro(double value, double dt)
 {
-    return value * dt / 1000000.0 * 0.001;
+    return value * dt * 0.0000001;
 }
 
 void loop()
@@ -785,7 +789,7 @@ void loop()
     currMicro = micros();
     dtMicros = currMicro - prevMicro;
     dtMillis = currMillis - prevMillis;
-
+    prevMicro = currMicro;
 
     // Print the raw acceleration values
     rawAccleX = rawAccel(accel_t_gyro.value.x_accel);
@@ -810,7 +814,7 @@ void loop()
 
     roll = atan2(fAccYg, fAccZg) * 180 / PI;
     pitch = atan2(-fAccXg, sqrt(fAccYg * fAccYg + fAccZg * fAccZg)) * 180 / PI;
-    yaw += dYaw;
+    yaw += abs(accel_t_gyro.value.z_gyro) >= MIN_GYRO_VALUE ? dYaw : 0;
 
     // Serial.print(F("accel x,y,z: "));
     // Serial.print(accel_t_gyro.value.x_accel, DEC);
@@ -851,7 +855,7 @@ void loop()
     // Serial.print(F(", "));
     // Serial.println(F(""));
 
-    if (dtMillis > 100) {
+    if (dtMillis > DATA_INTERVAL) {
         prevMillis = currMillis;
         sendData();
         numberOfSamples = 0;
@@ -868,7 +872,7 @@ void sendData() {
     Serial.print(", yaw: ");
     Serial.print(yaw);
     Serial.print(", dt: ");
-    Serial.print(currMicro - prevMicro);
+    Serial.print(dtMicros);
     Serial.print(", ");
     Serial.println(numberOfSamples);
 }
