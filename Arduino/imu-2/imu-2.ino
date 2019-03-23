@@ -622,6 +622,14 @@
 // I2C address thus becomes 0x69.
 #define MPU6050_I2C_ADDRESS 0x68
 
+// Offset registers
+#define MPU6050_RA_XA_OFFS_H        0x06 //[15:0] XA_OFFS
+#define MPU6050_RA_YA_OFFS_H        0x08 //[15:0] YA_OFFS
+#define MPU6050_RA_ZA_OFFS_H        0x0A //[15:0] ZA_OFFS
+#define MPU6050_RA_XG_OFFS_USRH     0x13 //[15:0] XG_OFFS_USR
+#define MPU6050_RA_YG_OFFS_USRH     0x15 //[15:0] YG_OFFS_USR
+#define MPU6050_RA_ZG_OFFS_USRH     0x17 //[15:0] ZG_OFFS_USR
+
 // Declaring an union for the registers and the axis values.
 // The byte order does not match the byte order of
 // the compiler and AVR chip.
@@ -706,6 +714,7 @@ void setup()
 
     // Clear the 'sleep' bit to start the sensor.
     MPU6050_write_reg(MPU6050_PWR_MGMT_1, 0);
+    setOffsets();
 }
 
 void loop()
@@ -908,6 +917,25 @@ int MPU6050_write(int start, const uint8_t *pData, int size)
     return (0); // return : no error
 }
 
+int MPU6050_write_offset(int reg, const uint16_t data)
+{
+    int n, error;
+
+    Wire.beginTransmission(MPU6050_I2C_ADDRESS);
+    n = Wire.write(reg); // write the start address
+    if (n != 1)
+        return (-20);
+            // Wire.send((uint8_t)(data[i] >> 8));     // send MSB
+            // Wire.send((uint8_t)data[i++]);          // send LSB
+
+    Wire.write((uint8_t)(data >> 8)); // write data bytes
+    Wire.write((uint8_t)data); // write data bytes
+
+    error = Wire.endTransmission(true); // release the I2C-bus
+
+    return (0); // return : no error
+}
+
 // --------------------------------------------------------
 // MPU6050_write_reg
 //
@@ -923,4 +951,40 @@ int MPU6050_write_reg(int reg, uint8_t data)
     error = MPU6050_write(reg, &data, 1);
 
     return (error);
+}
+
+void setOffsets() {
+    //acelX acelY acelZ giroX giroY giroZ
+    //-1346	-6736	1851	25	-70	-16
+
+    setXAccelOffset(-1346);
+    setYAccelOffset(-6736);
+    setZAccelOffset(1851);
+    setXGyroOffset(25);
+    setYGyroOffset(-70);
+    setZGyroOffset(-16);
+}
+
+void setXAccelOffset(int16_t offset) {
+    MPU6050_write_offset(MPU6050_RA_XA_OFFS_H, offset);
+}
+
+void setYAccelOffset(int16_t offset) {
+    MPU6050_write_offset(MPU6050_RA_YA_OFFS_H, offset);
+}
+
+void setZAccelOffset(int16_t offset) {
+    MPU6050_write_offset(MPU6050_RA_ZA_OFFS_H, offset);
+}
+
+void setXGyroOffset(int16_t offset) {
+    MPU6050_write_offset(MPU6050_RA_XG_OFFS_USRH, offset);
+}
+
+void setYGyroOffset(int16_t offset) {
+    MPU6050_write_offset(MPU6050_RA_YG_OFFS_USRH, offset);
+}
+
+void setZGyroOffset(int16_t offset) {
+    MPU6050_write_offset(MPU6050_RA_ZG_OFFS_USRH, offset);
 }
