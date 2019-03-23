@@ -680,8 +680,8 @@ const int DATA_INTERVAL = 1000 / NUM_DATA;
 
 double rawAccleX, rawAccleY, rawAccleZ, rawGyroX, rawGyroY, rawGyroZ, roll, pitch, yaw = 0;
 double dRoll, dPitch, dYaw;
-long prevMillis, currMillis, prevMicro, currMicro;
-double dtMicros, dtMillis;
+long prevMillis, currMillis, prevMicro, currMicro, prevMicroSave;
+double dtMicros, dtMillis, dt;
 int numberOfSamples = 0;
 double fAccXg = 0, fAccYg = 0, fAccZg = 0;
 double fGyroXg = 0, fGyroYg = 0, fGyroZg = 0;
@@ -726,6 +726,7 @@ void setup()
     setOffsets();
     prevMicro = micros();
     prevMillis = millis();
+    prevMicroSave = prevMicro;
 }
 
 double lowPassFilter(double raw, double filtered)
@@ -750,22 +751,10 @@ double deltaGyro(double value, double dt)
 
 void loop()
 {
-    // double dT;
     numberOfSamples++;
     accel_t_gyro_union accel_t_gyro;
 
-    // Serial.println(F(""));
-    // Serial.println(F("MPU-6050"));
-
-    // Read the raw values.
-    // Read 14 bytes at once,
-    // containing acceleration, temperature and gyro.
-    // With the default settings of the MPU-6050,
-    // there is no filter enabled, and the values
-    // are not very stable.
     error = MPU6050_read(MPU6050_ACCEL_XOUT_H, (uint8_t *)&accel_t_gyro, sizeof(accel_t_gyro));
-    // Serial.print(F("Read accel, temp and gyro, error = "));
-    // Serial.println(error, DEC);
 
     // Swap all high and low bytes.
     // After this, the registers values are swapped,
@@ -789,6 +778,7 @@ void loop()
     currMicro = micros();
     dtMicros = currMicro - prevMicro;
     dtMillis = currMillis - prevMillis;
+    dt = currMicro - prevMicroSave;
     prevMicro = currMicro;
 
     // Print the raw acceleration values
@@ -816,65 +806,23 @@ void loop()
     pitch = atan2(-fAccXg, sqrt(fAccYg * fAccYg + fAccZg * fAccZg)) * 180 / PI;
     yaw += abs(accel_t_gyro.value.z_gyro) >= MIN_GYRO_VALUE ? dYaw : 0;
 
-    // Serial.print(F("accel x,y,z: "));
-    // Serial.print(accel_t_gyro.value.x_accel, DEC);
-    // Serial.print(F(", "));
-    // Serial.print(accel_t_gyro.value.y_accel, DEC);
-    // Serial.print(F(", "));
-    // Serial.print(accel_t_gyro.value.z_accel, DEC);
-    // Serial.println(F(""));
-
-    // Serial.print(F("accel x,y,z: "));
-    // Serial.print(rawAccleX);
-    // Serial.print(F(", "));
-    // Serial.print(rawAccleY);
-    // Serial.print(F(", "));
-    // Serial.print(rawAccleZ);
-    // Serial.println(F(""));
-
-    // The temperature sensor is -40 to +85 degrees Celsius.
-    // It is a signed integer.
-    // According to the datasheet:
-    //   340 per degrees Celsius, -512 at 35 degrees.
-    // At 0 degrees: -512 - (340 * 35) = -12412
-
-    // Serial.print(F("temperature: "));
-    // dT = ((double)accel_t_gyro.value.temperature + 12412.0) / 340.0;
-    // Serial.print(dT, 3);
-    // Serial.print(F(" degrees Celsius"));
-    // Serial.println(F(""));
-
-    // // Print the raw gyro values.
-
-    // Serial.print(F("gyro x,y,z : "));
-    // Serial.print(accel_t_gyro.value.x_gyro, DEC);
-    // Serial.print(F(", "));
-    // Serial.print(accel_t_gyro.value.y_gyro, DEC);
-    // Serial.print(F(", "));
-    // Serial.print(accel_t_gyro.value.z_gyro, DEC);
-    // Serial.print(F(", "));
-    // Serial.println(F(""));
-
     if (dtMillis > DATA_INTERVAL) {
-        prevMillis = currMillis;
         sendData();
+        prevMillis = currMillis;
+        prevMicroSave = currMicro;
         numberOfSamples = 0;
+        dt = prevMicro;
     }
 }
 
 void sendData() {
-    Serial.print(" error: ");
-    Serial.print(error);
-    Serial.print(" roll: ");
-    Serial.print(roll);
-    Serial.print(", pitch: ");
-    Serial.print(pitch);
-    Serial.print(", yaw: ");
-    Serial.print(yaw);
-    Serial.print(", dt: ");
-    Serial.print(dtMicros);
-    Serial.print(", ");
-    Serial.println(numberOfSamples);
+    static char json[128], rollstr[16], pitchstr[16], yawstr[16], dtstr[16];
+    dtostrf(roll, 0, 1, rollstr);
+    dtostrf(pitch, 0, 1, pitchstr);
+    dtostrf(yaw, 0, 1, yawstr);
+    dtostrf(dt / 1000, 0, 2, dtstr);
+    sprintf(json, "{\"r\":%s,\"p\":%s,\"y\":%s,\"t\":%s}", rollstr, pitchstr, yawstr, dtstr);
+    Serial.println(json);
 }
 
 // --------------------------------------------------------
