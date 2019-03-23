@@ -739,6 +739,11 @@ double rawGyro(int16_t data)
     return data / SENSITIVITY_SCALE_FACTOR;
 }
 
+double deltaGyro(double value, double dt)
+{
+    return value * dt / 1000000.0 * 0.001;
+}
+
 void loop()
 {
     // double dT;
@@ -799,9 +804,9 @@ void loop()
     fGyroYg = lowPassFilter(rawGyroY, fGyroYg);
     fGyroZg = lowPassFilter(rawGyroZ, fGyroZg);
 
-    dRoll = rawGyroX * dtMicros / 1000000.0 * 0.001;
-    dPitch = rawGyroY * dtMicros / 1000000.0 * 0.001;
-    dYaw = rawGyroZ * dtMicros / 1000000.0 * -0.001;
+    dRoll = deltaGyro(rawGyroX, dtMicros);
+    dPitch = deltaGyro(rawGyroY, dtMicros);
+    dYaw = deltaGyro(rawGyroZ, dtMicros);
 
     roll = atan2(fAccYg, fAccZg) * 180 / PI;
     pitch = atan2(-fAccXg, sqrt(fAccYg * fAccYg + fAccZg * fAccZg)) * 180 / PI;
