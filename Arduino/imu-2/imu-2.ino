@@ -674,11 +674,13 @@ int error;
 const float alpha = 0.45;
 const float const1 = 0.00390625;
 const float SCF = 131;
-double xg, yg, zg, xds, yds, zds, roll, pitch, yaw = 0;
+double rawAccleX, rawAccleY, rawAccleZ, rawGyroX, rawGyroY, rawGyroZ, roll, pitch, yaw = 0;
 double dRoll, dPitch, dYaw;
 long prevMillis, currMillis, prevMicro, currMicro;
 double dtMicros, dtMillis;
 int numberOfSamples = 0;
+double fAccXg = 0, fAccYg = 0, fAccZg = 0;
+double fGyroXg = 0, fGyroYg = 0, fGyroZg = 0;
 
 void setup()
 {
@@ -720,6 +722,11 @@ void setup()
     setOffsets();
     prevMicro = micros();
     prevMillis = millis();
+}
+
+double lowPassFilter(double raw, double filtered)
+{
+    return raw * alpha + filtered * (1.0 - alpha);
 }
 
 void loop()
@@ -766,21 +773,29 @@ void loop()
 
 
     // Print the raw acceleration values
-    xg = accel_t_gyro.value.x_accel * const1;
-    yg = accel_t_gyro.value.y_accel * const1;
-    zg = accel_t_gyro.value.z_accel * const1;
+    rawAccleX = accel_t_gyro.value.x_accel * const1;
+    rawAccleY = accel_t_gyro.value.y_accel * const1;
+    rawAccleZ = accel_t_gyro.value.z_accel * const1;
 
-    xds = accel_t_gyro.value.z_gyro / SCF;
-    yds = accel_t_gyro.value.z_gyro / SCF;
-    zds = accel_t_gyro.value.z_gyro / SCF;
+    rawGyroX = accel_t_gyro.value.z_gyro / SCF;
+    rawGyroY = accel_t_gyro.value.z_gyro / SCF;
+    rawGyroZ = accel_t_gyro.value.z_gyro / SCF;
 
-    dRoll = xds * dtMicros / 1000000.0 * 0.001;
-    dPitch = yds * dtMicros / 1000000.0 * 0.001;
-    dYaw = zds * dtMicros / 1000000.0 * 0.001;
+    fAccXg = lowPassFilter(rawAccleX, fAccXg);
+    fAccYg = lowPassFilter(rawAccleY, fAccYg);
+    fAccZg = lowPassFilter(rawAccleZ, fAccZg);
 
-    roll = atan2(yg, zg) * 180 / PI;
-    pitch = atan2(-xg, sqrt(yg * yg + zg * zg)) * 180 / PI;
-    yaw += abs(dYaw) > 0.005 ? dYaw : 0 ;
+    fGyroXg = lowPassFilter(rawGyroX, fGyroXg);
+    fGyroYg = lowPassFilter(rawGyroY, fGyroYg);
+    fGyroZg = lowPassFilter(rawGyroZ, fGyroZg);
+
+    dRoll = rawGyroX * dtMicros / 1000000.0 * 0.001;
+    dPitch = rawGyroY * dtMicros / 1000000.0 * 0.001;
+    dYaw = rawGyroZ * dtMicros / 1000000.0 * -0.001;
+
+    roll = atan2(fAccYg, fAccZg) * 180 / PI;
+    pitch = atan2(-fAccXg, sqrt(fAccYg * fAccYg + fAccZg * fAccZg)) * 180 / PI;
+    yaw += dYaw;
 
     // Serial.print(F("accel x,y,z: "));
     // Serial.print(accel_t_gyro.value.x_accel, DEC);
@@ -791,11 +806,11 @@ void loop()
     // Serial.println(F(""));
 
     // Serial.print(F("accel x,y,z: "));
-    // Serial.print(xg);
+    // Serial.print(rawAccleX);
     // Serial.print(F(", "));
-    // Serial.print(yg);
+    // Serial.print(rawAccleY);
     // Serial.print(F(", "));
-    // Serial.print(zg);
+    // Serial.print(rawAccleZ);
     // Serial.println(F(""));
 
     // The temperature sensor is -40 to +85 degrees Celsius.
