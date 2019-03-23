@@ -673,7 +673,7 @@ int error;
 const float alpha = 0.45;
 const float const1 = 0.00390625;
 const float SCF = 131;
-double xg, yg, zg, xds, yds, zds, roll, pitch, fXg = 0, fYg = 0, fZg = 0, yaw = 0;
+double xg, yg, zg, xds, yds, zds, roll, pitch, yaw = 0;
 double dRoll, dPitch, dYaw;
 long prevMillis = 0, currMillis = 0, prevMicro = 0, currMicro = 0, dtMicros, dtMillis;
 
@@ -763,16 +763,11 @@ void loop()
     xg = accel_t_gyro.value.x_accel * const1;
     yg = accel_t_gyro.value.y_accel * const1;
     zg = accel_t_gyro.value.z_accel * const1;
-    fXg = xg * alpha + (fXg * (1.0 - alpha));
-    fYg = yg * alpha + (fYg * (1.0 - alpha));
-    fZg = zg * alpha + (fZg * (1.0 - alpha));
-    xg = fXg;
-    yg = fYg;
-    zg = fZg;
 
     xds = accel_t_gyro.value.z_gyro / SCF;
     yds = accel_t_gyro.value.z_gyro / SCF;
     zds = accel_t_gyro.value.z_gyro / SCF;
+
     dRoll = xds * dtMicros / 1000000.0 * 0.001;
     dPitch = yds * dtMicros / 1000000.0 * 0.001;
     dYaw = zds * dtMicros / 1000000.0 * 0.001;
