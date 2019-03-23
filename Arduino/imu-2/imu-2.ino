@@ -36,6 +36,7 @@
 //      Register 0x75 (WHO_AM_I)   = 0x68.
 //
 
+#include <stdlib.h>
 #include <Wire.h>
 
 // The name of the sensor is "MPU-6050".
@@ -675,7 +676,9 @@ const float const1 = 0.00390625;
 const float SCF = 131;
 double xg, yg, zg, xds, yds, zds, roll, pitch, yaw = 0;
 double dRoll, dPitch, dYaw;
-long prevMillis = 0, currMillis = 0, prevMicro = 0, currMicro = 0, dtMicros, dtMillis;
+long prevMillis, currMillis, prevMicro, currMicro;
+double dtMicros, dtMillis;
+int numberOfSamples = 0;
 
 void setup()
 {
@@ -715,11 +718,14 @@ void setup()
     // Clear the 'sleep' bit to start the sensor.
     MPU6050_write_reg(MPU6050_PWR_MGMT_1, 0);
     setOffsets();
+    prevMicro = micros();
+    prevMillis = millis();
 }
 
 void loop()
 {
     // double dT;
+    numberOfSamples++;
     accel_t_gyro_union accel_t_gyro;
 
     // Serial.println(F(""));
@@ -774,7 +780,7 @@ void loop()
 
     roll = atan2(yg, zg) * 180 / PI;
     pitch = atan2(-xg, sqrt(yg * yg + zg * zg)) * 180 / PI;
-    yaw += dYaw;
+    yaw += abs(dYaw) > 0.005 ? dYaw : 0 ;
 
     // Serial.print(F("accel x,y,z: "));
     // Serial.print(accel_t_gyro.value.x_accel, DEC);
@@ -818,6 +824,7 @@ void loop()
     if (dtMillis > 100) {
         prevMillis = currMillis;
         sendData();
+        numberOfSamples = 0;
     }
 }
 
@@ -831,7 +838,9 @@ void sendData() {
     Serial.print(", yaw: ");
     Serial.print(yaw);
     Serial.print(", dt: ");
-    Serial.println(currMicro - prevMicro);
+    Serial.print(currMicro - prevMicro);
+    Serial.print(", ");
+    Serial.println(numberOfSamples);
 }
 
 // --------------------------------------------------------
