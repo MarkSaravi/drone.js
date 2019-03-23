@@ -672,8 +672,8 @@ typedef union accel_t_gyro_union {
 
 int error;
 const float alpha = 0.45;
-const float const1 = 0.00390625;
-const float SCF = 131;
+const float ACCEL_RESOLUTION = 0.00390625;
+const float SENSITIVITY_SCALE_FACTOR = 131;
 double rawAccleX, rawAccleY, rawAccleZ, rawGyroX, rawGyroY, rawGyroZ, roll, pitch, yaw = 0;
 double dRoll, dPitch, dYaw;
 long prevMillis, currMillis, prevMicro, currMicro;
@@ -729,6 +729,16 @@ double lowPassFilter(double raw, double filtered)
     return raw * alpha + filtered * (1.0 - alpha);
 }
 
+double rawAccel(int16_t data) 
+{
+    return data * ACCEL_RESOLUTION;
+}
+
+double rawGyro(int16_t data) 
+{
+    return data / SENSITIVITY_SCALE_FACTOR;
+}
+
 void loop()
 {
     // double dT;
@@ -773,13 +783,13 @@ void loop()
 
 
     // Print the raw acceleration values
-    rawAccleX = accel_t_gyro.value.x_accel * const1;
-    rawAccleY = accel_t_gyro.value.y_accel * const1;
-    rawAccleZ = accel_t_gyro.value.z_accel * const1;
+    rawAccleX = rawAccel(accel_t_gyro.value.x_accel);
+    rawAccleY = rawAccel(accel_t_gyro.value.y_accel);
+    rawAccleZ = rawAccel(accel_t_gyro.value.z_accel);
 
-    rawGyroX = accel_t_gyro.value.z_gyro / SCF;
-    rawGyroY = accel_t_gyro.value.z_gyro / SCF;
-    rawGyroZ = accel_t_gyro.value.z_gyro / SCF;
+    rawGyroX = rawGyro(accel_t_gyro.value.z_gyro);
+    rawGyroY = rawGyro(accel_t_gyro.value.z_gyro);
+    rawGyroZ = rawGyro(accel_t_gyro.value.z_gyro);
 
     fAccXg = lowPassFilter(rawAccleX, fAccXg);
     fAccYg = lowPassFilter(rawAccleY, fAccYg);
