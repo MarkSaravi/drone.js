@@ -664,8 +664,10 @@ typedef union accel_t_gyro_union {
 int error;
 const float alpha = 0.45;
 const float const1 = 0.00390625;
-double xg, yg, zg, zds, roll, pitch, fXg = 0, fYg = 0, fZg = 0, yaw = 0;
-long prevMillis = 0, currMillis = 0, prevMicro = 0, currMicro = 0;
+const float SCF = 131;
+double xg, yg, zg, xds, yds, zds, roll, pitch, fXg = 0, fYg = 0, fZg = 0, yaw = 0;
+double dRoll, dPitch, dYaw;
+long prevMillis = 0, currMillis = 0, prevMicro = 0, currMicro = 0, dtMicros, dtMillis;
 
 void setup()
 {
@@ -742,6 +744,12 @@ void loop()
     SWAP(accel_t_gyro.reg.y_gyro_h, accel_t_gyro.reg.y_gyro_l);
     SWAP(accel_t_gyro.reg.z_gyro_h, accel_t_gyro.reg.z_gyro_l);
 
+    currMillis = millis();
+    currMicro = micros();
+    dtMicros = currMicro - prevMicro;
+    dtMillis = currMillis - prevMillis;
+
+
     // Print the raw acceleration values
     xg = accel_t_gyro.value.x_accel * const1;
     yg = accel_t_gyro.value.y_accel * const1;
@@ -753,10 +761,16 @@ void loop()
     yg = fYg;
     zg = fZg;
 
-    zds = accel_t_gyro.value.z_gyro / 14.375;
+    xds = accel_t_gyro.value.z_gyro / SCF;
+    yds = accel_t_gyro.value.z_gyro / SCF;
+    zds = accel_t_gyro.value.z_gyro / SCF;
+    dRoll = xds * dtMicros / 1000000.0 * 0.001;
+    dPitch = yds * dtMicros / 1000000.0 * 0.001;
+    dYaw = zds * dtMicros / 1000000.0 * 0.001;
+
     roll = atan2(yg, zg) * 180 / PI;
     pitch = atan2(-xg, sqrt(yg * yg + zg * zg)) * 180 / PI;
-    yaw += zds * (currMicro-prevMicro)/1000 * -0.000001;
+    yaw += dYaw;
 
     // Serial.print(F("accel x,y,z: "));
     // Serial.print(accel_t_gyro.value.x_accel, DEC);
@@ -797,15 +811,13 @@ void loop()
     // Serial.print(F(", "));
     // Serial.println(F(""));
 
-    currMillis = millis();
-    currMicro = micros();
-    if (currMillis - prevMillis > 100) {
+    if (dtMillis > 100) {
+        prevMillis = currMillis;
         sendData();
     }
 }
 
 void sendData() {
-    prevMillis = currMillis;
     Serial.print(" error: ");
     Serial.print(error);
     Serial.print(" roll: ");
