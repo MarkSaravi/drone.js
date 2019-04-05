@@ -96,7 +96,6 @@ export default function showStatus(
     } else {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'red');
     }
-    printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
     if (config.debug == 'roll' || config.debug == 'pitch') {
         printPIDConfig(config.debug, config.rollPitchPID);
