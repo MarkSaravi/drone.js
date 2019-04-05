@@ -18,15 +18,8 @@ export default class PIDControl {
         return err * config.pGain;
     }
 
-    I(error: number, p: number, d: number, dt: number, config: IPIDConfig): number {
-        this.integralSum += error * dt * config.iGain;
-        if (p * this.integralSum <0 && Math.abs(error) >= config.iMaxAngle || Math.abs(this.integralSum) >= config.iMaxValue) {
-            if (this.integralSum>=0)
-                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`');
-            else
-                console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`');
-            this.integralSum = 0;
-        }
+    I(error: number, dt: number, config: IPIDConfig): number {
+        this.integralSum += Math.abs(error) <= config.iMaxAngle ? error * dt * config.iGain : 0;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
@@ -43,13 +36,13 @@ export default class PIDControl {
 
         const d = this.D(dAngle, dt, config);
         const p = this.P(error, config);
-        const i = this.I(error, p, d, dt, config);
+        const i = this.I(error, dt, config);
 
         this.prevTime = time;
         this.prevAngle = angle;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
         if (Math.abs(sum)>config.maxOutput) {
-            console.log(`${this.name}, ${sum} ,${config.maxOutput} @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`);
+            // console.log(`${this.name}, ${sum} ,${config.maxOutput} @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`);
         }
         return {
             sum: Math.abs(sum) <= config.maxOutput ? sum : config.maxOutput * Math.sign(sum),
