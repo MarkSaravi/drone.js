@@ -246,7 +246,7 @@ void setup() {
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
-void sendAsJson(double roll, double pitch, double yaw)
+void sendAsJson(double pitch, double roll, double yaw)
 {
     static char json[128], rollstr[16], pitchstr[16], yawstr[16];
     dtostrf(roll, 8, 3, rollstr);
