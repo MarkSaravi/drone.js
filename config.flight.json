@@ -18,10 +18,10 @@
 	"suppress": {
 		"roll": false,
 		"pitch": false,
-		"yaw": false
+		"yaw": true
 	},
 	"rollPitchPID": {
-		"pGain": 0.0,
+		"pGain": 0.2,
 		"iGain": 3.0,
 		"dGain": 0.0,
 		"usePGain": true,
@@ -30,10 +30,10 @@
 		"pGainInc": 0.001,
 		"iGainInc": 0.1,
 		"dGainInc": 0.001,
-		"iMaxValue": 0.35,
+		"iMaxValue": 0.6,
 		"iMaxAngle": 3,
 		"iMinAngle": 1.5,
-		"pMaxAngle": 30,
+		"pMaxAngle": 5,
 		"maxOutput": 5,
 		"dMaxValue": 5
 	},
