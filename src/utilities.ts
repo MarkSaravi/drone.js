@@ -84,14 +84,14 @@ export default function showStatus(
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
     if (Math.abs(errors.rollError) < config.rollPitchPID.iMinAngle) {
         printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
-    } else if (Math.abs(errors.rollError) < config.rollPitchPID.iMinAngle * 1.5)  {
+    } else if (Math.abs(errors.rollError) < config.rollPitchPID.iMaxAngle)  {
         printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'yellow');
     } else {
         printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'red');
     }
     if (Math.abs(errors.pitchError) < config.rollPitchPID.iMinAngle) {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
-    } else if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle * 1.5) {
+    } else if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle) {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'yellow');
     } else {
         printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'red');
