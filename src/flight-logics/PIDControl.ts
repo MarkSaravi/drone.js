@@ -19,7 +19,9 @@ export default class PIDControl {
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        this.integralSum += Math.abs(error) <= config.iMaxAngle ? error * dt * config.iGain : 0;
+        const err = Math.abs(error) < config.iMaxAngle ?
+            error : Math.sign(error) * config.iMaxAngle;
+        this.integralSum += err * dt * config.iGain;
         this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
             this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
         return this.integralSum;
