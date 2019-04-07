@@ -153,7 +153,12 @@ export default class Application extends EventEmitter {
                     this.emit('toggle-d');
                     break;
 
-                case 'y':
+                case 'r':
+                case 'R':
+                    this.emit('toggle-roll-pitch');
+                    break;
+
+                    case 'y':
                 case 'Y':
                     this.emit('reset-yaw');
                     break            
@@ -203,27 +208,27 @@ export default class Application extends EventEmitter {
         });
 
         this.on('inc-p-gain', () => {
-            this.flightController.incPGain();
+            this.flightController.incGain('p', true);
         });
 
         this.on('dec-p-gain', () => {
-            this.flightController.decPGain();
+            this.flightController.incGain('p', false);
         });
 
         this.on('inc-i-gain', () => {
-            this.flightController.incIGain();
+            this.flightController.incGain('i', true);
         });
 
         this.on('dec-i-gain', () => {
-            this.flightController.decIGain();
+            this.flightController.incGain('i', false);
         });
 
         this.on('inc-d-gain', () => {
-            this.flightController.incDGain();
+            this.flightController.incGain('d', true);
         });
 
         this.on('dec-d-gain', () => {
-            this.flightController.decDGain();
+            this.flightController.incGain('d', false);
         });
 
         this.on('inc-power', () => {
@@ -235,15 +240,19 @@ export default class Application extends EventEmitter {
         });
 
         this.on('toggle-p', () => {
-            this.flightController.toggleP();
+            this.flightController.toggleUseGain('p');
         });
 
         this.on('toggle-i', () => {
-            this.flightController.toggleI();
+            this.flightController.toggleUseGain('i');
         });
 
         this.on('toggle-d', () => {
-            this.flightController.toggleD();
+            this.flightController.toggleUseGain('d');
+        });
+
+        this.on('toggle-roll-pitch', () => {
+            this.flightController.toggleRollPitchTuning();
         });
 
         this.on('reset-yaw', () => {

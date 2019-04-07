@@ -12,7 +12,6 @@ import showStatus from '../utilities';
 import IArmPower from '../models/IArmPower';
 import { RpmArmPower } from '../flight-logics/front-back-power';
 
-
 export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
@@ -63,111 +62,55 @@ export default class FlightController {
         this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
     }
 
-    toggleP() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.usePGain = !this.config.rollPID.usePGain;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.usePGain = !this.config.pitchPID.usePGain;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.usePGain = !this.config.yawPID.usePGain;
+    toggleRollPitchTuning() {
+        if (this.config.debug == 'roll') {
+            this.config.debug = 'pitch';
+        } else if (this.config.debug == 'pitch') {
+            this.config.debug = 'roll';
         }
     }
 
-    toggleI() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.useIGain = !this.config.rollPID.useIGain;
+    getPIDConfig() {
+        switch(this.config.debug) {
+            case 'roll':
+                return this.config.rollPID;
+            case 'pitch':
+                return this.config.pitchPID;
+            case 'yaw':
+                return this.config.yawPID;
         }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.useIGain = !this.config.pitchPID.useIGain;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.useIGain = !this.config.yawPID.useIGain;
+        return null;
+    }
+
+    toggleUseGain(pidType: string) {
+        let config = this.getPIDConfig();
+
+        switch(pidType) {
+            case 'p':
+                config.usePGain = !config.usePGain;
+                break;
+            case 'i': 
+                config.useIGain = !config.useIGain;
+                break;
+            case 'd':
+                config.useDGain = !config.useDGain;
+                break;
         }
     }
 
-    toggleD() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.useDGain = !this.config.rollPID.useDGain;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.useDGain = !this.config.pitchPID.useDGain;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.useDGain = !this.config.yawPID.useDGain;
-        }
-    }
+    incGain(pidType: string, inc: boolean) {
+        let config = this.getPIDConfig();
 
-    incPGain() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.pGain += this.config.rollPID.pGainInc;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.pGain += this.config.rollPID.pGainInc;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.pGain += this.config.yawPID.pGainInc;
-        }
-    }
-
-    decPGain() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.pGain -= this.config.rollPID.pGainInc;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.pGain -= this.config.pitchPID.pGainInc;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.pGain -= this.config.yawPID.pGainInc;
-        }
-    }
-
-    incIGain() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.iGain += this.config.rollPID.iGainInc;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.iGain += this.config.pitchPID.iGainInc;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.iGain += this.config.yawPID.iGainInc;
-        }
-    }
-
-    decIGain() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.iGain -= this.config.rollPID.iGainInc;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.iGain -= this.config.pitchPID.iGainInc;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.iGain -= this.config.yawPID.iGainInc;
-        }
-    }
-
-    incDGain() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.dGain += this.config.rollPID.dGainInc;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.dGain += this.config.pitchPID.dGainInc;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.dGain += this.config.yawPID.dGainInc;
-        }
-    }
-
-    decDGain() {
-        if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPID.dGain -= this.config.rollPID.dGainInc;
-        }
-        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
-            this.config.pitchPID.dGain -= this.config.pitchPID.dGainInc;
-        }
-        if (this.config.debug == 'yaw') {
-            this.config.yawPID.dGain -= this.config.yawPID.dGainInc;
+        switch(pidType) {
+            case 'p':
+                config.pGain += inc ? config.pGainInc : -config.pGainInc;
+                break;
+            case 'i': 
+                config.iGain += inc ? config.iGainInc : -config.iGainInc;
+                break;
+            case 'd':
+                config.dGain += inc ? config.dGainInc : -config.dGainInc;
+                break;
         }
     }
 

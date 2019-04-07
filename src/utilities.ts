@@ -95,10 +95,10 @@ export default function showStatus(
     showError('roll', errors.rollError, config.rollPID.iMinAngle, config.rollPID.iMaxAngle);
     showError('pitch', errors.pitchError, config.rollPID.iMinAngle, config.rollPID.iMaxAngle);
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
-    if (config.debug == 'roll' || config.debug == 'pitch') {
+    if (config.debug == 'roll') {
         printPIDConfig(config.debug, config.rollPID);
     }
-    if (config.debug == 'pitch' || config.debug == 'pitch') {
+    if (config.debug == 'pitch') {
         printPIDConfig(config.debug, config.pitchPID);
     }
     if (config.debug == 'yaw') {
