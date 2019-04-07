@@ -12,28 +12,27 @@ export default class PIDControl {
         protected readonly displayData: boolean = false) {
     }
 
+    limitValue(value: number, maxValue: number) {
+        return Math.abs(value) <= maxValue ?
+            value : maxValue * Math.sign(value);
+    }
+
     P(error: number, config: IPIDConfig): number {
-        const err = Math.abs(error) < config.pMaxAngle ?
-            error : Math.sign(error) * config.pMaxAngle;
-        return err * config.pGain;
+        return this.limitValue(error * config.pGain, config.pMaxValue);
     }
 
     I(error: number, dt: number, config: IPIDConfig): number {
-        const err = Math.abs(error) < config.iMaxAngle ?
-            error : Math.sign(error) * config.iMaxAngle;
-        this.integralSum += err * dt * config.iGain;
-        this.integralSum = Math.abs(this.integralSum) <= config.iMaxValue ?
-            this.integralSum : config.iMaxValue * Math.sign(this.integralSum);
+        const err = this.limitValue(error, config.iMaxAngle);
+        this.integralSum = this.limitValue(this.integralSum + err * dt * config.iGain , config.iMaxValue);
         return this.integralSum;
     }
 
     D(dAngle: number, dt: number, config: IPIDConfig): number {
-        const d = dAngle / dt * config.dGain;
-        return Math.abs(d) < config.dMaxValue ? d : config.dMaxValue * Math.sign(d);
+        return this.limitValue(dAngle / dt * config.dGain, config.dMaxValue);
     }
 
     PID(error: number, angle: number, time: number, config: IPIDConfig): IPIDValue {
-        const dt = (time - this.prevTime); //convert to milliseconds
+        const dt = (time - this.prevTime);
         const dAngle = this.prevAngle - angle;
 
         const d = this.D(dAngle, dt, config);
