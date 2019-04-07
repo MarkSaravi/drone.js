@@ -65,7 +65,10 @@ export default class FlightController {
 
     toggleP() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.usePGain = !this.config.rollPitchPID.usePGain;
+            this.config.rollPID.usePGain = !this.config.rollPID.usePGain;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.usePGain = !this.config.pitchPID.usePGain;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.usePGain = !this.config.yawPID.usePGain;
@@ -74,7 +77,10 @@ export default class FlightController {
 
     toggleI() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.useIGain = !this.config.rollPitchPID.useIGain;
+            this.config.rollPID.useIGain = !this.config.rollPID.useIGain;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.useIGain = !this.config.pitchPID.useIGain;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.useIGain = !this.config.yawPID.useIGain;
@@ -83,7 +89,10 @@ export default class FlightController {
 
     toggleD() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.useDGain = !this.config.rollPitchPID.useDGain;
+            this.config.rollPID.useDGain = !this.config.rollPID.useDGain;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.useDGain = !this.config.pitchPID.useDGain;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.useDGain = !this.config.yawPID.useDGain;
@@ -92,7 +101,10 @@ export default class FlightController {
 
     incPGain() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.pGain += this.config.rollPitchPID.pGainInc;
+            this.config.rollPID.pGain += this.config.rollPID.pGainInc;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.pGain += this.config.rollPID.pGainInc;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.pGain += this.config.yawPID.pGainInc;
@@ -101,7 +113,10 @@ export default class FlightController {
 
     decPGain() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.pGain -= this.config.rollPitchPID.pGainInc;
+            this.config.rollPID.pGain -= this.config.rollPID.pGainInc;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.pGain -= this.config.pitchPID.pGainInc;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.pGain -= this.config.yawPID.pGainInc;
@@ -110,7 +125,10 @@ export default class FlightController {
 
     incIGain() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.iGain += this.config.rollPitchPID.iGainInc;
+            this.config.rollPID.iGain += this.config.rollPID.iGainInc;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.iGain += this.config.pitchPID.iGainInc;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.iGain += this.config.yawPID.iGainInc;
@@ -119,7 +137,10 @@ export default class FlightController {
 
     decIGain() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.iGain -= this.config.rollPitchPID.iGainInc;
+            this.config.rollPID.iGain -= this.config.rollPID.iGainInc;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.iGain -= this.config.pitchPID.iGainInc;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.iGain -= this.config.yawPID.iGainInc;
@@ -128,7 +149,10 @@ export default class FlightController {
 
     incDGain() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.dGain += this.config.rollPitchPID.dGainInc;
+            this.config.rollPID.dGain += this.config.rollPID.dGainInc;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.dGain += this.config.pitchPID.dGainInc;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.dGain += this.config.yawPID.dGainInc;
@@ -137,7 +161,10 @@ export default class FlightController {
 
     decDGain() {
         if (this.config.debug == 'roll' || this.config.debug == 'pitch') {
-            this.config.rollPitchPID.dGain -= this.config.rollPitchPID.dGainInc;
+            this.config.rollPID.dGain -= this.config.rollPID.dGainInc;
+        }
+        if (this.config.debug == 'pitch' || this.config.debug == 'pitch') {
+            this.config.pitchPID.dGain -= this.config.pitchPID.dGainInc;
         }
         if (this.config.debug == 'yaw') {
             this.config.yawPID.dGain -= this.config.yawPID.dGainInc;
@@ -220,8 +247,8 @@ export default class FlightController {
         const dt = errors.time - this.prevTime;
         this.prevTime = errors.time;
         if (basePower >= this.config.minPower) {
-            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, errors.time, this.config.rollPitchPID);
-            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, errors.time, this.config.rollPitchPID);
+            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, errors.time, this.config.rollPID);
+            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, errors.time, this.config.pitchPID);
             const yawPIDResult = this.pidYaw.PID(yawError, -yawError, errors.time, this.config.yawPID);
             const rollBasePower = basePower + yawPIDResult.sum;
             const pitchBasePower = basePower - yawPIDResult.sum;

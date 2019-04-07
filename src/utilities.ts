@@ -68,6 +68,16 @@ export const printPowerValues = (cmd: string) => {
     printLabelValue('d:',`${numeral(p.d).format('00.0')}\n`, 'yellow');
 }
 
+function showError(label: string, err: number, iMinAngle: number, iMaxAngle: number) {
+    if (Math.abs(err) < iMinAngle) {
+        printLabelValue(`${label}:`, `${numeral(err).format('+00.000')} `, 'green');
+    } else if (Math.abs(err) < iMaxAngle)  {
+        printLabelValue(`${label}:`, `${numeral(err).format('+00.000')} `, 'yellow');
+    } else {
+        printLabelValue(`${label}:`, `${numeral(err).format('+00.000')} `, 'red');
+    }
+}
+
 export default function showStatus(
     power: number,
     rollPower: number,
@@ -82,23 +92,14 @@ export default function showStatus(
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
-    if (Math.abs(errors.rollError) < config.rollPitchPID.iMinAngle) {
-        printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'green');
-    } else if (Math.abs(errors.rollError) < config.rollPitchPID.iMaxAngle)  {
-        printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'yellow');
-    } else {
-        printLabelValue('roll:', `${numeral(errors.rollError).format('+00.000')} `, 'red');
-    }
-    if (Math.abs(errors.pitchError) < config.rollPitchPID.iMinAngle) {
-        printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'green');
-    } else if (Math.abs(errors.pitchError) < config.rollPitchPID.iMaxAngle) {
-        printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'yellow');
-    } else {
-        printLabelValue('pitch:', `${numeral(errors.pitchError).format('+00.000')} `, 'red');
-    }
+    showError('roll', errors.rollError, config.rollPID.iMinAngle, config.rollPID.iMaxAngle);
+    showError('pitch', errors.pitchError, config.rollPID.iMinAngle, config.rollPID.iMaxAngle);
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
     if (config.debug == 'roll' || config.debug == 'pitch') {
-        printPIDConfig(config.debug, config.rollPitchPID);
+        printPIDConfig(config.debug, config.rollPID);
+    }
+    if (config.debug == 'pitch' || config.debug == 'pitch') {
+        printPIDConfig(config.debug, config.pitchPID);
     }
     if (config.debug == 'yaw') {
         printPIDConfig(config.debug, config.yawPID);

@@ -24,6 +24,7 @@ export default interface IFlightConfig {
     maxPower: number;
     rpm: IRPMConfig;
     yawPID: IPIDConfig;
-    rollPitchPID: IPIDConfig;
+    rollPID: IPIDConfig;
+    pitchPID: IPIDConfig;
     debug: string;
 }

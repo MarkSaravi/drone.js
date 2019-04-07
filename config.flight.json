@@ -20,7 +20,24 @@
 		"pitch": false,
 		"yaw": true
 	},
-	"rollPitchPID": {
+	"rollPID": {
+		"pGain": 0.33,
+		"iGain": 0.33,
+		"dGain": 0.065,
+		"usePGain": true,
+		"useIGain": true,
+		"useDGain": true,
+		"pGainInc": 0.01,
+		"iGainInc": 0.01,
+		"dGainInc": 0.001,
+		"iMaxValue": 2.5,
+		"iMaxAngle": 3,
+		"iMinAngle": 1.5,
+		"pMaxValue": 2.5,
+		"maxOutput": 10,
+		"dMaxValue": 2.5
+	},
+	"pitchPID": {
 		"pGain": 0.33,
 		"iGain": 0.33,
 		"dGain": 0.065,
