@@ -158,10 +158,26 @@ export default class Application extends EventEmitter {
                     this.emit('toggle-roll-pitch');
                     break;
 
-                    case 'y':
+                case 'y':
                 case 'Y':
                     this.emit('reset-yaw');
-                    break            
+                    break;
+                case 'f':
+                case 'F':
+                    this.emit('inc-roll-offset');         
+                    break;
+                case 'g':
+                case 'G':
+                    this.emit('dec-roll-offset');
+                    break;
+                case 'h':
+                case 'H':
+                    this.emit('inc-pitch-offset');         
+                    break;
+                case 'j':
+                case 'J':
+                    this.emit('dec-pitch-offset');
+                    break;
             }
         });
         setInterval(() => {
@@ -255,6 +271,22 @@ export default class Application extends EventEmitter {
             this.flightController.toggleRollPitchTuning();
         });
 
+        this.on('inc-roll-offset', () => {
+            this.flightController.incRollOffset();
+        });
+
+        this.on('dec-roll-offset', () => {
+            this.flightController.decRollOffset();
+        });
+
+        this.on('inc-pitch-offset', () => {
+            this.flightController.incPitchOffset();
+        });
+
+        this.on('dec-pitch-offset', () => {
+            this.flightController.decPitchOffset();
+        });
+
         this.on('reset-yaw', () => {
             this.flightController.resetYaw();
         });
@@ -268,13 +300,6 @@ export default class Application extends EventEmitter {
     }
 
     onImuData(imuJson: string) {
-        // if (this.imuIgnoreCounter < 200) {
-        //     if (this.imuIgnoreCounter == 0) {
-        //         console.log('Initialising IMU...');
-        //     }
-        //     this.imuIgnoreCounter++;
-        //     return;
-        // }
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
