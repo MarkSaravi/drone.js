@@ -72,5 +72,7 @@
 		"maxOutput": 1,
 		"dMaxValue": 1
 	},
+	"rollOffset": 0,
+	"pitchOffset": 0,
 	"debug": "roll"
 }
