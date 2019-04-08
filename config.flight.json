@@ -31,15 +31,15 @@
 		"pGainInc": 0.01,
 		"iGainInc": 0.1,
 		"dGainInc": 0.001,
-		"iMaxValue": 2.5,
 		"iMaxAngle": 3,
 		"iMinAngle": 1.5,
-		"pMaxValue": 2.5,
-		"maxOutput": 10,
-		"dMaxValue": 5
+		"pMaxValue": 10,
+		"iMaxValue": 10,
+		"dMaxValue": 10,
+		"maxOutput": 10
 	},
 	"pitchPID": {
-		"pGain": 0.38,
+		"pGain": 0.5,
 		"iGain": 0.6,
 		"dGain": 0.059,
 		"usePGain": true,
@@ -48,12 +48,12 @@
 		"pGainInc": 0.01,
 		"iGainInc": 0.1,
 		"dGainInc": 0.001,
-		"iMaxValue": 2.5,
 		"iMaxAngle": 3,
 		"iMinAngle": 1.5,
 		"pMaxValue": 2.5,
-		"maxOutput": 10,
-		"dMaxValue": 5
+		"iMaxValue": 2.5,
+		"dMaxValue": 5,
+		"maxOutput": 10
 	},
 	"yawPID": {
 		"pGain": 0,

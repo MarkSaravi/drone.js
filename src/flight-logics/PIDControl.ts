@@ -42,11 +42,8 @@ export default class PIDControl {
         this.prevTime = time;
         this.prevAngle = angle;
         const sum = (config.usePGain ? p : 0) + (config.useIGain ? i : 0) + (config.useDGain ? d : 0);
-        if (Math.abs(sum)>config.maxOutput) {
-            // console.log(`${this.name}, ${sum} ,${config.maxOutput} @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`);
-        }
         return {
-            sum: Math.abs(sum) <= config.maxOutput ? sum : config.maxOutput * Math.sign(sum),
+            sum: this.limitValue(sum, config.maxOutput),
             p, i, d
         };
     }
