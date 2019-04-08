@@ -93,7 +93,9 @@ export default function showStatus(
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
     showError('roll', errors.rollError, config.rollPID.iMinAngle, config.rollPID.iMaxAngle);
+    printLabelValue('rOffs', `${numeral(config.rollOffset).format('+0.0')} `, 'green');
     showError('pitch', errors.pitchError, config.rollPID.iMinAngle, config.rollPID.iMaxAngle);
+    printLabelValue('pOffs', `${numeral(config.pitchOffset).format('+0.0')} `, 'green');
     printLabelValue('yaw:', `${numeral(errors.yawError).format('+00.000')} `, 'green');
     if (config.debug == 'roll') {
         printPIDConfig(config.debug, config.rollPID);

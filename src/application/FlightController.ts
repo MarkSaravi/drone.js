@@ -202,8 +202,8 @@ export default class FlightController {
 
     calcMotorsPower(): IPowers {
         let errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
-        const rollError = !this.config.suppress.roll ? errors.rollError : 0;
-        const pitchError = !this.config.suppress.pitch ? errors.pitchError : 0;
+        const rollError = !this.config.suppress.roll ? (errors.rollError - this.config.rollOffset): 0;
+        const pitchError = !this.config.suppress.pitch ? (errors.pitchError - this.config.pitchOffset) : 0;
         const yawError = !this.config.suppress.yaw ? errors.yawError : 0;
         const basePower = this.targetFlightState.power;
         const dt = errors.time - this.prevTime;
