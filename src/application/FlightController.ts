@@ -72,7 +72,23 @@ export default class FlightController {
             this.config.debug = 'roll';
         }
     }
+    
+    incRollOffset() {
+        this.config.rollOffset += this.config.rollOffsetInc;
+    }
 
+    decRollOffset() {
+        this.config.rollOffset -= this.config.rollOffsetInc;
+    }
+    
+    incPitchOffset() {
+        this.config.pitchOffset += this.config.pitchOffsetInc;
+    }
+    
+    decPitchOffset() {
+        this.config.pitchOffset -= this.config.pitchOffsetInc;
+    }
+    
     getPIDConfig() {
         switch(this.config.debug) {
             case 'roll':

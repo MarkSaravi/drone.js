@@ -29,5 +29,7 @@ export default interface IFlightConfig {
     pitchPID: IPIDConfig;
     rollOffset: number;
     pitchOffset: number;
+    rollOffsetInc: number;
+    pitchOffsetInc: number;
     debug: string;
 }

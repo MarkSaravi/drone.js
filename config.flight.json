@@ -74,5 +74,7 @@
 	},
 	"rollOffset": 0,
 	"pitchOffset": 0,
+	"rollOffsetInc": 0,
+	"pitchOffsetInc": 0,
 	"debug": "roll"
 }
