@@ -22,6 +22,7 @@ export default interface IFlightConfig {
     maxAngle: number;
     minPower: number;
     maxPower: number;
+    useRollPIDForPitchPID: boolean;
     rpm: IRPMConfig;
     yawPID: IPIDConfig;
     rollPID: IPIDConfig;

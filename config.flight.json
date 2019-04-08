@@ -20,6 +20,7 @@
 		"pitch": false,
 		"yaw": false
 	},
+	"useRollPIDForPitchPID": true,
 	"rollPID": {
 		"pGain": 0.5,
 		"iGain": 0.6,

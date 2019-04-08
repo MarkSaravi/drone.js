@@ -28,6 +28,9 @@ export default class FlightController {
     private prevTime: number = 0;
 
     constructor(private config: IFlightConfig) {
+        if (this.config.useRollPIDForPitchPID && this.config.debug != 'yaw') {
+            this.config.pitchPID = this.config.rollPID;
+        }
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
         this.targetFlightState = new FlightState(0, 0, NaN, 0, 0);
     }
