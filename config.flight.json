@@ -22,8 +22,8 @@
 	},
 	"useRollPIDForPitchPID": false,
 	"rollPID": {
-		"pGain": 0.38,
-		"iGain": 5.0,
+		"pGain": 0.18,
+		"iGain": 1.5,
 		"dGain": 0.065,
 		"usePGain": true,
 		"useIGain": true,
@@ -39,9 +39,9 @@
 		"maxOutput": 10
 	},
 	"pitchPID": {
-		"pGain": 0.25,
-		"iGain": 5.0,
-		"dGain": 0.08,
+		"pGain": 0.18,
+		"iGain": 1.5,
+		"dGain": 0.065,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
