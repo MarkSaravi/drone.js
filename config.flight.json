@@ -22,9 +22,9 @@
 	},
 	"useRollPIDForPitchPID": false,
 	"rollPID": {
-		"pGain": 0.18,
-		"iGain": 1.5,
-		"dGain": 0.065,
+		"pGain": 0.160,
+		"iGain": 4.5,
+		"dGain": 0.066,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
@@ -39,9 +39,9 @@
 		"maxOutput": 10
 	},
 	"pitchPID": {
-		"pGain": 0.18,
-		"iGain": 1.5,
-		"dGain": 0.065,
+		"pGain": 0.16,
+		"iGain": 4.5,
+		"dGain": 0.066,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
@@ -72,9 +72,9 @@
 		"maxOutput": 1,
 		"dMaxValue": 1
 	},
-	"rollOffset": 0,
-	"pitchOffset": 0,
-	"rollOffsetInc": 0,
-	"pitchOffsetInc": 0,
-	"debug": "roll"
+	"debug": "roll",
+	"rollOffset": 1,
+	"pitchOffset": 0.6,
+	"rollOffsetInc": 0.1,
+	"pitchOffsetInc": 0.1
 }
