@@ -199,14 +199,14 @@ void setup() {
 
     // supply your own gyro offsets here, scaled for min sensitivity
     //acelX acelY acelZ giroX giroY giroZ
-    //-1346	-6736	1851	25	-70	-16
+    //-1354	-6694	1781	15	-70	-48
 
-    mpu.setXGyroOffset(25);
+    mpu.setXGyroOffset(15);
     mpu.setYGyroOffset(-70);
-    mpu.setZGyroOffset(-16);
-    mpu.setXAccelOffset(-1346);
-    mpu.setYAccelOffset(-6736);
-    mpu.setZAccelOffset(1851); 
+    mpu.setZGyroOffset(-48);
+    mpu.setXAccelOffset(-1354);
+    mpu.setYAccelOffset(-6694);
+    mpu.setZAccelOffset(1781); 
     // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
