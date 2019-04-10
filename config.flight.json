@@ -2,7 +2,7 @@
 	"rollPolarity": -1,
 	"pitchPolarity": 1,
 	"yawPolarity": 1,
-	"maxAngle": 25,
+	"maxAngle": 15,
 	"minPower": 28,
 	"maxPower": 50,
 	"rpm": {
@@ -23,7 +23,7 @@
 	"useRollPIDForPitchPID": false,
 	"rollPID": {
 		"pGain": 0.160,
-		"iGain": 4.5,
+		"iGain": 1.9,
 		"dGain": 0.066,
 		"usePGain": true,
 		"useIGain": true,
@@ -73,8 +73,8 @@
 		"dMaxValue": 1
 	},
 	"debug": "roll",
-	"rollOffset": 1,
-	"pitchOffset": 0.6,
+	"rollOffset": 0,
+	"pitchOffset": 0,
 	"rollOffsetInc": 0.1,
 	"pitchOffsetInc": 0.1
 }
