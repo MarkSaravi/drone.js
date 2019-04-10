@@ -77,6 +77,7 @@ function showError(label: string, err: number, iMinAngle: number, iMaxAngle: num
         printLabelValue(`${label}:`, `${numeral(err).format('+00.000')} `, 'red');
     }
 }
+let counter: number = 0;
 
 export default function showStatus(
     power: number,
@@ -89,6 +90,8 @@ export default function showStatus(
     yawPID: IPIDValue
 
 ) {
+    if (counter++ < 40) return;
+    counter = 0;
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
@@ -115,4 +118,5 @@ export default function showStatus(
     if (yawPID && config.debug == 'yaw') {
         printPIDValues(yawPID, errors.time);
     }
+    console.log('');
 }

@@ -325,7 +325,7 @@ export default class Application extends EventEmitter {
         const escCommand = !this.motorsIdle ?
             this.createEscCommand(powers) : ESC_STOP_COMMAND;
         this.esc.write(escCommand, () => {
-            printPowerValues(escCommand);
+            // printPowerValues(escCommand);
             if (this.terminated && escCommand == ESC_STOP_COMMAND) {
                 this.esc.close();
                 this.imu.close();
