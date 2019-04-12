@@ -20,10 +20,10 @@
 		"pitch": false,
 		"yaw": false
 	},
-	"useRollPIDForPitchPID": false,
+	"useRollPIDForPitchPID": true,
 	"rollPID": {
 		"pGain": 0.160,
-		"iGain": 1.9,
+		"iGain": 1.0,
 		"dGain": 0.066,
 		"usePGain": true,
 		"useIGain": true,
@@ -31,7 +31,7 @@
 		"pGainInc": 0.01,
 		"iGainInc": 0.1,
 		"dGainInc": 0.001,
-		"iMaxAngle": 3,
+		"iMaxAngle": 5,
 		"iMinAngle": 1.5,
 		"pMaxValue": 10,
 		"iMaxValue": 10,
@@ -40,7 +40,7 @@
 	},
 	"pitchPID": {
 		"pGain": 0.16,
-		"iGain": 4.5,
+		"iGain": 1.2,
 		"dGain": 0.066,
 		"usePGain": true,
 		"useIGain": true,
@@ -49,10 +49,10 @@
 		"iGainInc": 0.1,
 		"dGainInc": 0.001,
 		"iMaxAngle": 3,
-		"iMinAngle": 1.5,
-		"pMaxValue": 2.5,
-		"iMaxValue": 2.5,
-		"dMaxValue": 5,
+		"iMinAngle": 10,
+		"pMaxValue": 10,
+		"iMaxValue": 10,
+		"dMaxValue": 10,
 		"maxOutput": 10
 	},
 	"yawPID": {
