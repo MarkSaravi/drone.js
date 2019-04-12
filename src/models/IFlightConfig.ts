@@ -1,5 +1,4 @@
 import IPIDConfig from './IPIDConfig';
-import IRPMConfig from './IRPMConfig';
 
 export interface Motors {
     a: boolean;
@@ -23,7 +22,6 @@ export default interface IFlightConfig {
     minPower: number;
     maxPower: number;
     useRollPIDForPitchPID: boolean;
-    rpm: IRPMConfig;
     yawPID: IPIDConfig;
     rollPID: IPIDConfig;
     pitchPID: IPIDConfig;

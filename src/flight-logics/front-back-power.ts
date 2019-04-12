@@ -1,6 +1,5 @@
 import IArmPower from '../models/IArmPower';
 import { IPIDValue } from '../models/IPIDValue';
-import IRPMConfig from '../models/IRPMConfig';
 import { BalanceFrontAndEnd } from '../convertors/front-back-power';
 
 export const SumArmPower = (basePower: number, pid: IPIDValue): IArmPower => {
@@ -10,7 +9,7 @@ export const SumArmPower = (basePower: number, pid: IPIDValue): IArmPower => {
     }
 }
 
-export const RpmArmPower = (basePower: number, pid: IPIDValue, config: IRPMConfig): IArmPower => {
+export const frontBackPower = (basePower: number, pid: IPIDValue): IArmPower => {
     const powers = BalanceFrontAndEnd(basePower, pid.sum);
     return {
         front: powers.frontPower,

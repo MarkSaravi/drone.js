@@ -10,7 +10,7 @@ import { IPIDValue } from '../models/IPIDValue';
 import PIDControl from '../flight-logics/PIDControl';
 import showStatus from '../utilities';
 import IArmPower from '../models/IArmPower';
-import { RpmArmPower } from '../flight-logics/front-back-power';
+import { frontBackPower } from '../flight-logics/front-back-power';
 
 export default class FlightController {
     private actualFlightState: FlightState;
@@ -197,7 +197,7 @@ export default class FlightController {
     }
 
     calcPairPower(power: number, pid: IPIDValue): IArmPower {
-        return RpmArmPower(power, pid, this.config.rpm);
+        return frontBackPower(power, pid);
     }
 
     calcMotorsPower(): IPowers {

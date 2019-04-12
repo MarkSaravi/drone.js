@@ -5,10 +5,6 @@
 	"maxAngle": 15,
 	"minPower": 28,
 	"maxPower": 50,
-	"rpm": {
-		"M": 136,
-		"Y0": 120
-	},
 	"motors": {
 		"a": true,
 		"b": true,
