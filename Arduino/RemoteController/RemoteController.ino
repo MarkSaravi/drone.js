@@ -1,48 +1,75 @@
-/*
-  ReadAnalogVoltage
+#include <math.h>
 
-  Reads an analog input on pin 0, converts it to voltage, and prints the result to the Serial Monitor.
-  Graphical representation is available using Serial Plotter (Tools > Serial Plotter menu).
-  Attach the center pin of a potentiometer to pin A0, and the outside pins to +5V and ground.
+const float MID_ROLL = 2.5;
+const float MID_PITCH = 2.5;
+const float MID_YAW = 2.4;
 
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/ReadAnalogVoltage
-*/
 float powerVoltage;
 float rollVoltage;
 float pitchVoltage;
 float yawVoltage;
 
-float sensorValueToVolt(int sensorValue) {
-    return sensorValue * (5.0 / 1023.0);
+float prePowerVoltage = 0;
+float preRollVoltage = 0;
+float prePitchVoltage = 0;
+float preYawVoltage = 0;
+
+long lastSent = 0;
+
+bool isChanged()
+{
+  return preRollVoltage != rollVoltage ||
+         prePitchVoltage != pitchVoltage ||
+         preYawVoltage != yawVoltage ||
+         prePowerVoltage != powerVoltage;
 }
 
-void readSensorVoltages() {
-    rollVoltage = sensorValueToVolt(analogRead(A0));
-    pitchVoltage = sensorValueToVolt(analogRead(A1));
-    yawVoltage = sensorValueToVolt(analogRead(A2));
-    powerVoltage = sensorValueToVolt(analogRead(A3));
+void resetPreVoltage()
+{
+  preRollVoltage = rollVoltage;
+  prePitchVoltage = pitchVoltage;
+  preYawVoltage = yawVoltage;
+  prePowerVoltage = powerVoltage;
+  lastSent = millis();
 }
 
-void sendJsonData() {
-    Serial.print("{\"roll\":");
-    Serial.print(rollVoltage);
-    Serial.print(",\"pitch\":");
-    Serial.print(pitchVoltage);
-    Serial.print(",\"yaw\":");
-    Serial.print(yawVoltage);
-    Serial.print(",\"power\":");
-    Serial.print(powerVoltage);
-    Serial.println("}");
+float sensorValueToVolt(int sensorValue)
+{
+  return round(sensorValue * 5.0 / 1023.0 * 10) / 10.0;
 }
 
-void setup() {
+void readSensorVoltages()
+{
+  rollVoltage = sensorValueToVolt(analogRead(A0)) - MID_ROLL;
+  pitchVoltage = sensorValueToVolt(analogRead(A1)) - MID_PITCH;
+  yawVoltage = sensorValueToVolt(analogRead(A2)) - MID_YAW;
+  powerVoltage = sensorValueToVolt(analogRead(A3));
+}
+
+void sendJsonData()
+{
+  Serial.print("{\"roll\":");
+  Serial.print(rollVoltage);
+  Serial.print(",\"pitch\":");
+  Serial.print(pitchVoltage);
+  Serial.print(",\"yaw\":");
+  Serial.print(yawVoltage);
+  Serial.print(",\"power\":");
+  Serial.print(powerVoltage);
+  Serial.println("}");
+}
+
+void setup()
+{
   Serial.begin(9600);
 }
 
-void loop() {
+void loop()
+{
   readSensorVoltages();
-  sendJsonData();
-  delay(100);
+  if (isChanged() || (millis() - lastSent >= 200))
+  {
+    sendJsonData();
+    resetPreVoltage();
+  }
 }
