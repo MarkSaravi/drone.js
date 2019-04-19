@@ -1,0 +1,9 @@
+Setup
+AT
+AT+BAUD6
+AT+ROLE0
+
+AT+ADDR
++ADDR=00:15:87:00:91:3E
+
+
