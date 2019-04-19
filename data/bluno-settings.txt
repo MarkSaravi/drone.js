@@ -1,0 +1,5 @@
+Name: Bluno
+Baud: 38400,8,N,1
+Bind: 0x0017ea9397e1
+MAC: 0xF045DA10B603
+
