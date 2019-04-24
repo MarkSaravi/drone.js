@@ -6,3 +6,5 @@ AT+UART=57600,0,0
 MASTER
 AT+UART=57600,0,0
 AT+BIND=21,13,57418
+
+https://www.instructables.com/id/Arduino-Bluetooth-Master-and-Slave-Using-Any-HC-05/
