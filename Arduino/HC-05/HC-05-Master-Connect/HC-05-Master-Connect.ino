@@ -9,28 +9,22 @@ int buttonState = 0;
 
 void setup() {
 
-  Serial.begin(9600);
-  BTserial.begin(38400);
+  Serial.begin(57600);
+  BTserial.begin(57600);
 
   pinMode(ledPin, OUTPUT);
   pinMode(buttonPin, INPUT);
 
 }
-
+int counter=0;
+float value = 0;
+char msg[128];
+char valuestr[64];
 void loop() {
-
-  buttonState = digitalRead(buttonPin);
-
-  if (buttonState == HIGH) {
-    digitalWrite(ledPin, HIGH);
-    delay(20);
-    BTserial.write('1');  //sends a 1 through the bluetooth serial link
+    dtostrf(value, 0, 2, valuestr);
+    sprintf(msg, "{\"#\":%d,\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s,}\n", counter++, valuestr, valuestr, valuestr, valuestr);
+    value += 0.1;
+    BTserial.write(msg);  //sends a 1 through the bluetooth serial link
+    Serial.print(msg);
     delay (20);
-  }
-
-  else {
-    BTserial.write('0');
-    digitalWrite(ledPin, LOW);
-    delay(20);
-  }
 }

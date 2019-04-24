@@ -1,0 +1,8 @@
+To start AT mode, hold the button and connect the Vcc
+SLAVE 
+AT+UART=57600,0,0
++ADDR:21:13:57418
+
+MASTER
+AT+UART=57600,0,0
+AT+BIND=21,13,57418

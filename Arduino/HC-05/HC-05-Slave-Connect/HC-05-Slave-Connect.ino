@@ -28,14 +28,14 @@ void setup() {
   pinMode(keyPin, OUTPUT);
   digitalWrite(keyPin, HIGH);
 
-  Serial.begin(9600);
+  Serial.begin(57600);
   Serial.println("Sketch HC-05");
   Serial.println("Arduino with HC-05 is ready");
   Serial.println("Make sure Both NL & CR are set");
   Serial.println("");
 
   //Set to HC-05 default baud rate, found using AT+UART.  It is usually 38400.
-  BTSerial.begin(38400);
+  BTSerial.begin(57600);
   Serial.println("BTserial started at 38400");
   Serial.println("");
 
