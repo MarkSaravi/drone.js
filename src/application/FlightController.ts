@@ -16,12 +16,6 @@ export default class FlightController {
     private actualFlightState: FlightState;
     private targetFlightState: FlightState;
     private imuData: ImuData = null;
-    private pitchTilt: number = 0;
-    private rollTilt: number = 0;
-    private command: Command = new Command(0, 0, 0, 0);
-    private heading: number = -1000;
-    private readonly TILT_INC: number = 0.25;
-    private readonly POWER_INC: number = 0.5;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("pitch");
     private readonly pidYaw: PIDControl = new PIDControl("yaw");
@@ -32,37 +26,7 @@ export default class FlightController {
             this.config.pitchPID = this.config.rollPID;
         }
         this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
-        this.targetFlightState = new FlightState(0, 0, NaN, 0, 0);
-    }
-
-    tiltForward() {
-        this.pitchTilt += this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
-    }
-
-    tiltBackward() {
-        this.pitchTilt -= this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
-    }
-
-    tiltRight() {
-        this.rollTilt += this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
-    }
-
-    tiltLeft() {
-        this.rollTilt -= this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
-    }
-
-    turnRight() {
-        this.heading += this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
-    }
-
-    turnLeft() {
-        this.heading -= this.TILT_INC;
-        this.targetFlightState = convertors.CommandToFlightStatus({ x: this.rollTilt, y: this.pitchTilt, heading: this.heading, power: this.targetFlightState.power });
+        this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
     }
 
     toggleRollPitchTuning() {
@@ -134,53 +98,17 @@ export default class FlightController {
     }
 
     resetYaw() {
-        this.heading = this.actualFlightState.yaw;
         this.targetFlightState.yaw = this.actualFlightState.yaw;
     }
 
-    initHeading() {
-        if (this.heading == -1000) {
-            this.resetYaw();
-        }
-    }
-
     applyIncomingCommand(cmdJson: string) {
+        // {"state":2,"roll":2.5,"pitch":2.5,"yaw":2.4,"power":0.0,"time":-22764}
         try{
             const cmd = JSON.parse(cmdJson);
-            const x = cmd.x != undefined ? cmd.x : this.command.x;
-            const y = cmd.y != undefined ? cmd.y : this.command.y;
-            const heading = cmd.heading != undefined ? cmd.heading : this.command.heading;
-            const power = cmd.p != undefined ? cmd.p : this.command.power;
-            this.command = new Command(heading, x, y, power);
-            this.targetFlightState = convertors.JsonToCommand(this.command, this.targetFlightState);
+            // this.command = new Command(cmd.roll, cmd.pitch, cmd.yaw, cmd.power, cmd.state, cmd.time);
+            // this.targetFlightState = convertors.JsonToCommand(this.command, this.targetFlightState);
         } catch(err){
         }
-    }
-
-    incPower() {
-        this.initHeading();
-        if (this.targetFlightState.power >= this.config.maxPower) {
-            return;
-        }
-        var newPower = 0;
-        if (this.targetFlightState.power >= this.config.minPower) {
-            newPower = this.targetFlightState.power + this.POWER_INC;
-        } else {
-            newPower = this.config.minPower;
-        }
-        this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, newPower));
-    }
-
-    decPower() {
-        var newPower = 0;
-        if (this.targetFlightState.power > this.config.minPower) {
-            newPower = this.targetFlightState.power - this.POWER_INC;
-        }
-        this.applyCommand(new Command(this.targetFlightState.yaw, this.targetFlightState.roll, this.targetFlightState.pitch, newPower));
-    }
-
-    applyCommand(command: Command) {
-        this.targetFlightState = convertors.CommandToFlightStatus(command);
     }
 
     applyImuData(rawImuData: ImuData) {
@@ -191,9 +119,6 @@ export default class FlightController {
             time: rawImuData.time
         };
         this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
-        if (isNaN(this.targetFlightState.yaw)) {
-            this.targetFlightState = new FlightState(0, 0, this.actualFlightState.yaw, 0, 0);
-        }
     }
 
     calcPairPower(power: number, pid: IPIDValue): IArmPower {
