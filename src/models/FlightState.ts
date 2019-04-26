@@ -1,8 +1,3 @@
-export interface ITilt {
-    roll: number;
-    pitch: number;
-}
-
 export interface IFlightState {
     roll: number,
     pitch: number,

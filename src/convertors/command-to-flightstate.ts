@@ -1,6 +1,16 @@
 import { IFlightState } from "../models/FlightState";
 import { IRemoteControlConfig } from "../models/IFlightConfig";
 
+const rotateRollPitch= (roll: number,pitch: number): {armRoll: number, armPitch: number} => {
+    const rotation = Math.PI / 4;
+    const roundFactor = 100000;
+    const armRoll = Math.round((roll * Math.cos(rotation) + pitch * Math.sin(rotation)) * roundFactor) / roundFactor;
+    const armPitch =Math.round((-roll * Math.sin(rotation) + pitch * Math.cos(rotation)) * roundFactor) / roundFactor;
+    return {
+        armRoll, armPitch
+    }
+}
+
 const commandToFlightState = (cmdStr: string, flightState: IFlightState, config: IRemoteControlConfig): IFlightState => {
     const cmd = JSON.parse(cmdStr);
     const powerRange = config.maxPower - config.minPower;
@@ -13,10 +23,11 @@ const commandToFlightState = (cmdStr: string, flightState: IFlightState, config:
     if (flightState.power == 0 && dPower / powerChangePercent > 5) {
         power = 0;
     }
+    const armData = rotateRollPitch(roll, pitch);
     return {
         power,
-        roll,
-        pitch,
+        roll: armData.armRoll,
+        pitch: armData.armPitch,
         yaw,
         time: cmd.time
     }
