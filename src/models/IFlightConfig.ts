@@ -24,7 +24,9 @@ export interface IImuDataSupressConfig {
     maxInputYaw: number,
     maxRoll: number,
     maxPitch: number,
-    maxYaw: number
+    maxYaw: number,
+    maxPower: number,
+    minPower: number;
 }
 
 export default interface IFlightConfig {
@@ -34,8 +36,6 @@ export default interface IFlightConfig {
     pitchPolarity: number;
     yawPolarity: number;
     maxAngle: number;
-    minPower: number;
-    maxPower: number;
     useRollPIDForPitchPID: boolean;
     remoteControl: IRemoteControlConfig;
     yawPID: IPIDConfig;

@@ -3,8 +3,6 @@
 	"pitchPolarity": 1,
 	"yawPolarity": 1,
 	"maxAngle": 15,
-	"minPower": 28,
-	"maxPower": 35,
 	"remoteControl": {
 		"minInputPower": 0,
 		"maxInputPower": 5,
@@ -16,7 +14,9 @@
 		"maxInputYaw": 2.5,
 		"maxRoll": 3,
 		"maxPitch": 3,
-		"maxYaw": 3
+		"maxYaw": 3,
+		"minPower": 28,
+		"maxPower": 35
 	},
 	"motors": {
 		"a": true,

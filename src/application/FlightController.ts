@@ -133,7 +133,7 @@ export default class FlightController {
         const basePower = this.targetFlightState.power;
         const dt = errors.time - this.prevTime;
         this.prevTime = errors.time;
-        if (basePower >= this.config.minPower) {
+        if (basePower >= this.config.remoteControl.minPower) {
             const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, errors.time, this.config.rollPID);
             const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, errors.time, this.config.pitchPID);
             const yawPIDResult = this.pidYaw.PID(yawError, -yawError, errors.time, this.config.yawPID);
