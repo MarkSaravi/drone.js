@@ -4,13 +4,9 @@
 	"yawPolarity": 1,
 	"maxAngle": 15,
 	"remoteControl": {
-		"minInputPower": 0,
 		"maxInputPower": 5,
-		"minInputRoll": -2.5,
 		"maxInputRoll": 2.5,
-		"minInputPitch": -2.5,
 		"maxInputPitch": 2.5,
-		"minInputYaw": -2.5,
 		"maxInputYaw": 2.5,
 		"maxRoll": 3,
 		"maxPitch": 3,

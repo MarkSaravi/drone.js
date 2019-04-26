@@ -14,13 +14,9 @@ export interface IImuDataSupressConfig {
 }
 
  export interface IRemoteControlConfig {
-    minInputPower: number,
     maxInputPower: number,
-    minInputRoll: number,
     maxInputRoll: number,
-    minInputPitch: number,
     maxInputPitch: number,
-    minInputYaw: number,
     maxInputYaw: number,
     maxRoll: number,
     maxPitch: number,
