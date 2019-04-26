@@ -55,9 +55,9 @@ float sensorValueToVolt(float sensorValue)
 
 void readSensorVoltages()
 {
-  data[ROLL_INDEX] = sensorValueToVolt(analogRead(A0) - MID_ROLL);
-  data[PITCH_INDEX] = sensorValueToVolt(analogRead(A1) - MID_PITCH);
-  data[YAW_INDEX] = sensorValueToVolt(analogRead(A2) - MID_YAW);
+  data[ROLL_INDEX] = sensorValueToVolt(analogRead(A0)) - MID_ROLL;
+  data[PITCH_INDEX] = sensorValueToVolt(analogRead(A1)) - MID_PITCH;
+  data[YAW_INDEX] = sensorValueToVolt(analogRead(A2)) - MID_YAW; 
   data[POWER_INDEX] = sensorValueToVolt(analogRead(A3));
 }
 
