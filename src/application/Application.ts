@@ -128,16 +128,6 @@ export default class Application extends EventEmitter {
                     this.emit('dec-d-gain');
                     break;
 
-                case 'a':
-                case 'A':
-                    this.emit('inc-power');
-                    break;
-
-                case 'z':
-                case 'Z':
-                    this.emit('dec-power');
-                    break;
-
                 case 'p':
                 case 'P':
                     this.emit('toggle-p');
@@ -199,30 +189,6 @@ export default class Application extends EventEmitter {
             this.onBleData(data);
         });
 
-        this.on('tilt-forward', () => {
-            this.flightController.tiltForward();
-        });
-
-        this.on('tilt-backward', () => {
-            this.flightController.tiltBackward();
-        });
-
-        this.on('tilt-right', () => {
-            this.flightController.tiltRight();
-        });
-
-        this.on('tilt-left', () => {
-            this.flightController.tiltLeft();
-        });
-
-        this.on('turn-right', () => {
-            this.flightController.turnRight();
-        });
-
-        this.on('turn-left', () => {
-            this.flightController.turnLeft();
-        });
-
         this.on('inc-p-gain', () => {
             this.flightController.incGain('p', true);
         });
@@ -245,14 +211,6 @@ export default class Application extends EventEmitter {
 
         this.on('dec-d-gain', () => {
             this.flightController.incGain('d', false);
-        });
-
-        this.on('inc-power', () => {
-            this.flightController.incPower();
-        });
-
-        this.on('dec-power', () => {
-            this.flightController.decPower();
         });
 
         this.on('toggle-p', () => {
@@ -341,7 +299,6 @@ export default class Application extends EventEmitter {
     }
 
     onBleData(bleJson: string) {
-        // {"x":0,"y":-3,"h":0,"p":42.5}
         this.flightController.applyIncomingCommand(bleJson);
     }
 }
