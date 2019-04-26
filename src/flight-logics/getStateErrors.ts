@@ -1,4 +1,4 @@
-import FlightState from '../models/FlightState';
+import IFlightState from '../models/IFlightState';
 import IFlightStateError from '../models/IFlightStateError';
 import IFlightConfig from '../models/IFlightConfig';
 
@@ -10,7 +10,7 @@ export function normaliseYawError(actualYaw: number, targetYaw: number) {
     return (360 - Math.abs(error)) * -Math.sign(error);
 }
 
-export default function getStateError(target: FlightState, actual: FlightState, config: IFlightConfig): IFlightStateError {
+export default function getStateError(target: IFlightState, actual: IFlightState, config: IFlightConfig): IFlightStateError {
     const rollError = (target.roll - actual.roll);
     const pitchError = (target.pitch - actual.pitch);
     const yawError = normaliseYawError(target.yaw, actual.yaw);

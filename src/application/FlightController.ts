@@ -1,5 +1,4 @@
-import FlightState from '../models/FlightState';
-import Command from '../models/Command';
+import IFlightState from '../models/IFlightState';
 import ImuData from '../models/ImuData';
 import getStateError from '../flight-logics/getStateErrors';
 import IFlightStateError from '../models/IFlightStateError';
@@ -11,10 +10,11 @@ import PIDControl from '../flight-logics/PIDControl';
 import showStatus from '../utilities';
 import IArmPower from '../models/IArmPower';
 import { frontBackPower } from '../flight-logics/front-back-power';
+import commandToFlightState from '../convertors/command-to-flightstate';
 
 export default class FlightController {
-    private actualFlightState: FlightState;
-    private targetFlightState: FlightState;
+    private actualFlightState: IFlightState;
+    private targetFlightState: IFlightState;
     private imuData: ImuData = null;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("pitch");
@@ -25,8 +25,8 @@ export default class FlightController {
         if (this.config.useRollPIDForPitchPID && this.config.debug != 'yaw') {
             this.config.pitchPID = this.config.rollPID;
         }
-        this.actualFlightState = new FlightState(0, 0, 0, 0, 0);
-        this.targetFlightState = new FlightState(0, 0, 0, 0, 0);
+        this.actualFlightState = { roll: 0, pitch: 0, yaw: 0, power: 0, time: 0 };
+        this.targetFlightState = { roll: 0, pitch: 0, yaw: 0, power: 0, time: 0 };
     }
 
     toggleRollPitchTuning() {
@@ -104,9 +104,7 @@ export default class FlightController {
     applyIncomingCommand(cmdJson: string) {
         // {"state":2,"roll":2.5,"pitch":2.5,"yaw":2.4,"power":0.0,"time":-22764}
         try{
-            const cmd = JSON.parse(cmdJson);
-            // this.command = new Command(cmd.roll, cmd.pitch, cmd.yaw, cmd.power, cmd.state, cmd.time);
-            // this.targetFlightState = convertors.JsonToCommand(this.command, this.targetFlightState);
+            this.targetFlightState = commandToFlightState(cmdJson, this.targetFlightState, this.config.remoteControl);
         } catch(err){
         }
     }

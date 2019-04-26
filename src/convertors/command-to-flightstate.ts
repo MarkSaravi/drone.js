@@ -1,4 +1,4 @@
-import { IFlightState } from "../models/FlightState";
+import IFlightState from "../models/IFlightState";
 import { IRemoteControlConfig } from "../models/IFlightConfig";
 
 const rotateRollPitch= (roll: number,pitch: number): {armRoll: number, armPitch: number} => {

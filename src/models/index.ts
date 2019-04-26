@@ -1,9 +1,7 @@
-import FlightState from './FlightState';
+import IFlightState from './IFlightState';
 import ImuData from './ImuData';
-import Command from './Command';
 import IPowers from './IPowers';
 
 export { IPowers };
-export { FlightState };
+export { IFlightState };
 export { ImuData };
-export { Command };
