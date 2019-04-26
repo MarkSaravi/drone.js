@@ -1,19 +1,19 @@
 import IPIDConfig from './IPIDConfig';
 
-export interface Motors {
+export interface IMotorsPowerSupressConfig {
     a: boolean;
     b: boolean;
     c: boolean;
     d: boolean;
 }
 
-export interface Suppress {
+export interface IImuDataSupressConfig {
     roll: boolean;
     pitch: boolean;
     yaw: boolean;
 }
 
- export interface RemoteControl {
+ export interface IRemoteControlConfig {
     minInputPower: number,
     maxInputPower: number,
     minInputRoll: number,
@@ -29,15 +29,15 @@ export interface Suppress {
 
 export default interface IFlightConfig {
     rollPolarity: number;
-    motors: Motors;
-    suppress: Suppress;
+    motors: IMotorsPowerSupressConfig;
+    suppress: IImuDataSupressConfig;
     pitchPolarity: number;
     yawPolarity: number;
     maxAngle: number;
     minPower: number;
     maxPower: number;
     useRollPIDForPitchPID: boolean;
-    remoteControl: RemoteControl;
+    remoteControl: IRemoteControlConfig;
     yawPID: IPIDConfig;
     rollPID: IPIDConfig;
     pitchPID: IPIDConfig;
