@@ -10,8 +10,8 @@
 		"type": "esc"
 	},
 	"ble": {
-		"name": "/dev/ttyBLE",
-		"baudRate": 115200,
+		"name": "/dev/ttyS0",
+		"baudRate": 57600,
 		"type": "ble"
 	}
 }
