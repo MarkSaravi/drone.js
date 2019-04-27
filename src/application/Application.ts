@@ -24,7 +24,6 @@ export default class Application extends EventEmitter {
     flightController: FlightController;
     motorsIdle: boolean = false;
     terminated: boolean = false;
-    // imuIgnoreCounter: number = 0;
 
     constructor() {
         super();
@@ -257,6 +256,8 @@ export default class Application extends EventEmitter {
         return Math.abs(imuData.roll) < 30 && Math.abs(imuData.roll) < 30;
     }
 
+    counter: number = 0;
+
     onImuData(imuJson: string) {
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
@@ -283,7 +284,11 @@ export default class Application extends EventEmitter {
         const escCommand = !this.motorsIdle ?
             this.createEscCommand(powers) : ESC_STOP_COMMAND;
         this.esc.write(escCommand, () => {
-            // printPowerValues(escCommand);
+            if (this.counter++ == 5) {
+                printPowerValues(escCommand);
+                this.counter = 0;
+            }
+            
             if (this.terminated && escCommand == ESC_STOP_COMMAND) {
                 this.esc.close();
                 this.imu.close();
