@@ -13,7 +13,6 @@ import { ImuData, IPowers } from '../models';
 import { println, printPowerValues } from '../utilities';
 
 const BLE_STOP_STATE = '{"state": "stop"}';
-const BLE_EXIT_STATE = '{"state": "exit"}';
 const ESC_STOP_COMMAND = '{"a":0.000,"b":0.000,"c":0.000,"d":0.000}';
 
 export default class Application extends EventEmitter {
@@ -304,7 +303,6 @@ export default class Application extends EventEmitter {
     }
 
     onBleData(bleJson: string) {
-        console.log(bleJson);
         this.flightController.applyIncomingCommand(bleJson);
     }
 }
