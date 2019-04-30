@@ -83,7 +83,7 @@ void sendJsonData()
 void setup()
 {
   Serial.begin(57600);
-  BTSerial.begin(57600);
+  BTSerial.begin(38400);
   resetPreVoltage(true);
 }
 

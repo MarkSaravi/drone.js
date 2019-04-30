@@ -90,8 +90,9 @@ export default function showStatus(
     yawPID: IPIDValue
 
 ) {
-    if (counter++ < 5) return;
+    if (counter++ < 20) return;
     counter = 0;
+    return;
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');

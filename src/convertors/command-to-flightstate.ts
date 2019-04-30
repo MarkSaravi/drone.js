@@ -21,6 +21,7 @@ const commandToFlightState = (cmdStr: string, flightState: IFlightState, config:
     const pitch = cmd.pitch / config.maxInputPitch * config.maxPitch;
     const yaw = cmd.yaw / config.maxInputYaw * config.maxYaw;
     if (flightState.power == 0 && powerChangePercent > 5) {
+        // console.log(`set power to zero ${power}, ${powerChangePercent}`);
         power = 0;
     }
     const armData = rotateRollPitch(roll, pitch);
