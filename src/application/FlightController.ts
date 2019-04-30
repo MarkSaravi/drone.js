@@ -101,11 +101,13 @@ export default class FlightController {
         this.targetFlightState.yaw = this.actualFlightState.yaw;
     }
 
-    applyIncomingCommand(cmdJson: string) {
+    applyIncomingCommand(cmdJson: string): boolean {
         // {"state":2,"roll":2.5,"pitch":2.5,"yaw":2.4,"power":0.0,"time":-22764}
         try{
             this.targetFlightState = commandToFlightState(cmdJson, this.targetFlightState, this.config.remoteControl);
+            return this.targetFlightState.power == 0;
         } catch(err){
+            return false;
         }
     }
 

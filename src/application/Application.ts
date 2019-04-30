@@ -21,6 +21,7 @@ export default class Application extends EventEmitter {
     ble: any;
     flightConfig: IFlightConfig;
     flightController: FlightController;
+    lastCommandReceivedTime: number;
     motorsIdle: boolean = false;
     terminated: boolean = false;
 
@@ -37,12 +38,13 @@ export default class Application extends EventEmitter {
         this.registerEvents();
     }
 
-    initDevice(config: IPortConfig, event: string, onClose: () => void) {
+    initDevice(config: IPortConfig, event: string, onOpen: () => void, onClose: () => void) {
         const Readline = SerialPort.parsers.Readline;
         const port = new SerialPort(config.name, { baudRate: config.baudRate, autoOpen: false });
         port.on('open', () => {
             println(`${config.type} is opened.`);
             port.flush();
+            onOpen();
         })
         port.on('close', () => {
             println(`${config.type} is closed.`);
@@ -60,14 +62,19 @@ export default class Application extends EventEmitter {
     openDevices() {
         println('trying to open port...');
         this.imu = this.initDevice(portsConfig.imu, 'data-imu',
+            () => {},
             () => { 
                 this.ble.close();
             });
         this.esc = this.initDevice(portsConfig.esc, 'data-esc',
+            () => {},
             () => {
                 this.imu.close();
             });
         this.ble = this.initDevice(portsConfig.ble, 'data-ble',
+            () => {
+                this.lastCommandReceivedTime = (new Date()).getTime();
+            },
             () => {
                 println("exiting the application");
                 process.exit(0);
@@ -258,6 +265,7 @@ export default class Application extends EventEmitter {
     counter: number = 0;
 
     onImuData(imuJson: string) {
+        const lastCommandTime = (new Date()).getTime() - this.lastCommandReceivedTime;
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
@@ -268,9 +276,10 @@ export default class Application extends EventEmitter {
         }
 
         if (Math.abs(imuData.roll) > this.flightConfig.maxAngle ||
-            Math.abs(imuData.pitch) > this.flightConfig.maxAngle) {
+            Math.abs(imuData.pitch) > this.flightConfig.maxAngle ||
+            lastCommandTime > 400) {
             this.motorsIdle = true;
-            this.terminated = true;
+            this.terminated = false;
         }
 
         if (!this.applySafeTilt(imuData)) {
@@ -303,6 +312,8 @@ export default class Application extends EventEmitter {
     }
 
     onBleData(bleJson: string) {
-        this.flightController.applyIncomingCommand(bleJson);
+        this.lastCommandReceivedTime = (new Date()).getTime();
+        const canResumeMotors = this.flightController.applyIncomingCommand(bleJson);
+        this.motorsIdle = this.motorsIdle && canResumeMotors ? false : this.motorsIdle;
     }
 }
