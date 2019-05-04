@@ -1,5 +1,4 @@
 #include <math.h>
-#include <AltSoftSerial.h>
 
 const float MID_ROLL = 2.5;
 const float MID_PITCH = 2.5;
@@ -22,8 +21,6 @@ char rollstr[16], pitchstr[16], yawstr[16], powerstr[16];
 char jsonstr[256];
 
 long lastSent = 0;
-
-AltSoftSerial BTSerial;
 
 double lowPassFilter(double raw, double filtered)
 {
@@ -82,8 +79,7 @@ void sendJsonData()
 
 void setup()
 {
-  Serial.begin(57600);
-  BTSerial.begin(38400);
+  Serial.begin(115200);
   resetPreVoltage(true);
 }
 
