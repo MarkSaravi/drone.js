@@ -73,8 +73,7 @@ void sendJsonData()
   sprintf(jsonstr, 
     "{\"state\":%d,\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s,\"time\":%d}\n", 
     FLYING, rollstr, pitchstr, yawstr, powerstr, lastSent);
-  Serial.print(jsonstr);
-  BTSerial.write(jsonstr);
+  Serial.write(jsonstr);
 }
 
 void setup()
