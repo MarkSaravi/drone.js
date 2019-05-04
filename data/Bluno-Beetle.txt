@@ -1,0 +1,33 @@
+Bluno Beetle
++++ //no lf+cr
+Entering AT MODE
+
+AT+EXIT
+OK
+
+---------------------
+
+Master
+AT+UART=? // lf+cr
+115200,8,N,1
+
+AT+MAC=? // lf+lcr
+0x1CBA8C1D3AAF
+
+AT+BIND=0xF045DA10B603
+AT+SETTING=DEFCENTRAL
+AT+CMODE=UNIQUE
+
+---------------------
+
+Slave
+AT+UART=? // lf+cr
+115200,8,N,1
+
+AT+MAC=? // lf+cr
+0xF045DA10B603
+
+AT+ROLE=? // lf+cr
+ROLE_PERIPHERAL
+
+
