@@ -18,9 +18,11 @@ float data[NUM_DATA];
 float prevData[NUM_DATA];
 
 char rollstr[16], pitchstr[16], yawstr[16], powerstr[16];
-char jsonstr[256];
+char jsonstr[64];
 
 long lastSent = 0;
+bool atMode = false;
+char incomingChar;
 
 double lowPassFilter(double raw, double filtered)
 {
@@ -71,8 +73,8 @@ void sendJsonData()
   dtostrf(data[YAW_INDEX], 0, 1, yawstr);
   dtostrf(data[POWER_INDEX], 0, 1, powerstr);
   sprintf(jsonstr, 
-    "{\"state\":%d,\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s,\"time\":%d}\n", 
-    FLYING, rollstr, pitchstr, yawstr, powerstr, lastSent);
+    "{\"r\":%s,\"p\":%s,\"y\":%s,\"p\":%s}\n", 
+    rollstr, pitchstr, yawstr, powerstr);
   Serial.write(jsonstr);
 }
 
@@ -84,6 +86,15 @@ void setup()
 
 void loop()
 {
+  if (Serial.available())
+  {
+    incomingChar = Serial.read();
+    if (incomingChar =='$') atMode = true;
+    if (incomingChar =='#') atMode = false;
+    Serial.write(Serial.read());
+  }
+
+  if (atMode) return;
   readSensorVoltages();
   if (isChanged() || (millis() - lastSent >= 250))
   {
