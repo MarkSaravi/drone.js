@@ -15,6 +15,8 @@ import commandToFlightState from '../convertors/command-to-flightstate';
 export default class FlightController {
     private actualFlightState: IFlightState;
     private targetFlightState: IFlightState;
+    private time: number = 0;
+    private power: number = 0;
     private imuData: ImuData = null;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("pitch");
@@ -25,8 +27,8 @@ export default class FlightController {
         if (this.config.useRollPIDForPitchPID && this.config.debug != 'yaw') {
             this.config.pitchPID = this.config.rollPID;
         }
-        this.actualFlightState = { roll: 0, pitch: 0, yaw: 0, power: 0, time: 0 };
-        this.targetFlightState = { roll: 0, pitch: 0, yaw: 0, power: 0, time: 0 };
+        this.actualFlightState = { roll: 0, pitch: 0, yaw: 0 };
+        this.targetFlightState = { roll: 0, pitch: 0, yaw: 0 };
     }
 
     toggleRollPitchTuning() {
@@ -102,10 +104,12 @@ export default class FlightController {
     }
 
     applyIncomingCommand(cmdJson: string): boolean {
-        // {"state":2,"roll":2.5,"pitch":2.5,"yaw":2.4,"power":0.0,"time":-22764}
+        // {"r":2.5,"p":2.5,"y":2.4,"p":0.0}
         try{
-            this.targetFlightState = commandToFlightState(cmdJson, this.targetFlightState, this.config.remoteControl);
-            return this.targetFlightState.power == 0;
+            const { target , power } = commandToFlightState(cmdJson, this.targetFlightState, this.power, this.config.remoteControl);
+            this.targetFlightState = target;
+            this.power = power;
+            return this.power == 0;
         } catch(err){
             return false;
         }
@@ -118,11 +122,19 @@ export default class FlightController {
             yaw: rawImuData.yaw,
             time: rawImuData.time
         };
-        this.actualFlightState = convertors.ImuDataToFlightStatus(this.imuData);
+        const { imu, time } = convertors.ImuDataToFlightStatus(this.imuData);
+        this.actualFlightState = imu;
+        this.time = time;
     }
 
     calcPairPower(power: number, pid: IPIDValue): IArmPower {
         return frontBackPower(power, pid);
+    }
+
+    getTimeDifference() {
+        const dt = this.time - this.prevTime;
+        this.prevTime = this.time;
+        return dt < 20 ? dt : 20; //limit to 20 milliseconds
     }
 
     calcMotorsPower(): IPowers {
@@ -130,13 +142,13 @@ export default class FlightController {
         const rollError = !this.config.suppress.roll ? (errors.rollError - this.config.rollOffset): 0;
         const pitchError = !this.config.suppress.pitch ? (errors.pitchError - this.config.pitchOffset) : 0;
         const yawError = !this.config.suppress.yaw ? errors.yawError : 0;
-        const basePower = this.targetFlightState.power;
-        const dt = errors.time - this.prevTime;
-        this.prevTime = errors.time;
+        const basePower = this.power;
+        const dt = this.getTimeDifference();
+
         if (basePower >= this.config.remoteControl.minPower) {
-            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, errors.time, this.config.rollPID);
-            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, errors.time, this.config.pitchPID);
-            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, errors.time, this.config.yawPID);
+            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
+            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
+            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID);
             const rollBasePower = basePower + yawPIDResult.sum;
             const pitchBasePower = basePower - yawPIDResult.sum;
             const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
@@ -151,11 +163,10 @@ export default class FlightController {
                 rollError,
                 pitchError,
                 yawError,
-                time: dt
-            }, rollPIDResult, pitchPIDResult, yawPIDResult);
+            }, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
             return powers;
         } else {
-            showStatus(basePower, basePower, basePower, this.config, errors, null, null, null);
+            showStatus(basePower, basePower, basePower, this.config, errors, null, null, null, dt);
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }

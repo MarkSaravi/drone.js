@@ -87,7 +87,8 @@ export default function showStatus(
     errors: IFlightStateError,
     rollPID: IPIDValue,
     pitchPID: IPIDValue,
-    yawPID: IPIDValue
+    yawPID: IPIDValue,
+    time: number
 
 ) {
     if (counter++ < 20) return;
@@ -110,12 +111,12 @@ export default function showStatus(
         printPIDConfig(config.debug, config.yawPID);
     }
     if (rollPID && config.debug == 'roll') {
-        printPIDValues(rollPID, errors.time);
+        printPIDValues(rollPID, time);
     }
     if (pitchPID && config.debug == 'pitch') {
-        printPIDValues(pitchPID, errors.time);
+        printPIDValues(pitchPID, time);
     }
     if (yawPID && config.debug == 'yaw') {
-        printPIDValues(yawPID, errors.time);
+        printPIDValues(yawPID, time);
     }
 }

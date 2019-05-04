@@ -18,8 +18,7 @@ export default function getStateError(target: IFlightState, actual: IFlightState
     let error = {
         rollError,
         pitchError,
-        yawError,
-        time: actual.time
+        yawError
     };
     return error;
 }
