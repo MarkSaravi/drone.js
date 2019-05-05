@@ -74,8 +74,8 @@ void sendJsonData()
   dtostrf(data[YAW_INDEX], 0, 1, yawstr);
   dtostrf(data[POWER_INDEX], 0, 1, powerstr);
   sprintf(jsonstr, 
-    "{\"n\":%d,\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s}\n", 
-    counter++, rollstr, pitchstr, yawstr, powerstr);
+    "{\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s, \"n\":%d}\n", 
+    rollstr, pitchstr, yawstr, powerstr, counter++);
   Serial.write(jsonstr);
 }
 
