@@ -17,6 +17,7 @@ export default class FlightController {
     private targetFlightState: IFlightState;
     private time: number = 0;
     private power: number = 0;
+    private isRemoteSynced = false;
     private imuData: ImuData = null;
     private readonly pidRoll: PIDControl = new PIDControl("roll");
     private readonly pidPitch: PIDControl = new PIDControl("pitch");
@@ -29,6 +30,11 @@ export default class FlightController {
         }
         this.actualFlightState = { roll: 0, pitch: 0, yaw: 0 };
         this.targetFlightState = { roll: 0, pitch: 0, yaw: 0 };
+    }
+
+    invalidateRemoteSync() {
+        this.power = 0;
+        this.isRemoteSynced = false;
     }
 
     toggleRollPitchTuning() {
@@ -103,19 +109,30 @@ export default class FlightController {
         this.targetFlightState.yaw = this.actualFlightState.yaw;
     }
 
-    applyIncomingCommand(cmdJson: string): boolean {
-        // {"r":2.5,"p":2.5,"y":2.4,"p":0.0}
+    applyIncomingCommand(cmdJson: string) {
+        // {"roll":2.5,"pitch":2.5,"yaw":2.4,"power":0.0}
         try{
             const { target , power } = commandToFlightState(cmdJson, this.targetFlightState, this.power, this.config.remoteControl);
             this.targetFlightState = target;
             this.power = power;
-            return this.power == 0;
+            if (!this.isRemoteSynced) {
+                if (this.power == 0) {
+                    this.isRemoteSynced = true;
+                    console.log('remote synced 👍🏻');
+                } else {
+                    this.power = 0;
+                }
+            }
         } catch(err){
-            return false;
         }
     }
 
     applyImuData(rawImuData: ImuData) {
+        if (Math.abs(rawImuData.roll) > this.config.maxAngle ||
+            Math.abs(rawImuData.pitch) > this.config.maxAngle) {
+                this.invalidateRemoteSync();
+        }
+
         this.imuData = {
             roll: rawImuData.roll,
             pitch: rawImuData.pitch,

@@ -9,7 +9,7 @@ const SerialPort = require('serialport');
 import FlightController from './FlightController';
 import IFlightConfig from '../models/IFlightConfig';
 import * as convertors from '../convertors';
-import { ImuData, IPowers } from '../models';
+import { IPowers } from '../models';
 import { println, printPowerValues } from '../utilities';
 
 const BLE_STOP_STATE = '{"state": "stop"}';
@@ -22,7 +22,6 @@ export default class Application extends EventEmitter {
     flightConfig: IFlightConfig;
     flightController: FlightController;
     lastCommandReceivedTime: number;
-    motorsIdle: boolean = false;
     terminated: boolean = false;
 
     constructor() {
@@ -85,9 +84,8 @@ export default class Application extends EventEmitter {
         return `{"a":${numeral(p.a).format('0.000')},"b":${numeral(p.b).format('0.000')},"c":${numeral(p.c).format('0.000')},"d":${numeral(p.d).format('0.000')}}`
     }
 
-
-    activateMotors(activate: boolean) {
-        this.motorsIdle = !activate;
+    invalidateRemoteAync() {
+        this.flightController.invalidateRemoteSync();
     }
 
     registerConsoleCommands() {
@@ -95,19 +93,9 @@ export default class Application extends EventEmitter {
         process.stdin.setRawMode(true);
         process.stdin.on('keypress', (str, key) => {
             switch (str) {
-                case 's':
-                case 'S':
-                    if (this.motorsIdle) {
-                        println('Starting motors.');
-                        this.activateMotors(true);
-                    } else {
-                        println('Stopping motors.');
-                        this.activateMotors(false);
-                    }
-                    break;
                 case 'q':
                 case 'Q':
-                    this.motorsIdle = true;
+                    this.invalidateRemoteAync();
                     this.terminated = true;
                     break;
                 case ']':
@@ -258,14 +246,12 @@ export default class Application extends EventEmitter {
     writeBLE(s: string): void {
     }
 
-    applySafeTilt(imuData: ImuData): boolean {
-        return Math.abs(imuData.roll) < 30 && Math.abs(imuData.roll) < 30;
-    }
-
     counter: number = 0;
 
     onImuData(imuJson: string) {
-        const lastCommandTime = (new Date()).getTime() - this.lastCommandReceivedTime;
+        if (((new Date()).getTime() - this.lastCommandReceivedTime) > 400) {
+            this.flightController.invalidateRemoteSync();
+        }
         const imuData = convertors.JsonToImuData(
             imuJson, this.flightConfig.rollPolarity,
             this.flightConfig.pitchPolarity,
@@ -275,27 +261,15 @@ export default class Application extends EventEmitter {
             return;
         }
 
-        if (Math.abs(imuData.roll) > this.flightConfig.maxAngle ||
-            Math.abs(imuData.pitch) > this.flightConfig.maxAngle ||
-            lastCommandTime > 400) {
-            this.motorsIdle = true;
-        }
-
-        if (!this.applySafeTilt(imuData)) {
-            this.activateMotors(false);
-            return;
-        }
-
         this.flightController.applyImuData(imuData);
         const powers = this.flightController.calcMotorsPower();
-        const escCommand = !this.motorsIdle && !this.terminated?
+        const escCommand = !this.terminated?
             this.createEscCommand(powers) : ESC_STOP_COMMAND;
         this.esc.write(escCommand, () => {
             if (this.counter++ == 20) {
                 printPowerValues(escCommand);
                 this.counter = 0;
             }
-            
             if (this.terminated) {
                 this.esc.close();
                 this.imu.close();
@@ -312,7 +286,6 @@ export default class Application extends EventEmitter {
 
     onBleData(bleJson: string) {
         this.lastCommandReceivedTime = (new Date()).getTime();
-        const canResumeMotors = this.flightController.applyIncomingCommand(bleJson);
-        this.motorsIdle = this.motorsIdle && canResumeMotors ? false : this.motorsIdle;
+        this.flightController.applyIncomingCommand(bleJson);
     }
 }

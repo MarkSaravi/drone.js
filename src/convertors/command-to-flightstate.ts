@@ -16,14 +16,10 @@ const commandToFlightState = (cmdStr: string, flightState: IFlightState, currPow
         const cmd = JSON.parse(cmdStr);
         const powerRange = config.maxPower - config.minPower;
         const dPower = cmd.power / config.maxInputPower * powerRange;
-        const powerChangePercent = dPower / powerRange * 100;
         let power = cmd.power > 0 ? config.minPower + dPower : 0;
         const roll = cmd.roll / config.maxInputRoll * config.maxRoll;
         const pitch = cmd.pitch / config.maxInputPitch * config.maxPitch;
         const yaw = cmd.yaw / config.maxInputYaw * config.maxYaw;
-        if (currPower == 0 && powerChangePercent > 5) {
-            power = 0;
-        }
         const armData = rotateRollPitch(roll, pitch);
         return {
             target: {
