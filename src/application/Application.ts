@@ -279,7 +279,6 @@ export default class Application extends EventEmitter {
             Math.abs(imuData.pitch) > this.flightConfig.maxAngle ||
             lastCommandTime > 400) {
             this.motorsIdle = true;
-            this.terminated = false;
         }
 
         if (!this.applySafeTilt(imuData)) {
@@ -289,7 +288,7 @@ export default class Application extends EventEmitter {
 
         this.flightController.applyImuData(imuData);
         const powers = this.flightController.calcMotorsPower();
-        const escCommand = !this.motorsIdle ?
+        const escCommand = !this.motorsIdle && !this.terminated?
             this.createEscCommand(powers) : ESC_STOP_COMMAND;
         this.esc.write(escCommand, () => {
             if (this.counter++ == 20) {
@@ -297,7 +296,7 @@ export default class Application extends EventEmitter {
                 this.counter = 0;
             }
             
-            if (this.terminated && escCommand == ESC_STOP_COMMAND) {
+            if (this.terminated) {
                 this.esc.close();
                 this.imu.close();
                 this.ble.close();

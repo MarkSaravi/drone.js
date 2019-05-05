@@ -14,6 +14,7 @@ const rotateRollPitch = (roll: number, pitch: number): { armRoll: number, armPit
 const commandToFlightState = (cmdStr: string, flightState: IFlightState, currPower: number, config: IRemoteControlConfig): { target: IFlightState, power: number } => {
     const cmd = JSON.parse(cmdStr);
     try {
+        console.log(cmdStr);
         const powerRange = config.maxPower - config.minPower;
         const dPower = cmd.power / config.maxInputPower * powerRange;
         const powerChangePercent = dPower / powerRange * 100;

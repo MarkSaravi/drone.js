@@ -68,13 +68,14 @@ void applyLowPassFilter() {
 
 void sendJsonData()
 {
+  static long counter = 0;
   dtostrf(data[ROLL_INDEX], 0, 1, rollstr);
   dtostrf(data[PITCH_INDEX], 0, 1, pitchstr);
   dtostrf(data[YAW_INDEX], 0, 1, yawstr);
   dtostrf(data[POWER_INDEX], 0, 1, powerstr);
   sprintf(jsonstr, 
-    "{\"r\":%s,\"p\":%s,\"y\":%s,\"p\":%s}\n", 
-    rollstr, pitchstr, yawstr, powerstr);
+    "{\"n\":%d,\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s}\n", 
+    counter++, rollstr, pitchstr, yawstr, powerstr);
   Serial.write(jsonstr);
 }
 
@@ -89,9 +90,12 @@ void loop()
   if (Serial.available())
   {
     incomingChar = Serial.read();
+    if (atMode && incomingChar != '#' && incomingChar !='$')
+    {
+      Serial.write(Serial.read());
+    }
     if (incomingChar =='$') atMode = true;
     if (incomingChar =='#') atMode = false;
-    Serial.write(Serial.read());
   }
 
   if (atMode) return;
