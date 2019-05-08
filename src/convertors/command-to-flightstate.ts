@@ -21,14 +21,16 @@ const commandToFlightState = (cmdStr: string, flightState: IFlightState, currPow
         const pitch = cmd.pitch / config.maxInputPitch * config.maxPitch;
         const yaw = cmd.yaw / config.maxInputYaw * config.maxYaw;
         const armData = rotateRollPitch(roll, pitch);
-        return {
+        const target =  {
             target: {
                 roll: armData.armRoll,
                 pitch: armData.armPitch,
                 yaw,
             },
             power
-        }
+        };
+        // console.log(`${cmdStr}, {roll: ${roll}, pitch: ${pitch}}, ${JSON.stringify(target)}`);
+        return target;
     }
     catch (err) { 
         return {
