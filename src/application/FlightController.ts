@@ -117,6 +117,7 @@ export default class FlightController {
             if (!this.isRemoteSynced) {
                 if (this.power == 0) {
                     this.isRemoteSynced = true;
+                    this.resetYaw();
                     console.log('remote synced 👍🏻');
                 } else {
                     this.power = 0;
