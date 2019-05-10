@@ -111,7 +111,7 @@ export default class FlightController {
 
     applyIncomingCommand(cmdJson: string) {
         try{
-            const { target , power } = commandToFlightState(cmdJson, this.config.remoteControl);
+            const { target , power } = commandToFlightState(cmdJson, this.targetFlightState, this.config.remoteControl);
             this.targetFlightState = target;
             this.power = power;
             if (!this.isRemoteSynced) {
