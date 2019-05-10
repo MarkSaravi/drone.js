@@ -61,8 +61,8 @@
 		"maxOutput": 10
 	},
 	"yawPID": {
-		"pGain": 0,
-		"iGain": 0,
+		"pGain": 0.4,
+		"iGain": 0.01,
 		"dGain": 0.10,
 		"usePGain": true,
 		"useIGain": true,
