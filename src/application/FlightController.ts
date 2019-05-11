@@ -117,11 +117,13 @@ export default class FlightController {
             if (!this.isRemoteSynced) {
                 if (this.power == 0) {
                     this.isRemoteSynced = true;
-                    this.resetYaw();
                     console.log('remote synced 👍🏻');
                 } else {
                     this.power = 0;
                 }
+            }
+            if (this.power <= this.config.remoteControl.minPower) {
+                this.resetYaw();
             }
         } catch(err){
         }
@@ -130,6 +132,7 @@ export default class FlightController {
     applyImuData(rawImuData: ImuData) {
         if (Math.abs(rawImuData.roll) > this.config.maxAngle ||
             Math.abs(rawImuData.pitch) > this.config.maxAngle) {
+                console.log(`Invalidating remote sync ********************* roll: ${rawImuData.roll}, pitch: ${rawImuData.pitch}`);
                 this.invalidateRemoteSync();
         }
 

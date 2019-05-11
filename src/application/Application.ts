@@ -23,6 +23,8 @@ export default class Application extends EventEmitter {
     flightController: FlightController;
     lastCommandReceivedTime: number;
     terminated: boolean = false;
+    time: Date = new Date();
+    counter: number = 0;
 
     constructor() {
         super();
@@ -246,10 +248,13 @@ export default class Application extends EventEmitter {
     writeBLE(s: string): void {
     }
 
-    counter: number = 0;
+    
+
 
     onImuData(imuJson: string) {
-        if (((new Date()).getTime() - this.lastCommandReceivedTime) > 400) {
+        const dt = this.time.getTime() - this.lastCommandReceivedTime;
+        if (dt > 400) {
+            console.log(`BLE data invalidation ${dt}`);
             this.flightController.invalidateRemoteSync();
         }
         const imuData = convertors.JsonToImuData(
