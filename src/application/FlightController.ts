@@ -180,17 +180,31 @@ export default class FlightController {
             const pitchBasePower = basePower - yawPIDResult.sum;
             const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
             const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
-            const powers = {
+            const powers: IPowers = {
                 a: this.config.motors.a ? pitchPower.front : 0,
                 b: this.config.motors.b ? rollPower.front : 0,
                 c: this.config.motors.c ? pitchPower.back : 0,
                 d: this.config.motors.d ? rollPower.back : 0
             };
-            showStatus('+', this.isRemoteSynced, basePower, rollBasePower, pitchBasePower, this.config, showError, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
+            showStatus(
+                '+', this.isRemoteSynced,
+                basePower, rollBasePower,
+                pitchBasePower,
+                this.config,
+                showError,
+                rollPIDResult,
+                pitchPIDResult,
+                yawPIDResult,
+                dt, powers);
             return powers;
         } else {
-            showStatus('-', this.isRemoteSynced, basePower, basePower, basePower, this.config, showError, null, null, null, dt);
-            return { a: 0, b: 0, c: 0, d: 0 };
+            const powers: IPowers = { a: 0, b: 0, c: 0, d: 0 };
+            showStatus(
+                '-', this.isRemoteSynced,
+                basePower, basePower, basePower,
+                this.config, showError, null, null, null, dt,
+                powers);
+            return powers;
         }
     }
 }

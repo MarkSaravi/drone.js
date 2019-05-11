@@ -68,6 +68,14 @@ export const printPowerValues = (cmd: string) => {
     printLabelValue('d:',`${numeral(p.d).format('00.0')}\n`, 'yellow');
 }
 
+export const printEscCommand = (powers: IPowers) => {
+    printLabelValue('a:',`${numeral(powers.a).format('00.0')} `, 'yellow');
+    printLabelValue('b:',`${numeral(powers.b).format('00.0')} `, 'yellow');
+    printLabelValue('c:',`${numeral(powers.c).format('00.0')} `, 'yellow');
+    printLabelValue('d:',`${numeral(powers.d).format('00.0')}\n`, 'yellow');
+}
+
+
 function showError(label: string, err: number, iMinAngle: number, iMaxAngle: number) {
     if (Math.abs(err) < iMinAngle) {
         printLabelValue(`${label}:`, `${numeral(err).format('+00.000')} `, 'green');
@@ -90,8 +98,8 @@ export default function showStatus(
     rollPID: IPIDValue,
     pitchPID: IPIDValue,
     yawPID: IPIDValue,
-    time: number
-
+    time: number,
+    escCommand: IPowers
 ) {
     if (isRemoteSynced) {
         colorStdout.green(`${label} `);
@@ -124,4 +132,5 @@ export default function showStatus(
     if (yawPID && config.debug == 'yaw') {
         printPIDValues(yawPID, time);
     }
+    printEscCommand(escCommand);
 }
