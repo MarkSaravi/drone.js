@@ -166,27 +166,27 @@ export default class FlightController {
         const dt = this.getTimeDifference();
 
         if (this.isRemoteSynced) {
-        if (basePower >= this.config.remoteControl.minPower) {
-            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
-            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
-            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID);
-            const rollBasePower = basePower + yawPIDResult.sum;
-            const pitchBasePower = basePower - yawPIDResult.sum;
-            const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
-            const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
-            const powers = {
-                a: this.config.motors.a ? pitchPower.front : 0,
-                b: this.config.motors.b ? rollPower.front : 0,
-                c: this.config.motors.c ? pitchPower.back : 0,
-                d: this.config.motors.d ? rollPower.back : 0
-            };
-                showStatus('+', basePower, rollBasePower, pitchBasePower, this.config, {
-                rollError,
-                pitchError,
-                yawError,
-            }, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
-            return powers;
-        } else {
+            if (basePower >= this.config.remoteControl.minPower) {
+                const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
+                const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
+                const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID);
+                const rollBasePower = basePower + yawPIDResult.sum;
+                const pitchBasePower = basePower - yawPIDResult.sum;
+                const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
+                const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
+                const powers = {
+                    a: this.config.motors.a ? pitchPower.front : 0,
+                    b: this.config.motors.b ? rollPower.front : 0,
+                    c: this.config.motors.c ? pitchPower.back : 0,
+                    d: this.config.motors.d ? rollPower.back : 0
+                };
+                    showStatus('+', basePower, rollBasePower, pitchBasePower, this.config, {
+                    rollError,
+                    pitchError,
+                    yawError,
+                }, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
+                return powers;
+            } else {
                 showStatus('-', basePower, basePower, basePower, this.config, errors, null, null, null, dt);
                 return { a: 0, b: 0, c: 0, d: 0 };
             }
