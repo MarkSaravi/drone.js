@@ -271,10 +271,8 @@ export default class Application extends EventEmitter {
         const escCommand = !this.terminated?
             this.createEscCommand(powers) : ESC_STOP_COMMAND;
         this.esc.write(escCommand, () => {
-            if (this.counter++ == 20) {
-                printPowerValues(escCommand);
-                this.counter = 0;
-            }
+            printPowerValues(escCommand);
+            this.counter = 0;
             if (this.terminated) {
                 this.esc.close();
                 this.imu.close();

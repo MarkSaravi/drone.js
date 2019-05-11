@@ -91,8 +91,6 @@ export default function showStatus(
     time: number
 
 ) {
-    if (counter++ < 20) return;
-    counter = 0;
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');
