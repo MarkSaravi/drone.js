@@ -70,12 +70,12 @@
 		"pGainInc": 0.1,
 		"iGainInc": 0.01,
 		"dGainInc": 0.01,
-		"iMaxValue": 1,
+		"iMaxValue": 2.5,
 		"iMaxAngle": 3,
 		"iMinAngle": 1.5,
-		"pMaxValue": 10,
-		"maxOutput": 1,
-		"dMaxValue": 1
+		"pMaxValue": 5,
+		"maxOutput": 5,
+		"dMaxValue": 5
 	},
 	"debug": "roll",
 	"rollOffset": 0,
