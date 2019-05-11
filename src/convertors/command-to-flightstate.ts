@@ -30,7 +30,6 @@ const commandToFlightState = (cmdStr: string, targetFlightState: IFlightState, c
             },
             power
         };
-        // console.log(`${cmdStr}, {roll: ${roll}, pitch: ${pitch}}, ${JSON.stringify(target)}`);
         return target;
     }
     catch (err) { 

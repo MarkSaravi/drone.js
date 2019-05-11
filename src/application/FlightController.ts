@@ -165,6 +165,7 @@ export default class FlightController {
         const basePower = this.power;
         const dt = this.getTimeDifference();
 
+        if (this.isRemoteSynced) {
         if (basePower >= this.config.remoteControl.minPower) {
             const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
             const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
@@ -179,14 +180,17 @@ export default class FlightController {
                 c: this.config.motors.c ? pitchPower.back : 0,
                 d: this.config.motors.d ? rollPower.back : 0
             };
-            showStatus(basePower, rollBasePower, pitchBasePower, this.config, {
+                showStatus('+', basePower, rollBasePower, pitchBasePower, this.config, {
                 rollError,
                 pitchError,
                 yawError,
             }, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
             return powers;
         } else {
-            showStatus(basePower, basePower, basePower, this.config, errors, null, null, null, dt);
+                showStatus('-', basePower, basePower, basePower, this.config, errors, null, null, null, dt);
+                return { a: 0, b: 0, c: 0, d: 0 };
+            }
+        } else {
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }

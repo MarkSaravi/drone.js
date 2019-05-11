@@ -80,6 +80,7 @@ function showError(label: string, err: number, iMinAngle: number, iMaxAngle: num
 let counter: number = 0;
 
 export default function showStatus(
+    label: string,
     power: number,
     rollPower: number,
     pitchPower: number,
@@ -91,6 +92,7 @@ export default function showStatus(
     time: number
 
 ) {
+    colorStdout.green(`${label} `);
     printLabelValue('pow:',`${numeral(power).format('0.00')} `, 'green');
     printLabelValue('rollPow:',`${numeral(rollPower).format('0.000')} `, 'green');
     printLabelValue('pitchPow:',`${numeral(pitchPower).format('0.000')} `, 'green');

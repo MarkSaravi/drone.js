@@ -248,9 +248,6 @@ export default class Application extends EventEmitter {
     writeBLE(s: string): void {
     }
 
-    
-
-
     onImuData(imuJson: string) {
         const dt = this.time.getTime() - this.lastCommandReceivedTime;
         if (dt > 400) {
