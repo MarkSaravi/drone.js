@@ -85,6 +85,7 @@ function showError(label: string, err: number, iMinAngle: number, iMaxAngle: num
         printLabelValue(`${label}:`, `${numeral(err).format('+00.000')} `, 'red');
     }
 }
+
 let counter: number = 0;
 
 export default function showStatus(
@@ -101,6 +102,10 @@ export default function showStatus(
     time: number,
     escCommand: IPowers
 ) {
+    if (counter++ < 10) {
+        return;
+    }
+    counter = 0;
     if (isRemoteSynced) {
         colorStdout.green(`${label} `);
     } else {
