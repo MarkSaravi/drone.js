@@ -11,7 +11,7 @@ const rotateRollPitch = (roll: number, pitch: number): { armRoll: number, armPit
     }
 }
 
-const commandToFlightState = (cmdStr: string, targetFlightState: IFlightState, config: IRemoteControlConfig): { target: IFlightState, power: number } => {
+const commandToFlightState = (cmdStr: string, targetFlightState: IFlightState, config: IRemoteControlConfig): { target: IFlightState, power: number, error: string } => {
     try {
         const cmd = JSON.parse(cmdStr);
         const powerRange = config.maxPower - config.minPower;
@@ -28,7 +28,8 @@ const commandToFlightState = (cmdStr: string, targetFlightState: IFlightState, c
                 pitch: armData.armPitch,
                 yaw,
             },
-            power
+            power,
+            error: '',
         };
         return target;
     }
@@ -39,7 +40,8 @@ const commandToFlightState = (cmdStr: string, targetFlightState: IFlightState, c
                 pitch: 0,
                 yaw: 0,
             },
-            power: 0
+            power: 0,
+            error: err,
         }
     }
 }
