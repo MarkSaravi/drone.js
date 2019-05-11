@@ -157,7 +157,7 @@ export default class FlightController {
         return dt < 20 ? dt : 20; //limit to 20 milliseconds
     }
 
-    calcErrors(): { errors: IFlightStateError , rollError: number, pitchError: number; yawError: number; basePower: number; dt: number } {
+    calcErrors(): { rollError: number, pitchError: number; yawError: number; basePower: number; dt: number } {
         const errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
         const rollError = !this.config.suppress.roll ? (errors.rollError - this.config.rollOffset): 0;
         const pitchError = !this.config.suppress.pitch ? (errors.pitchError - this.config.pitchOffset) : 0;
@@ -165,39 +165,31 @@ export default class FlightController {
         const basePower = this.power;
         const dt = this.getTimeDifference();
         return {
-            errors, rollError, pitchError, yawError, basePower, dt
+            rollError, pitchError, yawError, basePower, dt
         }
     }
     
     calcMotorsPower(): IPowers {
-        const { errors, rollError, pitchError, yawError, basePower, dt } = this.calcErrors();
-
-        if (this.isRemoteSynced) {
-            if (basePower >= this.config.remoteControl.minPower) {
-                const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
-                const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
-                const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID);
-                const rollBasePower = basePower + yawPIDResult.sum;
-                const pitchBasePower = basePower - yawPIDResult.sum;
-                const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
-                const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
-                const powers = {
-                    a: this.config.motors.a ? pitchPower.front : 0,
-                    b: this.config.motors.b ? rollPower.front : 0,
-                    c: this.config.motors.c ? pitchPower.back : 0,
-                    d: this.config.motors.d ? rollPower.back : 0
-                };
-                    showStatus('+', basePower, rollBasePower, pitchBasePower, this.config, {
-                    rollError,
-                    pitchError,
-                    yawError,
-                }, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
-                return powers;
-            } else {
-                showStatus('-', basePower, basePower, basePower, this.config, errors, null, null, null, dt);
-                return { a: 0, b: 0, c: 0, d: 0 };
-            }
+        const { rollError, pitchError, yawError, basePower, dt } = this.calcErrors();
+        const showError = { rollError, pitchError, yawError };
+        if (basePower >= this.config.remoteControl.minPower) {
+            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
+            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
+            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID);
+            const rollBasePower = basePower + yawPIDResult.sum;
+            const pitchBasePower = basePower - yawPIDResult.sum;
+            const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
+            const pitchPower = this.calcPairPower(pitchBasePower, pitchPIDResult);
+            const powers = {
+                a: this.config.motors.a ? pitchPower.front : 0,
+                b: this.config.motors.b ? rollPower.front : 0,
+                c: this.config.motors.c ? pitchPower.back : 0,
+                d: this.config.motors.d ? rollPower.back : 0
+            };
+            showStatus('+', this.isRemoteSynced, basePower, rollBasePower, pitchBasePower, this.config, showError, rollPIDResult, pitchPIDResult, yawPIDResult, dt);
+            return powers;
         } else {
+            showStatus('-', this.isRemoteSynced, basePower, basePower, basePower, this.config, showError, null, null, null, dt);
             return { a: 0, b: 0, c: 0, d: 0 };
         }
     }
