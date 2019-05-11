@@ -157,13 +157,20 @@ export default class FlightController {
         return dt < 20 ? dt : 20; //limit to 20 milliseconds
     }
 
-    calcMotorsPower(): IPowers {
-        let errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
+    calcErrors(): { errors: IFlightStateError , rollError: number, pitchError: number; yawError: number; basePower: number; dt: number } {
+        const errors: IFlightStateError = getStateError(this.targetFlightState, this.actualFlightState, this.config);
         const rollError = !this.config.suppress.roll ? (errors.rollError - this.config.rollOffset): 0;
         const pitchError = !this.config.suppress.pitch ? (errors.pitchError - this.config.pitchOffset) : 0;
         const yawError = !this.config.suppress.yaw ? errors.yawError : 0;
         const basePower = this.power;
         const dt = this.getTimeDifference();
+        return {
+            errors, rollError, pitchError, yawError, basePower, dt
+        }
+    }
+    
+    calcMotorsPower(): IPowers {
+        const { errors, rollError, pitchError, yawError, basePower, dt } = this.calcErrors();
 
         if (this.isRemoteSynced) {
             if (basePower >= this.config.remoteControl.minPower) {
