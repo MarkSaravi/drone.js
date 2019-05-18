@@ -1,5 +1,6 @@
 import IFlightState from "../models/IFlightState";
 import { IRemoteControlConfig } from "../models/IFlightConfig";
+import { charCommandToJson } from "./char-command-to-json";
 
 const rotateRollPitch = (roll: number, pitch: number): { armRoll: number, armPitch: number } => {
     const rotation = Math.PI / 4;
@@ -13,7 +14,8 @@ const rotateRollPitch = (roll: number, pitch: number): { armRoll: number, armPit
 
 const commandToFlightState = (cmdStr: string, targetFlightState: IFlightState, config: IRemoteControlConfig): { target: IFlightState, power: number, error: string } => {
     try {
-        const cmd = JSON.parse(cmdStr);
+        const jsonCommand = charCommandToJson(cmdStr);
+        const cmd = JSON.parse(jsonCommand);
         const powerRange = config.maxPower - config.minPower;
         const dPower = cmd.power / config.maxInputPower * powerRange;
         let power = cmd.power > 0 ? config.minPower + dPower : 0;

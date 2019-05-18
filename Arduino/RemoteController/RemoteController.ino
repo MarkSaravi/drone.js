@@ -3,6 +3,7 @@
 const float MID_ROLL = 2.5;
 const float MID_PITCH = 2.5;
 const float MID_YAW = 2.4;
+const float MID_RPY = 2.5;
 const int STOP = 0;
 const int IDLE = 1;
 const int FLYING = 2;
@@ -66,16 +67,32 @@ void applyLowPassFilter() {
   }
 }
 
+char rollPitchYawToChar(float value) 
+{
+  return char((int)((value + MID_RPY) * 10 + 50));
+}
+
+char powerToChar(float value) 
+{
+  return char((int)(value * 10 + 50));
+}
+
+
 void sendJsonData()
 {
-  static long counter = 0;
-  dtostrf(data[ROLL_INDEX], 0, 1, rollstr);
-  dtostrf(data[PITCH_INDEX], 0, 1, pitchstr);
-  dtostrf(data[YAW_INDEX], 0, 1, yawstr);
-  dtostrf(data[POWER_INDEX], 0, 1, powerstr);
-  sprintf(jsonstr, 
-    "{\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s, \"n\":%d}\n", 
-    rollstr, pitchstr, yawstr, powerstr, counter++);
+  // static long counter = 0;
+  // dtostrf(data[ROLL_INDEX], 0, 1, rollstr);
+  // dtostrf(data[PITCH_INDEX], 0, 1, pitchstr);
+  // dtostrf(data[YAW_INDEX], 0, 1, yawstr);
+  // dtostrf(data[POWER_INDEX], 0, 1, powerstr);
+  // sprintf(jsonstr, 
+  //   "{\"roll\":%s,\"pitch\":%s,\"yaw\":%s,\"power\":%s, \"n\":%d}\n", 
+  //   rollstr, pitchstr, yawstr, powerstr, counter++);
+  char roll = rollPitchYawToChar(data[ROLL_INDEX]);
+  char pitch = rollPitchYawToChar(data[PITCH_INDEX]);
+  char yaw = rollPitchYawToChar(data[YAW_INDEX]);
+  char power = powerToChar(data[POWER_INDEX]);
+  sprintf(jsonstr, "%c%c%c%c%c\n", roll, pitch, yaw, power, 48);
   Serial.write(jsonstr);
 }
 
@@ -100,10 +117,7 @@ void loop()
 
   if (atMode) return;
   readSensorVoltages();
-  if (isChanged() || (millis() - lastSent >= 250))
-  {
-    sendJsonData();
-    resetPreVoltage(false);
-  }
+  sendJsonData();
+  resetPreVoltage(false);
   delay(50);
 }
