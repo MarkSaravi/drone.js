@@ -23,6 +23,7 @@ export default class FlightController {
     private readonly pidPitch: PIDControl = new PIDControl("pitch");
     private readonly pidYaw: PIDControl = new PIDControl("yaw");
     private prevTime: number = 0;
+    private isPowerOn: boolean = false;
 
     constructor(private config: IFlightConfig) {
         if (this.config.useRollPIDForPitchPID && this.config.debug != 'yaw') {
@@ -173,9 +174,11 @@ export default class FlightController {
         const { rollError, pitchError, yawError, basePower, dt } = this.calcErrors();
         const showError = { rollError, pitchError, yawError };
         if (basePower >= this.config.remoteControl.minPower) {
-            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID);
-            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID);
-            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID);
+            const isMinPower = !this.isPowerOn;
+            this.isPowerOn = true;
+            const rollPIDResult = this.pidRoll.PID(rollError, this.actualFlightState.roll, this.time, this.config.rollPID, isMinPower);
+            const pitchPIDResult = this.pidPitch.PID(pitchError, this.actualFlightState.pitch, this.time, this.config.pitchPID, isMinPower);
+            const yawPIDResult = this.pidYaw.PID(yawError, -yawError, this.time, this.config.yawPID, isMinPower);
             const rollBasePower = basePower + yawPIDResult.sum;
             const pitchBasePower = basePower - yawPIDResult.sum;
             const rollPower = this.calcPairPower(rollBasePower, rollPIDResult);
@@ -198,6 +201,7 @@ export default class FlightController {
                 dt, powers);
             return powers;
         } else {
+            this.isPowerOn = false;
             const powers: IPowers = { a: 0, b: 0, c: 0, d: 0 };
             showStatus(
                 '-', this.isRemoteSynced,
