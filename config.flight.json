@@ -8,8 +8,8 @@
 		"maxInputRoll": 2.5,
 		"maxInputPitch": 2.5,
 		"maxInputYaw": 2.5,
-		"maxRoll": 3,
-		"maxPitch": 3,
+		"maxRoll": 2.5,
+		"maxPitch": 2.5,
 		"maxYaw": 3,
 		"minPower": 28,
 		"maxPower": 35
@@ -27,9 +27,9 @@
 	},
 	"useRollPIDForPitchPID": true,
 	"rollPID": {
-		"pGain": 0.160,
-		"iGain": 3.5,
-		"dGain": 0.066,
+		"pGain": 0.13,
+		"iGain": 2,
+		"dGain": 0.06,
 		"usePGain": true,
 		"useIGain": true,
 		"useDGain": true,
