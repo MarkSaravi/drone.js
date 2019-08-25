@@ -1,2 +1,2 @@
 Leostick I2C: SDA is D2 and SCL is D3.
-Test not available
+Test not available 2
